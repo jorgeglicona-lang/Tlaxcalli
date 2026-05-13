@@ -1,0 +1,7 @@
+# Excluir archivos compilados y empaquetados
+target/
+*.class
+*.jar
+
+# Excluir configuraciones personales de NetBeans
+nbproject/private/
