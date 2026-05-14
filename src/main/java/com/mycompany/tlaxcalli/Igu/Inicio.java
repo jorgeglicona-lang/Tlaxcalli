@@ -94,6 +94,9 @@ public class Inicio extends javax.swing.JFrame {
         b_reportes.setForeground(new java.awt.Color(255, 255, 255));
         b_reportes.setText("Reportes");
         b_reportes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                b_reportesMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 b_reportesMouseEntered(evt);
             }
@@ -197,7 +200,6 @@ public class Inicio extends javax.swing.JFrame {
         jBext.setBackground(new java.awt.Color(255, 255, 255));
 
         ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
-        ext.setForeground(new java.awt.Color(204, 204, 204));
         ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ext.setText("X");
         ext.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -318,6 +320,12 @@ public class Inicio extends javax.swing.JFrame {
         
         this.setLocation(x-xMause, y-yMause);
     }//GEN-LAST:event_jPanel3MouseDragged
+
+    private void b_reportesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_reportesMouseClicked
+        Reportes reg=new Reportes();
+        reg.setVisible(true);
+        reg.setLocationRelativeTo(null);
+    }//GEN-LAST:event_b_reportesMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

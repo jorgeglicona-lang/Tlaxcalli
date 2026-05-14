@@ -1,19 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package com.mycompany.tlaxcalli.Igu;
 
-/**
- *
- * @author Anyelo
- */
 public class Reportes extends javax.swing.JFrame {
 
     public Reportes() {
         initComponents();
-        
+        controlador.cargarEmpleados(CB_Empleados);
+        TotalV.setText("$0.00");
+        TotalG.setText("$0.00");
+        IngresosN.setText("$0.00");
     }
+    private com.mycompany.tlaxcalli.Logica.C_Reportes controlador = new com.mycompany.tlaxcalli.Logica.C_Reportes();
     
     public static void main (String[] args){
         Reportes log = new Reportes();
@@ -49,6 +46,7 @@ public class Reportes extends javax.swing.JFrame {
         B_GenPDF = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        B_SalirInicio = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Reportes");
@@ -96,6 +94,7 @@ public class Reportes extends javax.swing.JFrame {
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 110, -1, -1));
 
         BBuscarVG.setText("Aplicar");
+        BBuscarVG.addActionListener(this::BBuscarVGActionPerformed);
         jPanel1.add(BBuscarVG, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
 
         jPanel1.add(CB_Empleados, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 120, -1));
@@ -116,26 +115,27 @@ public class Reportes extends javax.swing.JFrame {
 
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Total de ventas");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, -1, -1));
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 340, -1, -1));
 
         jLabel8.setForeground(new java.awt.Color(0, 0, 0));
         jLabel8.setText("Total de gastos");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 380, -1, -1));
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 340, -1, -1));
 
         TotalV.setText("jLabel9");
-        jPanel1.add(TotalV, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 380, -1, -1));
+        jPanel1.add(TotalV, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 340, -1, -1));
 
         TotalG.setText("jLabel10");
-        jPanel1.add(TotalG, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 380, -1, -1));
+        jPanel1.add(TotalG, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 340, -1, -1));
 
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
         jLabel9.setText("Ingresos Netos");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 460, -1, -1));
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 380, -1, -1));
 
         IngresosN.setText("jLabel10");
-        jPanel1.add(IngresosN, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 460, -1, -1));
+        jPanel1.add(IngresosN, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 380, -1, -1));
 
         B_GAd.setText("Gastos Generales");
+        B_GAd.addActionListener(this::B_GAdActionPerformed);
         jPanel1.add(B_GAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
 
         B_GenPDF.setText("Generar Reporte");
@@ -148,6 +148,10 @@ public class Reportes extends javax.swing.JFrame {
         jLabel11.setForeground(new java.awt.Color(0, 0, 0));
         jLabel11.setText("aqui tambien va");
         jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 110, -1, -1));
+
+        B_SalirInicio.setText("Salir");
+        B_SalirInicio.addActionListener(this::B_SalirInicioActionPerformed);
+        jPanel1.add(B_SalirInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 490, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -163,10 +167,32 @@ public class Reportes extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void B_GAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_GAdActionPerformed
+        Gastos_Generales ventanaGastos = new Gastos_Generales();
+        ventanaGastos.setVisible(true);
+        ventanaGastos.setLocationRelativeTo(null); // Para que salga al centro
+
+    }//GEN-LAST:event_B_GAdActionPerformed
+
+    private void B_SalirInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_SalirInicioActionPerformed
+        Inicio ventanaInicio = new Inicio();
+        ventanaInicio.setVisible(true);
+        ventanaInicio.setLocationRelativeTo(null);
+        // Cerramos la ventana actual de Reportes
+        this.dispose();
+    }//GEN-LAST:event_B_SalirInicioActionPerformed
+
+    private void BBuscarVGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BBuscarVGActionPerformed
+        String empleadoSel = CB_Empleados.getSelectedItem().toString();
+        // Le pasamos la pelota al controlador con los componentes que debe actualizar
+        controlador.procesarReporte(empleadoSel, T_Ventas, T_Gastos, TotalV, TotalG, IngresosN);
+    }//GEN-LAST:event_BBuscarVGActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BBuscarVG;
     private javax.swing.JButton B_GAd;
     private javax.swing.JButton B_GenPDF;
+    private javax.swing.JButton B_SalirInicio;
     private javax.swing.JComboBox<String> CB_Empleados;
     private javax.swing.JLabel IngresosN;
     private javax.swing.JTable T_Gastos;

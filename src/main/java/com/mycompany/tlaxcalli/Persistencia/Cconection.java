@@ -42,15 +42,4 @@ public class Cconection { // Te perdono el nombre por ahora, luego lo cambiamos
         
         return conectar;
     }
-    /*
-    // MÉTODO DE PRUEBA (SOLO PARA DESARROLLO)
-    // Esto permite ejecutar este archivo individualmente
-    public static void main(String[] args) {
-        System.out.println("--- Iniciando prueba de conexión ---");
-        
-        Cconection objetoPrueba = new Cconection();
-        objetoPrueba.establecerConexion();
-        
-        System.out.println("--- Fin de la prueba ---");
-    }*/
 }
