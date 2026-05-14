@@ -32,8 +32,6 @@ public class Reportes extends javax.swing.JFrame {
         T_Ventas = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         T_Gastos = new javax.swing.JTable();
-        CD_Ini = new datechooser.beans.DateChooserCombo();
-        CD_Fin = new datechooser.beans.DateChooserCombo();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         BBuscarVG = new javax.swing.JButton();
@@ -49,6 +47,8 @@ public class Reportes extends javax.swing.JFrame {
         IngresosN = new javax.swing.JLabel();
         B_GAd = new javax.swing.JButton();
         B_GenPDF = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Reportes");
@@ -87,158 +87,80 @@ public class Reportes extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 200, 200, 120));
 
-        CD_Ini.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
-            new datechooser.view.appearance.ViewAppearance("custom",
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(204, 204, 204),
-                    new java.awt.Color(0, 0, 255),
-                    false,
-                    true,
-                    new datechooser.view.appearance.swing.ButtonPainter()),
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(204, 204, 204),
-                    new java.awt.Color(0, 0, 255),
-                    true,
-                    true,
-                    new datechooser.view.appearance.swing.ButtonPainter()),
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(0, 0, 255),
-                    new java.awt.Color(0, 0, 255),
-                    false,
-                    true,
-                    new datechooser.view.appearance.swing.ButtonPainter()),
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(128, 128, 128),
-                    new java.awt.Color(0, 0, 255),
-                    false,
-                    true,
-                    new datechooser.view.appearance.swing.LabelPainter()),
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(204, 204, 204),
-                    new java.awt.Color(0, 0, 255),
-                    false,
-                    true,
-                    new datechooser.view.appearance.swing.LabelPainter()),
-                new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                    new java.awt.Color(204, 204, 204),
-                    new java.awt.Color(255, 0, 0),
-                    false,
-                    false,
-                    new datechooser.view.appearance.swing.ButtonPainter()),
-                (datechooser.view.BackRenderer)null,
-                false,
-                true)));
-    jPanel1.add(CD_Ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 110, 100, -1));
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("De:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 110, -1, -1));
 
-    CD_Fin.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
-        new datechooser.view.appearance.ViewAppearance("custom",
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(204, 204, 204),
-                new java.awt.Color(0, 0, 255),
-                false,
-                true,
-                new datechooser.view.appearance.swing.ButtonPainter()),
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(204, 204, 204),
-                new java.awt.Color(0, 0, 255),
-                true,
-                true,
-                new datechooser.view.appearance.swing.ButtonPainter()),
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(0, 0, 255),
-                new java.awt.Color(0, 0, 255),
-                false,
-                true,
-                new datechooser.view.appearance.swing.ButtonPainter()),
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(128, 128, 128),
-                new java.awt.Color(0, 0, 255),
-                false,
-                true,
-                new datechooser.view.appearance.swing.LabelPainter()),
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(204, 204, 204),
-                new java.awt.Color(0, 0, 255),
-                false,
-                true,
-                new datechooser.view.appearance.swing.LabelPainter()),
-            new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
-                new java.awt.Color(204, 204, 204),
-                new java.awt.Color(255, 0, 0),
-                false,
-                false,
-                new datechooser.view.appearance.swing.ButtonPainter()),
-            (datechooser.view.BackRenderer)null,
-            false,
-            true)));
-jPanel1.add(CD_Fin, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 110, 90, -1));
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("A:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 110, -1, -1));
 
-jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-jLabel2.setText("De:");
-jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 110, -1, -1));
+        BBuscarVG.setText("Aplicar");
+        jPanel1.add(BBuscarVG, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
 
-jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-jLabel3.setText("A:");
-jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 110, -1, -1));
+        jPanel1.add(CB_Empleados, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 120, -1));
 
-BBuscarVG.setText("Aplicar");
-jPanel1.add(BBuscarVG, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel4.setText("Empleado:");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, -1, -1));
 
-jPanel1.add(CB_Empleados, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 120, -1));
+        jLabel5.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel5.setText("Ventas");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, -1, -1));
 
-jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-jLabel4.setText("Empleado:");
-jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, -1, -1));
+        jLabel6.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel6.setText("Gastos");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 170, -1, -1));
 
-jLabel5.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
-jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-jLabel5.setText("Ventas");
-jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, -1, -1));
+        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel7.setText("Total de ventas");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, -1, -1));
 
-jLabel6.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
-jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-jLabel6.setText("Gastos");
-jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 170, -1, -1));
+        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel8.setText("Total de gastos");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 380, -1, -1));
 
-jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-jLabel7.setText("Total de ventas");
-jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, -1, -1));
+        TotalV.setText("jLabel9");
+        jPanel1.add(TotalV, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 380, -1, -1));
 
-jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-jLabel8.setText("Total de gastos");
-jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 380, -1, -1));
+        TotalG.setText("jLabel10");
+        jPanel1.add(TotalG, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 380, -1, -1));
 
-TotalV.setText("jLabel9");
-jPanel1.add(TotalV, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 380, -1, -1));
+        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel9.setText("Ingresos Netos");
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 460, -1, -1));
 
-TotalG.setText("jLabel10");
-jPanel1.add(TotalG, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 380, -1, -1));
+        IngresosN.setText("jLabel10");
+        jPanel1.add(IngresosN, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 460, -1, -1));
 
-jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-jLabel9.setText("Ingresos Netos");
-jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 460, -1, -1));
+        B_GAd.setText("Gastos Generales");
+        jPanel1.add(B_GAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
 
-IngresosN.setText("jLabel10");
-jPanel1.add(IngresosN, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 460, -1, -1));
+        B_GenPDF.setText("Generar Reporte");
+        jPanel1.add(B_GenPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, -1, -1));
 
-B_GAd.setText("Gastos Generales");
-jPanel1.add(B_GAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
+        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel10.setText("Aqui va un calendario");
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 110, -1, -1));
 
-B_GenPDF.setText("Generar Reporte");
-jPanel1.add(B_GenPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, -1, -1));
+        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel11.setText("aqui tambien va");
+        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 110, -1, -1));
 
-javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-getContentPane().setLayout(layout);
-layout.setHorizontalGroup(
-    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
-    );
-    layout.setVerticalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
-    );
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+        );
 
-    pack();
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -246,14 +168,14 @@ layout.setHorizontalGroup(
     private javax.swing.JButton B_GAd;
     private javax.swing.JButton B_GenPDF;
     private javax.swing.JComboBox<String> CB_Empleados;
-    private datechooser.beans.DateChooserCombo CD_Fin;
-    private datechooser.beans.DateChooserCombo CD_Ini;
     private javax.swing.JLabel IngresosN;
     private javax.swing.JTable T_Gastos;
     private javax.swing.JTable T_Ventas;
     private javax.swing.JLabel TotalG;
     private javax.swing.JLabel TotalV;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

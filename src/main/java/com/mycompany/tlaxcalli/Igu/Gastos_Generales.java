@@ -32,7 +32,6 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        DC_IniGAd = new datechooser.beans.DateChooserCombo();
         B_GyS = new javax.swing.JButton();
         B_SalirGAd = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
@@ -41,7 +40,8 @@ public class Gastos_Generales extends javax.swing.JFrame {
         B_EliminarGAd = new javax.swing.JButton();
         B_BuscarG = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        dateChooserCombo2 = new datechooser.beans.DateChooserCombo();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -67,7 +67,6 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Fecha :");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 30, -1, -1));
-        jPanel1.add(DC_IniGAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 30, 90, -1));
 
         B_GyS.setText("Guardar y Salir");
         jPanel1.add(B_GyS, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 440, -1, -1));
@@ -94,7 +93,14 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("A:");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 30, -1, -1));
-        jPanel1.add(dateChooserCombo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 30, 90, -1));
+
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("calendario");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 30, -1, -1));
+
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("calendario");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 30, -1, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 500));
 
@@ -132,10 +138,10 @@ public class Gastos_Generales extends javax.swing.JFrame {
     private javax.swing.JButton B_EliminarGAd;
     private javax.swing.JButton B_GyS;
     private javax.swing.JButton B_SalirGAd;
-    private datechooser.beans.DateChooserCombo DC_IniGAd;
     private javax.swing.JTextField TotalGAd;
-    private datechooser.beans.DateChooserCombo dateChooserCombo2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
