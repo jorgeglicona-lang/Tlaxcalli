@@ -29,15 +29,15 @@ public class Reportes extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        T_Ventas = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
-        dateChooserCombo1 = new datechooser.beans.DateChooserCombo();
-        dateChooserCombo2 = new datechooser.beans.DateChooserCombo();
+        T_Gastos = new javax.swing.JTable();
+        CD_Ini = new datechooser.beans.DateChooserCombo();
+        CD_Fin = new datechooser.beans.DateChooserCombo();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        BBuscarVG = new javax.swing.JButton();
+        CB_Empleados = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -47,8 +47,8 @@ public class Reportes extends javax.swing.JFrame {
         TotalG = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         IngresosN = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        B_GAd = new javax.swing.JButton();
+        B_GenPDF = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Reportes");
@@ -63,31 +63,31 @@ public class Reportes extends javax.swing.JFrame {
         jLabel1.setText("Reportes");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(324, 31, -1, -1));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        T_Ventas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(T_Ventas);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 200, 120));
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        T_Gastos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
-        jScrollPane2.setViewportView(jTable2);
+        jScrollPane2.setViewportView(T_Gastos);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 200, 200, 120));
 
-        dateChooserCombo1.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
+        CD_Ini.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
             new datechooser.view.appearance.ViewAppearance("custom",
                 new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
                     new java.awt.Color(204, 204, 204),
@@ -128,9 +128,9 @@ public class Reportes extends javax.swing.JFrame {
                 (datechooser.view.BackRenderer)null,
                 false,
                 true)));
-    jPanel1.add(dateChooserCombo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 110, 100, -1));
+    jPanel1.add(CD_Ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 110, 100, -1));
 
-    dateChooserCombo2.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
+    CD_Fin.setCurrentView(new datechooser.view.appearance.AppearancesList("Grey",
         new datechooser.view.appearance.ViewAppearance("custom",
             new datechooser.view.appearance.swing.SwingCellAppearance(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12),
                 new java.awt.Color(204, 204, 204),
@@ -171,7 +171,7 @@ public class Reportes extends javax.swing.JFrame {
             (datechooser.view.BackRenderer)null,
             false,
             true)));
-jPanel1.add(dateChooserCombo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 110, 90, -1));
+jPanel1.add(CD_Fin, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 110, 90, -1));
 
 jLabel2.setForeground(new java.awt.Color(0, 0, 0));
 jLabel2.setText("De:");
@@ -181,10 +181,10 @@ jLabel3.setForeground(new java.awt.Color(0, 0, 0));
 jLabel3.setText("A:");
 jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 110, -1, -1));
 
-jButton1.setText("Aplicar");
-jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
+BBuscarVG.setText("Aplicar");
+jPanel1.add(BBuscarVG, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
 
-jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 120, -1));
+jPanel1.add(CB_Empleados, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 120, -1));
 
 jLabel4.setForeground(new java.awt.Color(0, 0, 0));
 jLabel4.setText("Empleado:");
@@ -221,11 +221,11 @@ jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 460,
 IngresosN.setText("jLabel10");
 jPanel1.add(IngresosN, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 460, -1, -1));
 
-jButton2.setText("Gastos Generales");
-jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
+B_GAd.setText("Gastos Generales");
+jPanel1.add(B_GAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
 
-jButton3.setText("Generar Reporte");
-jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, -1, -1));
+B_GenPDF.setText("Generar Reporte");
+jPanel1.add(B_GenPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, -1, -1));
 
 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
 getContentPane().setLayout(layout);
@@ -242,15 +242,17 @@ layout.setHorizontalGroup(
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BBuscarVG;
+    private javax.swing.JButton B_GAd;
+    private javax.swing.JButton B_GenPDF;
+    private javax.swing.JComboBox<String> CB_Empleados;
+    private datechooser.beans.DateChooserCombo CD_Fin;
+    private datechooser.beans.DateChooserCombo CD_Ini;
     private javax.swing.JLabel IngresosN;
+    private javax.swing.JTable T_Gastos;
+    private javax.swing.JTable T_Ventas;
     private javax.swing.JLabel TotalG;
     private javax.swing.JLabel TotalV;
-    private datechooser.beans.DateChooserCombo dateChooserCombo1;
-    private datechooser.beans.DateChooserCombo dateChooserCombo2;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -263,7 +265,5 @@ layout.setHorizontalGroup(
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
     // End of variables declaration//GEN-END:variables
 }
