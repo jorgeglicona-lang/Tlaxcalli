@@ -30,9 +30,9 @@
                 <version>12.4.2.jre11</version>
             </dependency>
         <dependency>
-            <groupId>unknown.binary</groupId>
-            <artifactId>DateChooser</artifactId>
-            <version>SNAPSHOT</version>
+            <groupId>com.github.lgooddatepicker</groupId>
+            <artifactId>LGoodDatePicker</artifactId>
+            <version>11.2.1</version>
         </dependency>
     </dependencies>
     <properties>

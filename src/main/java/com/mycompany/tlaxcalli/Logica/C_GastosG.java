@@ -24,9 +24,22 @@ public class C_GastosG {
         calcularTotal(tabla, txtTotal);
     }
 
-    public boolean agregarGasto(String descripcion, double monto) {
-        return dao.registrarGasto(descripcion, monto);
+    public void buscarPorFechas(String inicio, String fin, JTable tabla, JTextField txtTotal) {
+    DefaultTableModel modelo = dao.obtenerGastosPorRango(inicio, fin);
+    tabla.setModel(modelo);
+    
+    if (tabla.getColumnCount() > 0) {
+        tabla.getColumnModel().getColumn(0).setMinWidth(0);
+        tabla.getColumnModel().getColumn(0).setMaxWidth(0);
+        tabla.getColumnModel().getColumn(0).setWidth(0);
     }
+    calcularTotal(tabla, txtTotal);
+}
+
+// Actualizamos el agregar para pasar la fecha
+public boolean agregarGasto(String descripcion, double monto, String fecha) {
+    return dao.registrarGasto(descripcion, monto, fecha);
+}
 
     public boolean eliminarGasto(int idGasto) {
         return dao.eliminarGasto(idGasto);

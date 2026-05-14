@@ -31,57 +31,75 @@ public class ReportesDAO {
     }
 
     // Método para consultar y llenar la tabla de ventas (devuelve la suma)
-    public double llenarVentas(String empleado, DefaultTableModel modelo) {
-        double suma = 0;
-        Cconection conexion = new Cconection();
-        String sql = "SELECT E.Nombre, P.Nom_producto, V.Total_Dinero " +
-                     "FROM Ventas_Diarias V " +
-                     "JOIN Empleados E ON V.Id_empleado = E.Id_empleado " +
-                     "JOIN Productos P ON V.Id_producto = P.Id_producto ";
-                     
+    // Método para consultar ventas con filtro de empleado y FECHAS
+public double llenarVentas(String empleado, String fechaInicio, String fechaFin, DefaultTableModel modelo) {
+    double suma = 0;
+    Cconection conexion = new Cconection();
+    // Agregamos el filtro de fecha (BETWEEN)
+    String sql = "SELECT E.Nombre, P.Nom_producto, V.Total_Dinero " +
+                 "FROM Ventas_Diarias V " +
+                 "JOIN Empleados E ON V.Id_empleado = E.Id_empleado " +
+                 "JOIN Productos P ON V.Id_producto = P.Id_producto " +
+                 "WHERE V.Fecha BETWEEN ? AND ? ";
+                 
+    if (!empleado.equals("Todos")) {
+        sql += "AND E.Nombre = ? ";
+    }
+
+    try (Connection con = conexion.establecerConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setString(1, fechaInicio);
+        pst.setString(2, fechaFin);
         if (!empleado.equals("Todos")) {
-            sql += "WHERE E.Nombre = '" + empleado + "'";
+            pst.setString(3, empleado);
         }
 
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement pst = con.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-             
+        try (ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 double monto = rs.getDouble("Total_Dinero");
                 modelo.addRow(new Object[]{rs.getString("Nombre"), rs.getString("Nom_producto"), monto});
                 suma += monto;
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error en DAO Ventas: " + e.toString());
         }
-        return suma;
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error en DAO Ventas: " + e.toString());
     }
+    return suma;
+}
 
-    // Método para consultar y llenar la tabla de gastos (devuelve la suma)
-    public double llenarGastos(String empleado, DefaultTableModel modelo) {
-        double suma = 0;
-        Cconection conexion = new Cconection();
-        String sql = "SELECT E.Nombre, G.Descripcion, G.Monto " +
-                     "FROM Gastos G " +
-                     "JOIN Empleados E ON G.Id_empleado = E.Id_empleado ";
-                     
+// Método para consultar gastos con filtro de empleado y FECHAS
+public double llenarGastos(String empleado, String fechaInicio, String fechaFin, DefaultTableModel modelo) {
+    double suma = 0;
+    Cconection conexion = new Cconection();
+    String sql = "SELECT E.Nombre, G.Descripcion, G.Monto " +
+                 "FROM Gastos G " +
+                 "JOIN Empleados E ON G.Id_empleado = E.Id_empleado " +
+                 "WHERE G.Fecha BETWEEN ? AND ? ";
+                 
+    if (!empleado.equals("Todos")) {
+        sql += "AND E.Nombre = ? ";
+    }
+    
+    try (Connection con = conexion.establecerConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setString(1, fechaInicio);
+        pst.setString(2, fechaFin);
         if (!empleado.equals("Todos")) {
-            sql += "WHERE E.Nombre = '" + empleado + "'";
+            pst.setString(3, empleado);
         }
-        
-        try (Connection con = conexion.establecerConexion();
-             PreparedStatement pst = con.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-             
+
+        try (ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 double monto = rs.getDouble("Monto");
                 modelo.addRow(new Object[]{rs.getString("Nombre"), rs.getString("Descripcion"), monto});
                 suma += monto;
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error en DAO Gastos: " + e.toString());
         }
-        return suma;
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error en DAO Gastos: " + e.toString());
     }
+    return suma;
+}
 }
