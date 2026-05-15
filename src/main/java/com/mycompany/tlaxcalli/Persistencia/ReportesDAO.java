@@ -35,22 +35,25 @@ public class ReportesDAO {
 public double llenarVentas(String empleado, String fechaInicio, String fechaFin, DefaultTableModel modelo) {
     double suma = 0;
     Cconection conexion = new Cconection();
-    // Agregamos el filtro de fecha (BETWEEN)
+    
+    // 1. Construimos la base de la consulta
     String sql = "SELECT E.Nombre, P.Nom_producto, V.Total_Dinero " +
                  "FROM Ventas_Diarias V " +
                  "JOIN Empleados E ON V.Id_empleado = E.Id_empleado " +
                  "JOIN Productos P ON V.Id_producto = P.Id_producto " +
-                 "WHERE V.Fecha BETWEEN ? AND ? ";
+                 "WHERE V.Fecha BETWEEN ? AND ? "; // Siempre lleva 2 parámetros iniciales
                  
     if (!empleado.equals("Todos")) {
-        sql += "AND E.Nombre = ? ";
+        sql += "AND E.Nombre = ? "; // Agregamos el tercero solo si es necesario
     }
 
     try (Connection con = conexion.establecerConexion();
          PreparedStatement pst = con.prepareStatement(sql)) {
          
+        // 2. Pasamos los parámetros en orden estricto
         pst.setString(1, fechaInicio);
         pst.setString(2, fechaFin);
+        
         if (!empleado.equals("Todos")) {
             pst.setString(3, empleado);
         }
@@ -58,7 +61,12 @@ public double llenarVentas(String empleado, String fechaInicio, String fechaFin,
         try (ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 double monto = rs.getDouble("Total_Dinero");
-                modelo.addRow(new Object[]{rs.getString("Nombre"), rs.getString("Nom_producto"), monto});
+                // 3. Rellenamos el modelo que la IGU está esperando
+                modelo.addRow(new Object[]{
+                    rs.getString("Nombre"), 
+                    rs.getString("Nom_producto"), 
+                    monto
+                });
                 suma += monto;
             }
         }
@@ -96,7 +104,9 @@ public double llenarGastos(String empleado, String fechaInicio, String fechaFin,
                 modelo.addRow(new Object[]{rs.getString("Nombre"), rs.getString("Descripcion"), monto});
                 suma += monto;
             }
-        }
+        }catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error en DAO Gastos: " + e.toString());
+    }
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(null, "Error en DAO Gastos: " + e.toString());
     }

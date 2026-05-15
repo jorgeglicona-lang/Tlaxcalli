@@ -42,6 +42,7 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Gastos generales");
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -73,8 +74,8 @@ public class Gastos_Generales extends javax.swing.JFrame {
         B_SalirGAd.setText("Salir");
         jPanel1.add(B_SalirGAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(37, 441, -1, -1));
 
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Total de gastos operativos");
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 380, -1, -1));
 
         TotalGAd.setEditable(false);

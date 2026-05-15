@@ -1,6 +1,5 @@
-
 package com.mycompany.tlaxcalli.Igu;
-
+import com.mycompany.tlaxcalli.Logica.C_GenerarReporte;
 import javax.swing.JOptionPane;
 
 public class Reportes extends javax.swing.JFrame {
@@ -111,8 +110,8 @@ public class Reportes extends javax.swing.JFrame {
 
         jPanel1.add(CB_Empleados, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 150, 120, -1));
 
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Empleado:");
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 150, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
@@ -151,6 +150,7 @@ public class Reportes extends javax.swing.JFrame {
         jPanel1.add(B_GAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 600, -1, -1));
 
         B_GenPDF.setText("Generar Reporte");
+        B_GenPDF.addActionListener(this::B_GenPDFActionPerformed);
         jPanel1.add(B_GenPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 600, -1, -1));
 
         B_SalirInicio.setText("Salir");
@@ -180,7 +180,7 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_B_SalirInicioActionPerformed
 
     private void BBuscarVGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BBuscarVGActionPerformed
-        String empleadoSel = CB_Empleados.getSelectedItem().toString();
+    String empleadoSel = CB_Empleados.getSelectedItem().toString();
     
     // Capturamos las fechas de los DatePicker
     java.time.LocalDate date1 = datePicker1.getDate(); // El de "De:"
@@ -199,6 +199,15 @@ public class Reportes extends javax.swing.JFrame {
     // Le pasamos todo al controlador
     controlador.procesarReporte(empleadoSel, fInicio, fFin, T_Ventas, T_Gastos, TotalV, TotalG, IngresosN);
     }//GEN-LAST:event_BBuscarVGActionPerformed
+
+    private void B_GenPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_GenPDFActionPerformed
+        String empleado = CB_Empleados.getSelectedItem().toString();
+        String inicio = datePicker1.getDate().toString();
+        String fin = datePicker4.getDate().toString();
+
+        C_GenerarReporte orquestador = new C_GenerarReporte();
+        orquestador.prepararPDF(inicio, fin, empleado);
+    }//GEN-LAST:event_B_GenPDFActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BBuscarVG;
@@ -226,4 +235,8 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
+
+
+
+
 }
