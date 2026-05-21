@@ -1,29 +1,43 @@
 
 package com.ometeotl.tlaxcalli.IGU;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.Cconection;
+import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
+import com.ometeotl.tlaxcalli.Tlaxcalli;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO;
 import java.awt.Color;
 
 public class Inicio extends javax.swing.JFrame {
 
-    Cconection call=new Cconection();
     int xMause, yMause;
+    private Tlaxcalli nom = new Tlaxcalli();
+    private C_Inicio controlador = new C_Inicio();
     public Inicio() {
         initComponents();
-        pintarImagen(Logolb, "/imagen/transparencia.png");
-        call.establecerConexion();
+        controlador.pintarImagen(Logolb, "/imagen/transparencia.png");
+        nom.inicializarNombreNegocio(this, negocio);
         // 1. Le pedimos a la fábrica el "enchufe" de la sala
         I_InicioDAO inicioDAO = DAOFactory.getInicioDAO();
     
         // 2. Usamos el enchufe para pedir las tablas y las metemos a los JTable visuales
         tablaProductos.setModel(inicioDAO.obtenerProductosTabla());
         tablaCatGastos.setModel(inicioDAO.obtenerCatGastosTabla());
+        
+        // Ocultamos "Es Comodín" en la tabla de Productos (Es la Columna Índice 3)
+        tablaProductos.getColumnModel().getColumn(3).setMinWidth(0);
+        tablaProductos.getColumnModel().getColumn(3).setMaxWidth(0);
+        tablaProductos.getColumnModel().getColumn(3).setWidth(0);
+        tablaProductos.getColumnModel().getColumn(3).setPreferredWidth(0);
+
+        // Ocultamos "Requiere Descripción" en la tabla de Gastos (Es la Columna Índice 2)
+        tablaCatGastos.getColumnModel().getColumn(2).setMinWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(2).setMaxWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(2).setWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(2).setPreferredWidth(0);
     }
     
     public void settext(String nombre){
-        this.nombre.setText(nombre);
+        this.nombre.setText("¡Bienvenido "+nombre+"!");
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -44,11 +58,14 @@ public class Inicio extends javax.swing.JFrame {
         ext = new javax.swing.JLabel();
         nombre = new javax.swing.JLabel();
         negocio = new javax.swing.JLabel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        panelPestanias = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaProductos = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaCatGastos = new javax.swing.JTable();
+        b_agregar = new javax.swing.JButton();
+        b_modificar = new javax.swing.JButton();
+        b_eliminar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -272,7 +289,7 @@ public class Inicio extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tablaProductos);
 
-        jTabbedPane1.addTab("Catalogo Productos", jScrollPane1);
+        panelPestanias.addTab("Catalogo Productos", jScrollPane1);
 
         tablaCatGastos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -284,9 +301,33 @@ public class Inicio extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(tablaCatGastos);
 
-        jTabbedPane1.addTab("Catalogo Gastos", jScrollPane2);
+        panelPestanias.addTab("Catalogo Gastos", jScrollPane2);
 
-        jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 200, 580, 300));
+        jPanel1.add(panelPestanias, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 240, 580, 280));
+
+        b_agregar.setText("Agregar");
+        b_agregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_agregarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(b_agregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 200, 80, 30));
+
+        b_modificar.setText("Modificar");
+        b_modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_modificarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(b_modificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 200, -1, 30));
+
+        b_eliminar.setText("Eliminar");
+        b_eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_eliminarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(b_eliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 200, -1, 30));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 550));
 
@@ -365,11 +406,26 @@ public class Inicio extends javax.swing.JFrame {
         reg.setLocationRelativeTo(null);
     }//GEN-LAST:event_b_reportesMouseClicked
 
+    private void b_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarActionPerformed
+        controlador.agregarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+    }//GEN-LAST:event_b_agregarActionPerformed
+
+    private void b_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_eliminarActionPerformed
+        controlador.eliminarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+    }//GEN-LAST:event_b_eliminarActionPerformed
+
+    private void b_modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_modificarActionPerformed
+        controlador.modificarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+    }//GEN-LAST:event_b_modificarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Logolb;
     private javax.swing.JLabel Name;
+    private javax.swing.JButton b_agregar;
+    private javax.swing.JButton b_eliminar;
     private javax.swing.JLabel b_empleados;
+    private javax.swing.JButton b_modificar;
     private javax.swing.JLabel b_registros;
     private javax.swing.JLabel b_reportes;
     private javax.swing.JLabel ext;
@@ -382,44 +438,10 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel negocio;
     private javax.swing.JLabel nombre;
+    private javax.swing.JTabbedPane panelPestanias;
     private javax.swing.JTable tablaCatGastos;
     private javax.swing.JTable tablaProductos;
     // End of variables declaration//GEN-END:variables
-    
-    // MÉTODO NATIVO PARA AJUSTAR IMAGEN A JLABEL
-    private void pintarImagen(javax.swing.JLabel lbl, String ruta) {
-        try {
-            // 1. Cargar la imagen desde los recursos del proyecto (funciona dentro del JAR)
-            java.net.URL url = getClass().getResource(ruta);
-            
-            if (url != null) {
-                javax.swing.ImageIcon imagen = new javax.swing.ImageIcon(url);
-                
-                // 2. Obtener dimensiones. Si el layout aún no carga, usamos el tamaño preferido
-                int w = lbl.getWidth();
-                int h = lbl.getHeight();
-                if (w == 0 || h == 0) {
-                    w = lbl.getPreferredSize().width;
-                    h = lbl.getPreferredSize().height;
-                }
-                
-                // 3. Escalar la imagen (SCALE_SMOOTH da mejor calidad que la librería externa)
-                javax.swing.Icon icono = new javax.swing.ImageIcon(
-                    imagen.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH)
-                );
-                
-                // 4. Asignar al label
-                lbl.setIcon(icono);
-                lbl.repaint();
-            } else {
-                System.err.println("No se encontró la imagen en: " + ruta);
-            }
-        } catch (Exception e) {
-            System.err.println("Error cargando imagen: " + e.getMessage());
-        }
-    }
-
 }

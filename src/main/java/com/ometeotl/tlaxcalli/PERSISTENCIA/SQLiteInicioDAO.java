@@ -63,4 +63,105 @@ public class SQLiteInicioDAO implements I_InicioDAO {
         }
         return modelo;
     }
+
+    // ... sus métodos anteriores de obtenerProductosTabla y obtenerCatGastosTabla ...
+
+    @Override
+    public boolean registrarProducto(String nombre, double precio, int esComodin) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "INSERT INTO Productos (Nom_producto, Precio, Es_Comodin) VALUES (?, ?, ?)";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setDouble(2, precio);
+            ps.setInt(3, esComodin);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al registrar producto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean modificarProducto(int idProducto, String nombre, double precio, int esComodin) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "UPDATE Productos SET Nom_producto = ?, Precio = ?, Es_Comodin = ? WHERE Id_producto = ?";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setDouble(2, precio);
+            ps.setInt(3, esComodin);
+            ps.setInt(4, idProducto);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al modificar producto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminarProducto(int idProducto) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        // Borrado físico directo (si no hay ventas vinculadas)
+        String sql = "DELETE FROM Productos WHERE Id_producto = ?";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al eliminar producto (posible llave foránea): " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean registrarCatGasto(String nombre, int requiereDesc) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "INSERT INTO Cat_Gastos (Nombre, Requiere_Descripcion) VALUES (?, ?)";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setInt(2, requiereDesc);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al registrar catálogo de gasto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean modificarCatGasto(int idTipo, String nombre, int requiereDesc) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "UPDATE Cat_Gastos SET Nombre = ?, Requiere_Descripcion = ? WHERE Id_tipo = ?";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setInt(2, requiereDesc);
+            ps.setInt(3, idTipo);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al modificar catálogo de gasto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminarCatGasto(int idTipo) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "DELETE FROM Cat_Gastos WHERE Id_tipo = ?";
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idTipo);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error al eliminar gasto (posible llave foránea): " + e.getMessage());
+            return false;
+        }
+    }
 }

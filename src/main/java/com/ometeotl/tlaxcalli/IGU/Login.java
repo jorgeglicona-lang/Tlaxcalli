@@ -9,7 +9,6 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         pintarImagen(Logolb, "/imagen/logazul.png");
-        //rsscalelabel.RSScaleLabel.setScaleLabel(jLabel8, "src/main/resources/imagen/logazul.png");
     }
 
     @SuppressWarnings("unchecked")

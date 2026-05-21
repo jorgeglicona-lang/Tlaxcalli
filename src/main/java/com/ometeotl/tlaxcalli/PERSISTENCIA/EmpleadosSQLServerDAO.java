@@ -1,5 +1,6 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IEmpleadosDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement; // <--- Faltaba este
 import java.sql.ResultSet;
@@ -7,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.table.DefaultTableModel;
 
-public class EmpleadosDAO {
+public class EmpleadosSQLServerDAO implements IEmpleadosDAO{
 
     // Método que devuelve la tabla ya lista para mostrarse
     public DefaultTableModel consultarEmpleados(){

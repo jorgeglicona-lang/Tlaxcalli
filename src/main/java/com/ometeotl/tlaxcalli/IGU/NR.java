@@ -777,7 +777,7 @@ public class NR extends javax.swing.JFrame {
 
     // EN NR.java - Método cargarEmpleados ACTUALIZADO
     private void cargarEmpleados() {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosDAO();
+        com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO();
         javax.swing.table.DefaultTableModel modelo = dao.consultarEmpleados();
         
         BoxRepartidor.addItem(new com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem(0, "Seleccione...")); 

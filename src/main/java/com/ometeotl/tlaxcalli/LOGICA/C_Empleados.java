@@ -12,8 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import java.awt.GridLayout;
 
-// Importamos el DAO original que usted estaba usando
-import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosDAO; 
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IEmpleadosDAO;
 
 public class C_Empleados {
 
@@ -29,7 +29,7 @@ public class C_Empleados {
     }
 
     public void cargarTabla(JTable tabla) {
-        EmpleadosDAO dao = new EmpleadosDAO();
+        IEmpleadosDAO dao = DAOFactory.getEmpleadosDAO();
         DefaultTableModel modelo = dao.consultarEmpleadosVisibles();
         tabla.setModel(modelo);
         
@@ -117,7 +117,7 @@ public class C_Empleados {
             }
 
             // Llamamos a nuestro DAO para hacer el registro
-            EmpleadosDAO dao = new EmpleadosDAO();
+            IEmpleadosDAO dao = DAOFactory.getEmpleadosDAO();
             if (dao.registrarEmpleado(nom, app, apm, puesto, usuario, pass)) {
                 JOptionPane.showMessageDialog(parent, "✅ Empleado registrado con éxito.");
                 cargarTabla(tabla); 
@@ -143,7 +143,7 @@ public class C_Empleados {
                 "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
 
         if (confirmacion == JOptionPane.YES_OPTION) {
-            EmpleadosDAO dao = new EmpleadosDAO();
+            IEmpleadosDAO dao = DAOFactory.getEmpleadosDAO();
             if (dao.eliminarEmpleado(idEmpleado)) {
                 JOptionPane.showMessageDialog(parent, "✅ Empleado eliminado.");
                 cargarTabla(tabla);
@@ -166,10 +166,10 @@ public class C_Empleados {
         String apmActual = tabla.getValueAt(fila, 3).toString();
         String puestoActual = tabla.getValueAt(fila, 4).toString();
 
-        EmpleadosDAO dao = new EmpleadosDAO();
-        // NOTA: Asegúrese de que este método exista en su EmpleadosDAO original
-        String usuarioActual = dao.obtenerNombreUsuario(idEmpleado); 
-        if (usuarioActual == null) usuarioActual = "";
+        IEmpleadosDAO dao = DAOFactory.getEmpleadosDAO();
+        String usuarioRecuperado = dao.obtenerNombreUsuario(idEmpleado); 
+        // Declaramos usuarioActual como 'final' en una sola línea usando un operador ternario
+        final String usuarioActual = (usuarioRecuperado == null) ? "" : usuarioRecuperado;
 
         JTextField txtNombre = new JTextField(nombreActual);
         JTextField txtApp = new JTextField(appActual);
@@ -180,6 +180,33 @@ public class C_Empleados {
         String[] puestos = {"Repartidor", "Molinero", "Mostrador", "Gerente", "Administrador"};
         JComboBox<String> cmbPuesto = new JComboBox<>(puestos);
         cmbPuesto.setSelectedItem(puestoActual);
+
+        // --- 1. CONFIGURACIÓN INICIAL DE SEGURIDAD ---
+        // Verificamos si el empleado ya era jefe para encenderle las cajas desde el principio
+        boolean esJefeInicial = puestoActual.equalsIgnoreCase("Administrador") || puestoActual.equalsIgnoreCase("Gerente");
+        txtUser.setEnabled(esJefeInicial);
+        txtPass.setEnabled(esJefeInicial);
+
+        // --- 2. ESCUCHADOR DE CAMBIOS EN TIEMPO REAL ---
+        cmbPuesto.addActionListener(e -> {
+            String puestoSeleccionado = cmbPuesto.getSelectedItem().toString();
+            
+            if (puestoSeleccionado.equalsIgnoreCase("Administrador") || 
+                puestoSeleccionado.equalsIgnoreCase("Gerente")) {
+                txtUser.setEnabled(true);
+                txtPass.setEnabled(true);
+                
+                // Si lo estamos ascendiendo y antes tenía usuario, se lo volvemos a poner visible
+                txtUser.setText(usuarioActual); 
+            } else {
+                // Si lo degradan a Mostrador o Repartidor, apagamos y borramos los textos
+                // para que no se guarde basura oculta
+                txtUser.setEnabled(false);
+                txtPass.setEnabled(false);
+                txtUser.setText("");
+                txtPass.setText("");
+            }
+        });
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("--- Datos Personales ---"));
@@ -192,7 +219,7 @@ public class C_Empleados {
         panel.add(new JLabel("Puesto:"));
         panel.add(cmbPuesto);
         panel.add(new JLabel(" ")); 
-        panel.add(new JLabel("--- Acceso (Solo Admin) ---"));
+        panel.add(new JLabel("--- Acceso (Gerente y Admin) ---"));
         panel.add(new JLabel("Usuario:"));
         panel.add(txtUser);
         panel.add(new JLabel("Nueva Contraseña (Dejar vacía para mantener actual):"));
@@ -214,13 +241,17 @@ public class C_Empleados {
                 return;
             }
 
-            boolean esAdmin = newPuesto.equalsIgnoreCase("Administrador");
-            if (esAdmin && newUser.isEmpty()) {
-                JOptionPane.showMessageDialog(parent, "Un Administrador debe tener un Usuario asignado.");
+            // --- 3. VALIDACIÓN DE REGLAS DE NEGOCIO AL GUARDAR ---
+            boolean esJefe = newPuesto.equalsIgnoreCase("Administrador") || newPuesto.equalsIgnoreCase("Gerente");
+            
+            if (esJefe && newUser.isEmpty()) {
+                JOptionPane.showMessageDialog(parent, "Un " + newPuesto + " debe tener un Usuario asignado.");
                 return;
             }
-            if (esAdmin && usuarioActual.isEmpty() && newPass.isEmpty()) {
-                 JOptionPane.showMessageDialog(parent, "Al crear un nuevo Administrador, la contraseña es obligatoria.");
+            
+            // Si es Jefe, no tenía usuario antes (fue ascendido), y no puso contraseña nueva -> Error
+            if (esJefe && usuarioActual.isEmpty() && newPass.isEmpty()) {
+                 JOptionPane.showMessageDialog(parent, "Al ascender a " + newPuesto + ", la contraseña es obligatoria.");
                  return;
             }
 
