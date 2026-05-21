@@ -20,14 +20,7 @@ public class Reportes extends javax.swing.JFrame {
         TotalG.setText("$0.00");
         IngresosN.setText("$0.00");
     }
-    private com.ometeotl.tlaxcalli.LOGICA.C_Reportes controlador = new com.ometeotl.tlaxcalli.LOGICA.C_Reportes();
-    
-    public static void main (String[] args){
-        Reportes log = new Reportes();
-        log.setVisible(true);
-        log.setLocationRelativeTo(null);
-    }
-
+     private com.ometeotl.tlaxcalli.LOGICA.C_Reportes controlador = new com.ometeotl.tlaxcalli.LOGICA.C_Reportes();
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

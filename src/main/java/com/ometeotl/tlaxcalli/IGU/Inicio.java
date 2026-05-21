@@ -2,6 +2,8 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Cconection;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO;
 import java.awt.Color;
 
 public class Inicio extends javax.swing.JFrame {
@@ -10,9 +12,14 @@ public class Inicio extends javax.swing.JFrame {
     int xMause, yMause;
     public Inicio() {
         initComponents();
-       pintarImagen(Logolb, "/imagen/transparencia.png");
+        pintarImagen(Logolb, "/imagen/transparencia.png");
         call.establecerConexion();
-        
+        // 1. Le pedimos a la fábrica el "enchufe" de la sala
+        I_InicioDAO inicioDAO = DAOFactory.getInicioDAO();
+    
+        // 2. Usamos el enchufe para pedir las tablas y las metemos a los JTable visuales
+        tablaProductos.setModel(inicioDAO.obtenerProductosTabla());
+        tablaCatGastos.setModel(inicioDAO.obtenerCatGastosTabla());
     }
     
     public void settext(String nombre){
@@ -37,6 +44,11 @@ public class Inicio extends javax.swing.JFrame {
         ext = new javax.swing.JLabel();
         nombre = new javax.swing.JLabel();
         negocio = new javax.swing.JLabel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tablaProductos = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablaCatGastos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -245,10 +257,36 @@ public class Inicio extends javax.swing.JFrame {
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 40));
 
         nombre.setText("Nombre");
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 170, -1, -1));
+        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 90, -1, -1));
 
         negocio.setText("negocio");
-        jPanel1.add(negocio, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 240, -1, -1));
+        jPanel1.add(negocio, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 140, -1, -1));
+
+        tablaProductos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(tablaProductos);
+
+        jTabbedPane1.addTab("Catalogo Productos", jScrollPane1);
+
+        tablaCatGastos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(tablaCatGastos);
+
+        jTabbedPane1.addTab("Catalogo Gastos", jScrollPane2);
+
+        jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 200, 580, 300));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 550));
 
@@ -342,8 +380,13 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel negocio;
     private javax.swing.JLabel nombre;
+    private javax.swing.JTable tablaCatGastos;
+    private javax.swing.JTable tablaProductos;
     // End of variables declaration//GEN-END:variables
     
     // MÉTODO NATIVO PARA AJUSTAR IMAGEN A JLABEL
