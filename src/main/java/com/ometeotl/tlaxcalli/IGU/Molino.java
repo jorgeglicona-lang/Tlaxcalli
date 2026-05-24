@@ -1,33 +1,20 @@
-
 package com.ometeotl.tlaxcalli.IGU;
+
+import com.ometeotl.tlaxcalli.LOGICA.C_Molino;
 
 public class Molino extends javax.swing.JFrame {
 
-    // Constructor
+    private C_Molino controlador;
+
     public Molino() {
         initComponents();
+        controlador = new C_Molino();
+        
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
-        cargarDatosDelDia(); // <--- AGREGAR ESTO
-    }
-
-    // Método nuevo para buscar y llenar los campos
-    private void cargarDatosDelDia() {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO();
+        this.setLocationRelativeTo(null);
         
-        // Consultamos
-        double[] datosHoy = dao.consultarReporteHoy();
-        
-        if (datosHoy != null) {
-            // Si hay datos, los ponemos en los cuadros de texto
-            t_botes.setText(String.valueOf(datosHoy[0]));
-            t_harina.setText(String.valueOf(datosHoy[1]));
-            t_desperdicio.setText(String.valueOf(datosHoy[2]));
-            
-            // Opcional: Cambiar color para indicar que ya existe info
-            t_botes.setBackground(new java.awt.Color(255, 255, 200)); // Amarillo clarito
-            t_harina.setBackground(new java.awt.Color(255, 255, 200));
-            t_desperdicio.setBackground(new java.awt.Color(255, 255, 200));
-        }
+        // El controlador llena la pantalla si ya hay datos hoy
+        controlador.inicializarFormulario(t_botes, t_harina, t_desperdicio);
     }
 
     @SuppressWarnings("unchecked")
@@ -165,71 +152,7 @@ public class Molino extends javax.swing.JFrame {
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void b_guardarRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_guardarRActionPerformed
-                                          
-        try {
-            // 1. OBTENER DATOS DE LA INTERFAZ (Nuevos valores)
-            double botesNew = Double.parseDouble(t_botes.getText());
-            double harinaNew = Double.parseDouble(t_harina.getText());
-            double despNew = Double.parseDouble(t_desperdicio.getText());
-            
-            // 2. FÓRMULAS DE PRODUCCIÓN
-            double KILOS_MASA_POR_BOTE = 19.0; 
-            double masaNatural = botesNew * KILOS_MASA_POR_BOTE;
-            double masaTotal = masaNatural + (harinaNew * 2.5); 
-            double ventaMasa = 0.0; // Ajustar si tienes este dato
-            double masaParaTortilla = masaTotal - ventaMasa - despNew;
-            if (masaParaTortilla < 0) masaParaTortilla = 0;
-            double RENDIMIENTO_TORTILLA = masaParaTortilla / 18; 
-            double tortillaElaborada = 16 * RENDIMIENTO_TORTILLA;
-
-            // 3. CONSULTAR SI YA EXISTE REGISTRO
-            com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO();
-            double[] datosViejos = dao.consultarReporteHoy();
-            
-            if (datosViejos == null) {
-                // --- ESCENARIO A: NO HAY DATOS (REGISTRO NUEVO) ---
-                boolean exito = dao.guardarReporteDiario(1, botesNew, harinaNew, despNew, 
-                                        masaNatural, masaTotal, ventaMasa, 
-                                        masaParaTortilla, tortillaElaborada);
-                if (exito) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "✅ Producción del día registrada.");
-                    this.setVisible(false); // Cerramos ventana
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this, "❌ Error al guardar.");
-                }
-
-            } else {
-                // --- ESCENARIO B: YA HAY DATOS (ACTUALIZACIÓN) ---
-                
-                // Preparamos el mensaje de comparación
-                String mensaje = "⚠️ YA EXISTE UN REGISTRO DEL DÍA DE HOY.\n\n" +
-                                 "Datos Anteriores vs Nuevos:\n" +
-                                 "Botes:       " + datosViejos[0] + "  ->  " + botesNew + "\n" +
-                                 "Harina:      " + datosViejos[1] + "  ->  " + harinaNew + "\n" +
-                                 "Desperdicio: " + datosViejos[2] + "  ->  " + despNew + "\n\n" +
-                                 "¿Desea SOBRESCRIBIR la información con los nuevos datos?";
-
-                int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, mensaje, 
-                        "Confirmar Actualización", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE);
-                
-                if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
-                    boolean actualizado = dao.actualizarReporteDiario(botesNew, harinaNew, despNew, 
-                                            masaNatural, masaTotal, ventaMasa, 
-                                            masaParaTortilla, tortillaElaborada);
-                    
-                    if (actualizado) {
-                         javax.swing.JOptionPane.showMessageDialog(this, "✅ Datos actualizados correctamente.");
-                         this.setVisible(false);
-                    } else {
-                         javax.swing.JOptionPane.showMessageDialog(this, "❌ Error al actualizar.");
-                    }
-                }
-            }
-
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Escribe solo números válidos.");
-        }
-
+        controlador.procesarGuardado(this, t_botes.getText(), t_harina.getText(), t_desperdicio.getText());
     }//GEN-LAST:event_b_guardarRActionPerformed
 
 
@@ -245,14 +168,4 @@ public class Molino extends javax.swing.JFrame {
     private javax.swing.JTextField t_desperdicio;
     private javax.swing.JTextField t_harina;
     // End of variables declaration//GEN-END:variables
-
-    // MÉTODO PARA LIMPIAR EL FORMULARIO DE MOLINO
-    private void limpiarCampos() {
-        t_botes.setText("");
-        t_harina.setText("");
-        t_desperdicio.setText("");
-        // Colocamos el foco en el primer campo para seguir capturando rápido
-        t_botes.requestFocus(); 
-    }
-
 }

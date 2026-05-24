@@ -5,6 +5,7 @@ import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.SQLiteInicioDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoSQLiteDAO;
 
 public class DAOFactory {
     
@@ -33,5 +34,12 @@ public class DAOFactory {
             return new EmpleadosSQLiteDAO();
         }
         return new EmpleadosSQLServerDAO(); //<-- Cuando renombre el viejo
+    }
+    
+    public static IMolinoDAO getMolinoDAO() {
+        if (MODO_PORTATIL) {
+            return new MolinoSQLiteDAO();
+        }
+        return null; //<-- Cuando renombre el viejo
     }
 }

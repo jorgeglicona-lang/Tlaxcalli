@@ -2,7 +2,6 @@ package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
