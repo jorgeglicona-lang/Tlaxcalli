@@ -160,6 +160,11 @@ public class CSQLiteConnection {
             stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
                     + "VALUES ('Mostrador', '', '', 'Mostrador')");
             
+            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (1, 'Tortilla de Reparto', 19.0, 0)");
+            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (2, 'Tortilla Mostrador', 22.0, 0)");
+            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (3, 'Masa', 20.0, 0)");
+
+            
             System.out.println("¡Base de datos portátil creada de forma idéntica a SQL Server!");
             
         } catch (SQLException e) {

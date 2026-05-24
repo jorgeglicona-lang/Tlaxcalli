@@ -9,4 +9,5 @@ public interface IEmpleadosDAO {
     boolean modificarEmpleado(int idEmpleado, String nombre, String app, String apm, String puesto, String usuario, String password);
     String obtenerNombreUsuario(int idEmpleado);
     DefaultTableModel consultarEmpleadosVisibles();
+    DefaultTableModel consultarVendedores();
 }

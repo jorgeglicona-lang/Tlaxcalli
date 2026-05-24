@@ -6,6 +6,7 @@ import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.SQLiteInicioDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoSQLiteDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.VentasSQLiteDAO;
 
 public class DAOFactory {
     
@@ -41,5 +42,12 @@ public class DAOFactory {
             return new MolinoSQLiteDAO();
         }
         return null; //<-- Cuando renombre el viejo
+    }
+    
+    public static IVentasDAO getVentasDAO(){
+        if (MODO_PORTATIL){
+            return new VentasSQLiteDAO();
+        }
+        return null;
     }
 }

@@ -282,4 +282,32 @@ public class EmpleadosSQLServerDAO implements IEmpleadosDAO{
         }
         return modelo;
     }
+    
+    @Override
+    public DefaultTableModel consultarVendedores() {
+        String[] titulos = {"ID", "Nombre"};
+        DefaultTableModel modelo = new DefaultTableModel(null, titulos);
+        
+        // Filtramos para que solo traiga al personal de reparto y mostrador
+        String sql = "SELECT Id_empleado, Nombre FROM Empleados " +
+                     "WHERE Puesto = 'Repartidor' OR Puesto = 'Mostrador' " +
+                     "ORDER BY Nombre ASC";
+        
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             java.sql.PreparedStatement ps = con.prepareStatement(sql);
+             java.sql.ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Object[] fila = new Object[2];
+                fila[0] = rs.getInt("Id_empleado");
+                fila[1] = rs.getString("Nombre");
+                modelo.addRow(fila);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al consultar vendedores en SQLite: " + e.getMessage());
+        }
+        return modelo;
+    }
 }

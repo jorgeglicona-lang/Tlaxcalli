@@ -62,6 +62,18 @@ public class C_Inicio {
             javax.swing.JTextField txtNombre = new javax.swing.JTextField();
             javax.swing.JTextField txtPrecio = new javax.swing.JTextField();
             javax.swing.JCheckBox chkComodin = new javax.swing.JCheckBox("Es producto Comodín");
+            
+            chkComodin.addActionListener(e -> {
+                if (chkComodin.isSelected()) {
+                    txtPrecio.setText("0.0"); // Le ponemos cero por defecto
+                    txtPrecio.setEnabled(false); // Bloqueamos la escritura
+                    txtPrecio.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                } else {
+                    txtPrecio.setText(""); // Lo vaciamos
+                    txtPrecio.setEnabled(true); // Desbloqueamos
+                    txtPrecio.setBackground(java.awt.Color.WHITE); // Regresa a blanco
+                }
+            });
 
             javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
             panel.add(new javax.swing.JLabel("Nombre del Producto:"));
@@ -76,27 +88,30 @@ public class C_Inicio {
             if (resultado == JOptionPane.OK_OPTION) {
                 String nombre = txtNombre.getText().trim();
                 String precioStr = txtPrecio.getText().trim();
-                
+                int esComodin = chkComodin.isSelected() ? 1 : 0;
+
                 if (nombre.isEmpty() || precioStr.isEmpty()) {
                     JOptionPane.showMessageDialog(parent, "Todos los campos son obligatorios.");
-                    return;
+                    return; 
                 }
-                
+
                 try {
+                    // 2. PARSEO LIMPIO: Convertimos el texto directo a número
                     double precio = Double.parseDouble(precioStr);
-                    int esComodin = chkComodin.isSelected() ? 1 : 0;
-                    
+
+                    // 3. GUARDADO
                     com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
                         com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                    
+
                     if (dao.registrarProducto(nombre, precio, esComodin)) {
                         JOptionPane.showMessageDialog(parent, "✅ Producto guardado.");
                         recargarTablaProductos(tablaProd);
                     } else {
                         JOptionPane.showMessageDialog(parent, "❌ Error al guardar en base de datos.");
                     }
+
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(parent, "El precio debe ser un número válido.");
+                    JOptionPane.showMessageDialog(parent, "El precio debe ser un número válido (ej. 20.50).");
                 }
             }
         } else if (pestaniaActiva == 1) {
@@ -148,6 +163,13 @@ public class C_Inicio {
             
             int idProd = Integer.parseInt(tablaProd.getValueAt(fila, 0).toString());
             String nombre = tablaProd.getValueAt(fila, 1).toString();
+            
+            if (idProd > 0 && idProd < 4) {
+                JOptionPane.showMessageDialog(parent, 
+                    "⚠️ ACCIÓN DENEGADA:\nEl producto '" + nombre + "' es vital para los cálculos del sistema y no puede ser eliminado.", 
+                    "Seguridad de Tlaxcalli", JOptionPane.ERROR_MESSAGE);
+                return; // Cortamos la ejecución aquí, no se elimina nada
+            }
             
             int conf = JOptionPane.showConfirmDialog(parent, "¿Eliminar definitivamente el producto " + nombre + "?", 
                     "Confirmar", JOptionPane.YES_NO_OPTION);
@@ -211,8 +233,30 @@ public class C_Inicio {
             javax.swing.JTextField txtPrecio = new javax.swing.JTextField(String.valueOf(precioActual));
             javax.swing.JCheckBox chkComodin = new javax.swing.JCheckBox("Es producto Comodín");
             
+            chkComodin.addActionListener(e -> {
+                if (chkComodin.isSelected()) {
+                    txtPrecio.setText("0.0"); // Le ponemos cero por defecto
+                    txtPrecio.setEnabled(false); // Bloqueamos la escritura
+                    txtPrecio.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                } else {
+                    txtPrecio.setText(""); // Lo vaciamos
+                    txtPrecio.setEnabled(true); // Desbloqueamos
+                    txtPrecio.setBackground(java.awt.Color.WHITE); // Regresa a blanco
+                }
+            });
+            
             // Si la celda extraída decía "Sí", encendemos la palomita automáticamente
             chkComodin.setSelected(comodinActual.equalsIgnoreCase("Sí"));
+            
+            if (idProducto > 0 && idProducto <4) {
+                txtNombre.setEditable(false); // No pueden borrar ni cambiar el texto
+                txtNombre.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                chkComodin.setEnabled(false); // No pueden alterar su estado lógico
+                
+                JOptionPane.showMessageDialog(parent, 
+                    "ℹ️ MODO SEGURO ACTIVO:\nPara los productos base, solo está autorizado actualizar el Precio.", 
+                    "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            }
 
             javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
             panel.add(new javax.swing.JLabel("Nombre del Producto:"));

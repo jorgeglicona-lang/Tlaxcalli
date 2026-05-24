@@ -1,23 +1,30 @@
-
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.LOGICA.C_NR;
+import com.ometeotl.tlaxcalli.LOGICA.C_Inicio; // Para usar pintarImagen()
+
 public class NR extends javax.swing.JFrame {
+
+    // Instanciamos el cerebro
+    private C_NR controlador = new C_NR();
 
     public NR() {
         initComponents();
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
         
+        // Ocultar ID en la tabla
         tabla_detalles.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_detalles.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_detalles.getColumnModel().getColumn(0).setWidth(0);
         
-        cargarEmpleados();
-        configurarSeccionMasa();
-        cargarComboProductos();
-        cargarComboGastos();
-        pintarImagen(Logolb, "/imagen/transparencia.png");
+        // Pintar logo usando el utilitario que ya teníamos en C_Inicio
+        new C_Inicio().pintarImagen(Logolb, "/imagen/transparencia.png");
+        
+        // Llenar combos delegando la tarea al controlador
+        controlador.inicializarCombos(BoxRepartidor, cb_producto, cb_gastos);
+        controlador.cargarPreciosBase();
+        configurarSeccionMasa(); // Lógica puramente visual, se queda aquí
     }
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -323,75 +330,7 @@ public class NR extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void b_guardarVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_guardarVActionPerformed
-        if (BoxRepartidor.getSelectedItem() == null) return;
-        
-        // Convertir el seleccionado a EmpleadoItem para sacar su ID
-        // (Si te da error aquí, asegúrate de haber actualizado cargarEmpleados como en el paso 2)
-        Object itemSeleccionado = BoxRepartidor.getSelectedItem();
-        
-        // Validación extra por si acaso sigue siendo String (por versiones viejas)
-        int idEmpleado = 0;
-        if (itemSeleccionado instanceof com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem) {
-            idEmpleado = ((com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem) itemSeleccionado).getId();
-        }
-        
-        if (idEmpleado == 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, "⚠️ Por favor selecciona un Repartidor o Mostrador.");
-            return;
-        }
-
-        // 2. OBTENER CANTIDADES (Manejando errores si están vacíos)
-        double kReparto = 0, kVenta = 0, kMasa = 0;
-        
-        try {
-            if (!t_reparto.getText().isEmpty()) kReparto = Double.parseDouble(t_reparto.getText());
-            if (!t_venta.getText().isEmpty()) kVenta = Double.parseDouble(t_venta.getText());
-            if (!t_masa.getText().isEmpty()) kMasa = Double.parseDouble(t_masa.getText());
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "❌ Verifica que los kilos sean números válidos.");
-            return;
-        }
-
-        // 3. CONFIRMAR ACCIÓN
-        int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
-                "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?",
-                "Confirmar Guardado", javax.swing.JOptionPane.YES_NO_OPTION);
-        
-        if (confirm != javax.swing.JOptionPane.YES_OPTION) return;
-
-        // 4. PREPARAR TABLAS
-        javax.swing.table.DefaultTableModel modeloProductos = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
-        javax.swing.table.DefaultTableModel modeloGastos = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
-
-        // 5. LLAMAR AL DAO
-        com.ometeotl.tlaxcalli.PERSISTENCIA.VentasDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.VentasDAO();
-        
-        // NOTA: Asegúrate de tener el método 'guardarCorteCompleto' en VentasDAO 
-        // (Si no lo tienes, avísame para pasártelo de nuevo)
-        boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, modeloProductos, modeloGastos);
-        
-        if (exito) {
-            javax.swing.JOptionPane.showMessageDialog(this, "✅ ¡Corte guardado exitosamente!");
-            
-            // LIMPIEZA TOTAL PARA EL SIGUIENTE
-            BoxRepartidor.setSelectedIndex(0);
-            t_reparto.setText("");
-            t_venta.setText("");
-            t_masa.setText("");
-            
-            // Limpiar tablas
-            modeloProductos.setRowCount(0);
-            modeloGastos.setRowCount(0);
-            
-            // Resetear secciones
-            s_masaNo.setSelected(true);
-            s_PAdicionales.setSelected(false);
-            // Llamar al evento para que bloquee los campos visualmente
-            s_PAdicionalesActionPerformed(null); 
-            
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "❌ Error al guardar en la base de datos.");
-        }
+        controlador.guardarCorte(this, BoxRepartidor, t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, s_masaNo, s_PAdicionales);
     }//GEN-LAST:event_b_guardarVActionPerformed
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed
@@ -399,74 +338,7 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void BoxRepartidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BoxRepartidorActionPerformed
-        if (BoxRepartidor.getSelectedItem() == null) return;
-        String seleccionado = BoxRepartidor.getSelectedItem().toString();
-
-        // INSTANCIAS DAO
-        com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO molinoDao = new com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoDAO();
-        com.ometeotl.tlaxcalli.PERSISTENCIA.VentasDAO ventasDao = new com.ometeotl.tlaxcalli.PERSISTENCIA.VentasDAO();
-        
-        t_reparto.setText("");
-        
-        if(seleccionado.equalsIgnoreCase("Seleccione...")){
-            t_reparto.setEnabled(false);
-            t_venta.setEnabled(false);
-            return;
-        }
-        // 1. SI ES "MOSTRADOR"
-        if (seleccionado.equalsIgnoreCase("Mostrador")) {
-            
-            // --- VALIDACIÓN DE SEGURIDAD (NUEVO) ---
-            double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
-            
-            if (produccionTotal <= 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, 
-                    "⚠️ ACCIÓN BLOQUEADA:\n" +
-                    "No se puede calcular el Mostrador porque el registro de Molino está vacío.\n" +
-                    "Por favor, registre primero la producción del día.");
-                
-                // Regresamos el combo a la opción por defecto ("Seleccione..." o el primero)
-                BoxRepartidor.setSelectedIndex(0); 
-                return; // Cortamos la ejecución aquí
-            }
-            // ---------------------------------------
-
-            // SI PASÓ LA VALIDACIÓN, HACEMOS EL CÁLCULO
-            t_reparto.setEditable(false);
-            t_reparto.setBackground(new java.awt.Color(220, 220, 220));
-            t_venta.setEditable(false);
-            t_venta.setBackground(new java.awt.Color(220, 220, 220)); 
-            
-            try {
-                double vendidoReparto = ventasDao.obtenerTotalRepartoHoy();
-                double sobranteMostrador = produccionTotal - vendidoReparto;
-                
-                // Alerta visual si sale negativo
-                if (sobranteMostrador < 0) {
-                     t_venta.setForeground(java.awt.Color.RED);
-                     javax.swing.JOptionPane.showMessageDialog(this, 
-                         "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
-                } else {
-                     t_venta.setForeground(java.awt.Color.BLACK);
-                }
-                
-                t_venta.setText(String.format("%.2f", sobranteMostrador));
-                
-            } catch (Exception e) {
-                System.err.println("Error: " + e.getMessage());
-                javax.swing.JOptionPane.showMessageDialog(null, "Error SQL Crítico:\n" + e.getMessage());
-            }
-
-        } else {
-            // 2. SI ES REPARTIDOR (O "Seleccione...")
-            t_reparto.setEnabled(true);
-            t_venta.setEnabled(true);
-            t_reparto.setEditable(true);
-            t_venta.setEditable(true);
-            t_venta.setText("");
-            t_venta.setBackground(java.awt.Color.WHITE);
-            t_venta.setForeground(java.awt.Color.BLACK);
-        }
+        controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta);
     }//GEN-LAST:event_BoxRepartidorActionPerformed
 
     private void b_molinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_molinoActionPerformed
@@ -477,198 +349,103 @@ public class NR extends javax.swing.JFrame {
 
     private void cb_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_productoActionPerformed
         if (cb_producto.getSelectedItem() == null) return;
-        
-        // Recuperamos el objeto inteligente
-        com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = 
-            (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
+        com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
         t_cantidad.setText("");
         t_precio.setText("");
         t_detalle.setText("");
             
         if (item.getId() == 0) {
-            t_cantidad.setEnabled(false);
-            t_precio.setEnabled(false);
-            t_detalle.setEnabled(false);
-            b_agregarProd.setEnabled(false); // Desactivar botón agregar
+            t_cantidad.setEnabled(false); t_precio.setEnabled(false); t_detalle.setEnabled(false); b_agregarProd.setEnabled(false); 
             return;
         }
         
-        b_agregarProd.setEnabled(true);
-        t_cantidad.setEnabled(true);
-        t_cantidad.setEditable(true);        // <--- ¡AGREGA ESTO! (Desbloquear)
-        t_cantidad.requestFocus();
+        b_agregarProd.setEnabled(true); t_cantidad.setEnabled(true); t_cantidad.setEditable(true); t_cantidad.requestFocus();
         
         if (item.isComodin()) {
-            // Si es "OTRO", dejamos escribir una nota o precio manual
-            t_precio.setEnabled(true);
-            t_precio.setEditable(true);
-            t_detalle.setEnabled(true);
-            t_detalle.setEditable(true);
-            t_detalle.requestFocus();
+            t_precio.setEnabled(true); t_precio.setEditable(true); t_detalle.setEnabled(true); t_detalle.setEditable(true); t_detalle.requestFocus();
         } else {
-            // Si es producto normal, bloqueamos y mostramos el precio fijo
-            t_detalle.setEnabled(false);
-            t_detalle.setText(item.toString());
-            t_precio.setEnabled(false);
-            t_precio.setText(String.valueOf(item.getPrecio()));
+            t_detalle.setEnabled(false); t_detalle.setText(item.toString()); t_precio.setEnabled(false); t_precio.setText(String.valueOf(item.getPrecio()));
         }
     }//GEN-LAST:event_cb_productoActionPerformed
 
     private void b_agregarProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarProdActionPerformed
         try {
-            // 1. Obtener datos
-            com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = 
-                (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
-            
+            com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
             int cantidad = Integer.parseInt(t_cantidad.getText());
-            double precioUnitario = 0;
-            String observacion = "";
-
-            // 2. Lógica del "Comodín"
-            if (item.isComodin()) {
-                // Si es OTRO, el usuario debe haber escrito el precio total o una nota
-                // Aquí asumiremos que en t_detalle puso el precio manual por simplicidad
-                // O puedes usar t_detalle como descripción y pedir precio en otro lado.
-                precioUnitario = Double.parseDouble(t_precio.getText()); 
-                observacion = "Varios"; // O lo que quieras capturar
-            } else {
-                precioUnitario = item.getPrecio();
-                observacion = item.toString();
-            }
-
+            double precioUnitario = item.isComodin() ? Double.parseDouble(t_precio.getText()) : item.getPrecio();
+            String observacion = item.isComodin() ? t_detalle.getText() : item.toString();
             double subtotal = cantidad * precioUnitario;
 
-            // 3. Agregar a la Tabla Visual
             javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
+            modelo.addRow(new Object[] { item.getId(), observacion, cantidad, precioUnitario, subtotal });
             
-            // Columnas sugeridas para tu tabla: [ID, Producto, Cantidad, Precio U., Subtotal]
-            modelo.addRow(new Object[] {
-                item.getId(),
-                item.toString(),
-                cantidad,
-                precioUnitario,
-                subtotal
-            });
-            
-            // 4. Limpiar campos
-            t_cantidad.setText("");
-            t_precio.setText("");
-            
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Verifica la cantidad y precio.");
-        }
-        calcularTotalAPagar();
+            t_cantidad.setText(""); t_precio.setText(""); t_detalle.setText("");
+        } catch (NumberFormatException e) { javax.swing.JOptionPane.showMessageDialog(this, "Verifica la cantidad y precio."); }
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_agregarProdActionPerformed
 
     private void cb_gastosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_gastosActionPerformed
         if (cb_gastos.getSelectedItem() == null) return;
+        com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
+        t_montoGasto.setText(""); t_detalleGasto.setText("");
         
-        com.ometeotl.tlaxcalli.LOGICA.GastoItem item = 
-            (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
+        if (item.getId() == 0) { t_detalleGasto.setEnabled(false); b_agregarGasto.setEnabled(false); return; }
         
-        t_montoGasto.setText("");
-        t_detalleGasto.setText("");
-        
-        if (item.getId() == 0) {
-            t_detalleGasto.setEnabled(false);
-            b_agregarGasto.setEnabled(false); // Desactivar botón agregar
-            return;
-        }
-        b_agregarGasto.setEnabled(true);
-        t_montoGasto.setEnabled(true);
-        t_montoGasto.setEditable(true);
-        t_montoGasto.requestFocus();
+        b_agregarGasto.setEnabled(true); t_montoGasto.setEnabled(true); t_montoGasto.setEditable(true); t_montoGasto.requestFocus();
         
         if (item.isRequiereDescripcion()) {
-            t_detalleGasto.setEnabled(true);
-            t_detalleGasto.setEditable(true);
+            t_detalleGasto.setEnabled(true); t_detalleGasto.setEditable(true);
         } else {
-            t_detalleGasto.setEnabled(false);
-            t_detalleGasto.setEditable(true);
-            t_detalleGasto.setText(item.toString()); // Ponemos el nombre por defecto
+            t_detalleGasto.setEnabled(false); t_detalleGasto.setText(item.toString()); 
         }
-        
     }//GEN-LAST:event_cb_gastosActionPerformed
 
     private void b_agregarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarGastoActionPerformed
         try {
-            com.ometeotl.tlaxcalli.LOGICA.GastoItem item = 
-                (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
-            
+            com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
             double monto = Double.parseDouble(t_montoGasto.getText());
-            String descripcion = "";
+            String descripcion = item.isRequiereDescripcion() ? t_detalleGasto.getText() : item.toString();
 
-            if (item.isRequiereDescripcion()) {
-                descripcion = t_detalleGasto.getText();
-                if (descripcion.isEmpty()) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Por favor especifica el detalle del gasto.");
-                    return;
-                }
-            } else {
-                descripcion = item.toString();
+            if (item.isRequiereDescripcion() && descripcion.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Por favor especifica el detalle del gasto."); return;
             }
 
-            // Agregar a la tabla visual
             javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
-            
-            // Columnas sugeridas: [Concepto, Monto]
             modelo.addRow(new Object[] { descripcion, monto });
             
-            // Limpiar
-            t_montoGasto.setText("");
-            t_detalleGasto.setText("");
-            
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "El monto debe ser numérico.");
-        }
-        calcularTotalAPagar();
+            t_montoGasto.setText(""); t_detalleGasto.setText("");
+        } catch (NumberFormatException e) { javax.swing.JOptionPane.showMessageDialog(this, "El monto debe ser numérico."); }
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_agregarGastoActionPerformed
 
     private void s_PAdicionalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_s_PAdicionalesActionPerformed
-        if (s_PAdicionales == null) return;
-        
         boolean activo = s_PAdicionales.isSelected();
-
-        // 2. Activamos/Desactivamos SOLO el ComboBox y la Tabla
         cb_producto.setEnabled(activo);
         tabla_detalles.setEnabled(activo);
-
-        // 3. Lógica de limpieza
         if (!activo) {
-            // SI DESACTIVAMOS: Bloqueamos y limpiamos todo lo demás
-            cb_producto.setSelectedIndex(0); // Regresa a "Seleccionar..."
+            cb_producto.setSelectedIndex(0); 
             t_detalle.setText("");
             t_cantidad.setText("");
             t_precio.setText("");
-            
             tabla_detalles.clearSelection(); 
             b_EliminarProd.setEnabled(false);
-            
             t_detalle.setEnabled(false);
-            t_cantidad.setEnabled(false);  // Bloqueamos cantidad
-            t_precio.setEnabled(false);    // Bloqueamos detalle
-            b_agregarProd.setEnabled(false); // Bloqueamos botón
-        } 
-        // Nota: Si 'activo' es true, NO activamos los campos aquí. 
-        // Dejamos que el usuario seleccione algo en el Combo primero.
+            t_cantidad.setEnabled(false);  
+            t_precio.setEnabled(false);    
+            b_agregarProd.setEnabled(false); 
+        }
     }//GEN-LAST:event_s_PAdicionalesActionPerformed
 
     private void c_GastosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c_GastosActionPerformed
-        if(c_Gastos == null) return;
-        
         boolean activo = c_Gastos.isSelected();
-        
         cb_gastos.setEnabled(activo);
         tabla_gastos.setEnabled(activo);
-        
         if(!activo){
             cb_gastos.setSelectedIndex(0);
             t_montoGasto.setText("");
             t_detalleGasto.setText("");
-            
             tabla_gastos.clearSelection();
             b_EliminarGasto.setEnabled(false);
-            
             t_montoGasto.setEnabled(false);
             t_detalleGasto.setEnabled(false);
             b_agregarGasto.setEnabled(false);
@@ -676,56 +453,43 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_c_GastosActionPerformed
 
     private void t_repartoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_repartoKeyReleased
-        calcularTotalAPagar();
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_t_repartoKeyReleased
 
     private void t_ventaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_ventaKeyReleased
-        calcularTotalAPagar();
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_t_ventaKeyReleased
 
     private void t_masaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_masaKeyReleased
-        calcularTotalAPagar();
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_t_masaKeyReleased
 
     private void eliminarProd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarProd
         javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
         int fila = tabla_detalles.getSelectedRow();
-        
         if (fila >= 0) {
             modelo.removeRow(fila);
-            calcularTotalAPagar(); // ¡IMPORTANTE! Recalcular el dinero
-            
-            // Si ya no hay filas, desactivamos el botón
-            if (modelo.getRowCount() == 0) {
-                b_EliminarProd.setEnabled(false);
-            }
+            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar); 
+            if (modelo.getRowCount() == 0) b_EliminarProd.setEnabled(false);
         }
     }//GEN-LAST:event_eliminarProd
 
     private void b_EliminarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_EliminarGastoActionPerformed
         javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
         int fila = tabla_gastos.getSelectedRow();
-        
         if (fila >= 0) {
             modelo.removeRow(fila);
-            calcularTotalAPagar(); // Recalcular
-            
-            if (modelo.getRowCount() == 0) {
-                b_EliminarGasto.setEnabled(false);
-            }
+            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar); 
+            if (modelo.getRowCount() == 0) b_EliminarGasto.setEnabled(false);
         }
     }//GEN-LAST:event_b_EliminarGastoActionPerformed
 
     private void tabla_detallesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_detallesMouseClicked
-        if (tabla_detalles.getSelectedRow() != -1) {
-            b_EliminarProd.setEnabled(true);
-        }
+        if (tabla_detalles.getSelectedRow() != -1) b_EliminarProd.setEnabled(true);
     }//GEN-LAST:event_tabla_detallesMouseClicked
 
     private void tabla_gastosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_gastosMouseClicked
-        if (tabla_gastos.getSelectedRow() != -1) {
-            b_EliminarGasto.setEnabled(true);
-        }
+        if (tabla_gastos.getSelectedRow() != -1) b_EliminarGasto.setEnabled(true);
     }//GEN-LAST:event_tabla_gastosMouseClicked
 
 
@@ -774,185 +538,28 @@ public class NR extends javax.swing.JFrame {
     private javax.swing.JTable tabla_detalles;
     private javax.swing.JTable tabla_gastos;
     // End of variables declaration//GEN-END:variables
-
-    // EN NR.java - Método cargarEmpleados ACTUALIZADO
-    private void cargarEmpleados() {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO dao = new com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO();
-        javax.swing.table.DefaultTableModel modelo = dao.consultarEmpleados();
-        
-        BoxRepartidor.addItem(new com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem(0, "Seleccione...")); 
-        
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            // Columna 0 es ID, Columna 1 es Nombre
-            int id = Integer.parseInt(modelo.getValueAt(i, 0).toString());
-            String nombre = modelo.getValueAt(i, 1).toString();
-            
-            BoxRepartidor.addItem(new com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem(id, nombre));
-        }
-    }
-
+    
     private void configurarSeccionMasa() {
-        // A) AGRUPAR LOS BOTONES (Para que actúen como equipo)
         javax.swing.ButtonGroup grupoMasa = new javax.swing.ButtonGroup();
         grupoMasa.add(s_masaSi);
         grupoMasa.add(s_masaNo);
 
-        // B) ESTADO INICIAL (Por defecto: NO hay venta de masa)
-        s_masaNo.setSelected(true);   // Marcamos "No"
-        t_masa.setEnabled(false);     // Bloqueamos la caja
-        t_masa.setText("");           // La dejamos vacía
-        t_masa.setBackground(new java.awt.Color(220, 220, 220)); // Gris visual
+        s_masaNo.setSelected(true);   
+        t_masa.setEnabled(false);     
+        t_masa.setText("");           
+        t_masa.setBackground(new java.awt.Color(220, 220, 220)); 
 
-        // C) EVENTO PARA "SÍ"
-        s_masaSi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                t_masa.setEnabled(true);  // Desbloquear
-                t_masa.setBackground(java.awt.Color.WHITE); // Blanco para escribir
-                t_masa.requestFocus();    // Poner el cursor ahí listo para escribir
-            }
+        s_masaSi.addActionListener(e -> {
+            t_masa.setEnabled(true);  
+            t_masa.setBackground(java.awt.Color.WHITE); 
+            t_masa.requestFocus();    
         });
 
-        // D) EVENTO PARA "NO"
-        s_masaNo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                t_masa.setEnabled(false); // Bloquear
-                t_masa.setText("");       // Borrar lo que haya escrito
-                t_masa.setBackground(new java.awt.Color(220, 220, 220)); // Gris
-            }
+        s_masaNo.addActionListener(e -> {
+            t_masa.setEnabled(false); 
+            t_masa.setText("");       
+            t_masa.setBackground(new java.awt.Color(220, 220, 220)); 
+            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
         });
-    }
-    
-    private void cargarComboProductos() {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.Cconection con = new com.ometeotl.tlaxcalli.PERSISTENCIA.Cconection();
-        cb_producto.addItem(new com.ometeotl.tlaxcalli.LOGICA.ProductoItem(0, "Seleccionar...", 0, false));
-        try {
-            java.sql.Connection c = con.establecerConexion();
-            // Traemos todos MENOS la tortilla y masa base (esos tienen sus propios campos arriba)
-            // O si prefieres todo unificado, quita el WHERE.
-            String sql = "SELECT * FROM Productos where id_producto > 3"; 
-            java.sql.PreparedStatement ps = c.prepareStatement(sql);
-            java.sql.ResultSet rs = ps.executeQuery();
-            
-            while(rs.next()) {
-                // Creamos el objeto inteligente
-                com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = new com.ometeotl.tlaxcalli.LOGICA.ProductoItem(
-                    rs.getInt("Id_producto"),
-                    rs.getString("Nom_producto"),
-                    rs.getDouble("Precio"),
-                    rs.getBoolean("Es_Comodin")
-                );
-                cb_producto.addItem(item);
-            }
-            c.close();
-        } catch (Exception e) { e.printStackTrace(); javax.swing.JOptionPane.showMessageDialog(this, "Error cargando productos: " + e.getMessage());}
-    }
-    
-    private void cargarComboGastos() {
-        cb_gastos.addItem(new com.ometeotl.tlaxcalli.LOGICA.GastoItem(0, "Seleccionar...", false));
-        try {
-            java.sql.Connection c = new com.ometeotl.tlaxcalli.PERSISTENCIA.Cconection().establecerConexion();
-            String sql = "SELECT * FROM Cat_Gastos"; 
-            java.sql.PreparedStatement ps = c.prepareStatement(sql);
-            java.sql.ResultSet rs = ps.executeQuery();
-            //cb_gastos.addItem("Seleccionar...");
-            while(rs.next()) {
-                cb_gastos.addItem(new com.ometeotl.tlaxcalli.LOGICA.GastoItem(
-                    rs.getInt("Id_tipo"),
-                    rs.getString("Nombre"),
-                    rs.getBoolean("Requiere_Descripcion")
-                ));
-            }
-            c.close();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-    
-    private void pintarImagen(javax.swing.JLabel lbl, String ruta) {
-        try {
-            // 1. Cargar la imagen desde los recursos del proyecto (funciona dentro del JAR)
-            java.net.URL url = getClass().getResource(ruta);
-            
-            if (url != null) {
-                javax.swing.ImageIcon imagen = new javax.swing.ImageIcon(url);
-                
-                // 2. Obtener dimensiones. Si el layout aún no carga, usamos el tamaño preferido
-                int w = lbl.getWidth();
-                int h = lbl.getHeight();
-                if (w == 0 || h == 0) {
-                    w = lbl.getPreferredSize().width;
-                    h = lbl.getPreferredSize().height;
-                }
-                
-                // 3. Escalar la imagen (SCALE_SMOOTH da mejor calidad que la librería externa)
-                javax.swing.Icon icono = new javax.swing.ImageIcon(
-                    imagen.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH)
-                );
-                
-                // 4. Asignar al label
-                lbl.setIcon(icono);
-                lbl.repaint();
-            } else {
-                System.err.println("No se encontró la imagen en: " + ruta);
-            }
-        } catch (Exception e) {
-            System.err.println("Error cargando imagen: " + e.getMessage());
-        }
-    }
-    
-    // MÉTODO MAESTRO PARA CALCULAR EL CORTE EN TIEMPO REAL
-    private void calcularTotalAPagar() {
-        double totalIngresos = 0.0;
-        double totalGastos = 0.0;
-        
-        try {
-            // --- 1. SUMAR INGRESOS (VENTAS) ---
-            
-            // A. Tortilla Reparto ($19.00)
-            if (!t_reparto.getText().isEmpty()) {
-                totalIngresos += Double.parseDouble(t_reparto.getText()) * 19.00;
-            }
-            
-            // B. Tortilla Mostrador ($22.00)
-            if (!t_venta.getText().isEmpty()) {
-                totalIngresos += Double.parseDouble(t_venta.getText()) * 22.00;
-            }
-            
-            // C. Masa ($20.00)
-            if (!t_masa.getText().isEmpty()) {
-                totalIngresos += Double.parseDouble(t_masa.getText()) * 20.00;
-            }
-            
-            // D. Productos Adicionales (Tabla Detalles - Columna 4: Subtotal)
-            javax.swing.table.DefaultTableModel modeloProd = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
-            for (int i = 0; i < modeloProd.getRowCount(); i++) {
-                Object valor = modeloProd.getValueAt(i, 4); 
-                if (valor != null) totalIngresos += Double.parseDouble(valor.toString());
-            }
-
-            // --- 2. SUMAR GASTOS (RESTAS) ---
-            
-            // E. Gastos (Tabla Gastos - Columna 1: Monto)
-            javax.swing.table.DefaultTableModel modeloGastos = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
-            for (int i = 0; i < modeloGastos.getRowCount(); i++) {
-                Object valor = modeloGastos.getValueAt(i, 1);
-                if (valor != null) totalGastos += Double.parseDouble(valor.toString());
-            }
-
-        } catch (NumberFormatException e) {
-            // Ignoramos errores mientras escriben
-        }
-
-        // --- 3. CÁLCULO FINAL ---
-        double totalFinal = totalIngresos - totalGastos;
-        
-        // Mostramos el desglose en la etiqueta para que sea claro
-        // Ejemplo: "Entregar: $1500.00 (V: $1600 - G: $100)"
-        c_entregar.setText("Total a Entregar: $" + String.format("%.2f", totalFinal));
-        
-        // Si quieres que el texto cambie de color si sale negativo (debe dinero la tortillería):
-        if (totalFinal < 0) {
-            c_entregar.setForeground(java.awt.Color.RED);
-        } else {
-            c_entregar.setForeground(java.awt.Color.BLACK); // O el color original
-        }
-    }
+    }    
 }
