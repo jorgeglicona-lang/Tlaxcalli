@@ -1,16 +1,17 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.ReportesDAO;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
 
 public class C_Reportes {
     
-    private ReportesDAO dao = new ReportesDAO();
-
+    private IReportesDAO dao = DAOFactory.getReportesDAO();
+    
     // Lógica para estructurar el ComboBox
     public void cargarEmpleados(JComboBox<String> combo) {
         combo.removeAllItems();

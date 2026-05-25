@@ -1,121 +1,230 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.ometeotl.tlaxcalli.LOGICA;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import java.io.FileOutputStream;
-import java.io.File;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JFileChooser;
+// 🚀 NUEVOS IMPORTS DE ITEXT 7 (Adiós al paquete .text anterior)
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
 
+import javax.swing.table.DefaultTableModel;
 public class GeneradorReportes {
+    
+    private IReportesDAO reportesDao = DAOFactory.getReportesDAO();
+    private IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
+
+    public void prepararPDF(String fechaInicio, String fechaFin, String empleadoFiltro) {
+        // 1. Creamos modelos temporales para extraer la info de los DAOs
+        DefaultTableModel modeloVentas = new DefaultTableModel();
+        DefaultTableModel modeloGastosOp = new DefaultTableModel();
+        
+        // 🛠️ ¡REPARADO! Usamos el DAO unificado de Gastos Generales mediante la fábrica
+        DefaultTableModel modeloGastosAdm = gastosGeneralesDao.obtenerGastosPorRango(fechaInicio, fechaFin);
+        
+        modeloVentas.addColumn("Empleado");
+        modeloVentas.addColumn("Producto");
+        modeloVentas.addColumn("Monto ($)");
+
+        modeloGastosOp.addColumn("Empleado");
+        modeloGastosOp.addColumn("Descripción");
+        modeloGastosOp.addColumn("Monto ($)");
+
+        // 2. Ejecutamos las consultas portátiles desde SQLite
+        double totalV = reportesDao.llenarVentas(empleadoFiltro, fechaInicio, fechaFin, modeloVentas);
+        double totalGOp = reportesDao.llenarGastos(empleadoFiltro, fechaInicio, fechaFin, modeloGastosOp);
+        
+        // 3. Calculamos totales generales de la tabla administrativa (La columna 2 es el Monto)
+        double totalGAdm = 0;
+        for (int i = 0; i < modeloGastosAdm.getRowCount(); i++) {
+            totalGAdm += Double.parseDouble(modeloGastosAdm.getValueAt(i, 2).toString());
+        }
+
+        // 4. Llamamos al generador de PDF enviando toda la información recolectada
+        GeneradorReportes pdf = new GeneradorReportes();
+        pdf.crearDocumento(fechaInicio, fechaFin, empleadoFiltro, modeloVentas, modeloGastosOp, modeloGastosAdm, totalV, totalGOp, totalGAdm);
+    }
     
     public void crearDocumento(String fInicio, String fFin, String empleado, 
                                DefaultTableModel vtas, DefaultTableModel gOp, DefaultTableModel gAdm, 
                                double tV, double tGOp, double tGAdm) {
     
-        Document documento = new Document(PageSize.A4);
-    
+        // 1. Configuración de carpetas y nombre (Automatización intacta)
+        String userHome = System.getProperty("user.home");
+        java.io.File carpetaReportes = new java.io.File(userHome + java.io.File.separator + "Documents" + java.io.File.separator + "Tlaxcalli_Reportes");
+        
+        if (!carpetaReportes.exists()) {
+            carpetaReportes.mkdirs(); 
+        }
+
+        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+        java.time.format.DateTimeFormatter formatoFechaHora = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
+        String fechaHoraStr = ahora.format(formatoFechaHora);
+        String empleadoLimpio = empleado.trim().replace(" ", "_");
+        String nombreFinalArchivo = "Reporte_" + empleadoLimpio + "_" + fechaHoraStr + ".pdf";
+        
+        java.io.File archivoPDF = new java.io.File(carpetaReportes, nombreFinalArchivo);
+        String rutaFinal = archivoPDF.getAbsolutePath();
+        
+        // 🛡️ MOTOR DE ITEXT 9.6.0
         try {
-            // 1. Ubicación del archivo (Ventana para guardar)
-            String ruta = "";
-            JFileChooser jf = new JFileChooser();
-            if (jf.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                ruta = jf.getSelectedFile().getAbsolutePath() + ".pdf";
+            PdfWriter writer = new PdfWriter(rutaFinal);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document documento = new Document(pdfDoc, PageSize.A4);
+
+            // Carga de fuentes base
+            PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont fontNormal = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+            // ==========================================
+            // 🖼️ ENCABEZADO CON LOGO
+            // ==========================================
+            Table tablaEncabezado = new Table(UnitValue.createPercentArray(new float[]{1f, 4f}));
+            tablaEncabezado.setWidth(UnitValue.createPercentValue(100));
+
+            try {
+                java.net.URL urlLogo = getClass().getResource("/imagen/transparencia.png");
+                if (urlLogo != null) {
+                    Image logo = new Image(ImageDataFactory.create(urlLogo));
+                    logo.scaleToFit(35, 35);
+                    
+                    Cell celdaLogo = new Cell().add(logo);
+                    celdaLogo.setBorder(com.itextpdf.layout.borders.Border.NO_BORDER);
+                    celdaLogo.setTextAlignment(TextAlignment.CENTER);
+                    celdaLogo.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    tablaEncabezado.addCell(celdaLogo);
+                } else {
+                    tablaEncabezado.addCell(new Cell().setBorder(com.itextpdf.layout.borders.Border.NO_BORDER));
+                }
+            } catch (Exception ex) {
+                System.err.println("No se pudo cargar el logo: " + ex.getMessage());
             }
 
-            PdfWriter.getInstance(documento, new FileOutputStream(ruta));
-            documento.open();
+            // Textos del encabezado
+            Cell celdaTextos = new Cell().setBorder(com.itextpdf.layout.borders.Border.NO_BORDER);
+            
+            celdaTextos.add(new Paragraph("TLAXCALLI - REPORTE DE ACTIVIDAD")
+                    .setFont(fontBold).setFontSize(18).setTextAlignment(TextAlignment.CENTER));
+            
+            celdaTextos.add(new Paragraph("Periodo: " + fInicio + " al " + fFin)
+                    .setFont(fontNormal).setFontSize(11).setTextAlignment(TextAlignment.CENTER));
+            
+            celdaTextos.add(new Paragraph("Filtro Empleado: " + empleado)
+                    .setFont(fontNormal).setFontSize(11).setTextAlignment(TextAlignment.CENTER));
 
-            // --- ESTILOS ---
-            Font tituloF = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-            Font subTituloF = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLUE);
-            Font negrita = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+            tablaEncabezado.addCell(celdaTextos);
+            documento.add(tablaEncabezado);
+            documento.add(new Paragraph("\n")); 
 
-            // 2. ENCABEZADO
-            Paragraph titulo = new Paragraph("TLAXCALLI - REPORTE DE ACTIVIDAD", tituloF);
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(titulo);
-            documento.add(new Paragraph("Periodo: " + fInicio + " al " + fFin));
-            documento.add(new Paragraph("Filtro Empleado: " + empleado));
-            documento.add(Chunk.NEWLINE);
-
-            // 3. SECCIÓN 1: RESUMEN EJECUTIVO (Caja de Totales)
-            documento.add(new Paragraph("1. RESUMEN FINANCIERO", subTituloF));
-            PdfPTable tablaResumen = new PdfPTable(2);
-            tablaResumen.setWidthPercentage(100);
+            // ==========================================
+            // 📊 SECCIÓN 1: RESUMEN FINANCIERO
+            // ==========================================
+            documento.add(new Paragraph("1. RESUMEN FINANCIERO")
+                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
+            
+            Table tablaResumen = new Table(UnitValue.createPercentArray(2));
+            tablaResumen.setWidth(UnitValue.createPercentValue(100));
         
             double totalGastos = tGOp + tGAdm;
             double neto = tV - totalGastos;
 
-            agregarCeldaResumen(tablaResumen, "Ventas Totales:", String.format("$%.2f", tV));
-            agregarCeldaResumen(tablaResumen, "Gastos Totales (Adm + Op):", String.format("$%.2f", totalGastos));
-            agregarCeldaResumen(tablaResumen, "GANANCIA NETA:", String.format("$%.2f", neto));
+            agregarCeldaResumen(tablaResumen, "Ventas Totales:", String.format("$%.2f", tV), fontNormal, fontBold);
+            agregarCeldaResumen(tablaResumen, "Gastos Totales (Adm + Op):", String.format("$%.2f", totalGastos), fontNormal, fontBold);
+            agregarCeldaResumen(tablaResumen, "GANANCIA NETA:", String.format("$%.2f", neto), fontNormal, fontBold);
         
             documento.add(tablaResumen);
-            documento.add(Chunk.NEWLINE);
+            documento.add(new Paragraph("\n"));
 
-            // 4. SECCIÓN 2: GASTOS ADMINISTRATIVOS (Materia Prima/Fijos)
-            documento.add(new Paragraph("2. DESGLOSE ADMINISTRATIVO", subTituloF));
-            PdfPTable tablaAdm = crearTablaDesdeModelo(gAdm, new String[]{"ID", "Descripción", "Monto ($)", "Fecha"});
+            // ==========================================
+            // 🏢 SECCIÓN 2: DESGLOSE ADMINISTRATIVO
+            // ==========================================
+            documento.add(new Paragraph("2. DESGLOSE ADMINISTRATIVO")
+                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
+            
+            Table tablaAdm = crearTablaDesdeModelo(gAdm, new String[]{"ID", "Descripción", "Monto ($)", "Fecha"}, fontNormal, fontBold);
             documento.add(tablaAdm);
-            documento.add(new Paragraph("Subtotal Administrativo: $" + String.format("%.2f", tGAdm), negrita));
-            documento.add(Chunk.NEWLINE);
+            
+            documento.add(new Paragraph("Subtotal Administrativo: $" + String.format("%.2f", tGAdm))
+                    .setFont(fontBold).setFontSize(10));
+            documento.add(new Paragraph("\n"));
 
-            // 5. SECCIÓN 3: ACTIVIDAD OPERATIVA (Ventas y Gastos por Trabajador)
-            documento.add(new Paragraph("3. ACTIVIDAD OPERATIVA (MOSTRADOR/REPARTIDORES)", subTituloF));
+            // ==========================================
+            // 🛵 SECCIÓN 3: ACTIVIDAD OPERATIVA
+            // ==========================================
+            documento.add(new Paragraph("3. ACTIVIDAD OPERATIVA (MOSTRADOR/REPARTIDORES)")
+                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
         
-            documento.add(new Paragraph("Ventas registradas:", negrita));
-            documento.add(crearTablaDesdeModelo(vtas, new String[]{"Empleado", "Producto", "Monto ($)"}));
+            documento.add(new Paragraph("Ventas registradas:").setFont(fontBold).setFontSize(10));
+            documento.add(crearTablaDesdeModelo(vtas, new String[]{"Empleado", "Producto", "Monto ($)"}, fontNormal, fontBold));
         
-            documento.add(new Paragraph("Gastos operativos registrados:", negrita));
-            documento.add(crearTablaDesdeModelo(gOp, new String[]{"Empleado", "Descripción", "Monto ($)"}));
+            documento.add(new Paragraph("Gastos operativos registrados:").setFont(fontBold).setFontSize(10));
+            documento.add(crearTablaDesdeModelo(gOp, new String[]{"Empleado", "Descripción", "Monto ($)"}, fontNormal, fontBold));
         
-            documento.add(new Paragraph("Subtotal Operativo: $" + String.format("%.2f", tGOp), negrita));
+            documento.add(new Paragraph("Subtotal Operativo: $" + String.format("%.2f", tGOp))
+                    .setFont(fontBold).setFontSize(10));
 
-            documento.add(new Paragraph("\n--- Fin del Reporte ---"));
+            documento.add(new Paragraph("\n--- Fin del Reporte ---").setTextAlignment(TextAlignment.CENTER));
+            
+            // Cierre maestro del PDF
             documento.close();
-       
-             java.awt.Desktop.getDesktop().open(new File(ruta)); // Abre el PDF automáticamente
-        
+            
+            // Apertura automática
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().open(archivoPDF);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(null, "✅ Reporte guardado en:\n" + rutaFinal);
+            }
+            
         } catch (Exception e) {
-            System.err.println("Error al dibujar PDF: " + e.getMessage());
+            System.err.println("Error procesando iText 9: " + e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(null, "❌ Error generando PDF:\n" + e.getMessage());
         }
     }
-        // Crea celdas elegantes para el resumen
-    private void agregarCeldaResumen(PdfPTable tabla, String texto, String valor) {
-        tabla.addCell(new Phrase(texto));
-        PdfPCell celdaValor = new PdfPCell(new Phrase(valor));
-        celdaValor.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+    private void agregarCeldaResumen(Table tabla, String texto, String valor, PdfFont normal, PdfFont bold) {
+        tabla.addCell(new Cell().add(new Paragraph(texto).setFont(normal)));
+        
+        // La alineación en la celda se hace con TextAlignment
+        Cell celdaValor = new Cell().add(new Paragraph(valor).setFont(bold));
+        celdaValor.setTextAlignment(TextAlignment.RIGHT); 
         tabla.addCell(celdaValor);
     }
     
-    // Convierte cualquier DefaultTableModel en una tabla de iText
-    private PdfPTable crearTablaDesdeModelo(DefaultTableModel modelo, String[] titulos) throws DocumentException {
-        PdfPTable tabla = new PdfPTable(titulos.length);
-        tabla.setWidthPercentage(100);
-        tabla.setSpacingBefore(10f);
+    private Table crearTablaDesdeModelo(DefaultTableModel modelo, String[] titulos, PdfFont normal, PdfFont bold) {
+        Table tabla = new Table(UnitValue.createPercentArray(titulos.length));
+        tabla.setWidth(UnitValue.createPercentValue(100));
+        tabla.setMarginTop(10f);
 
-        // Cabezales de la tabla
+        // Cabeceras (Background gris oscuro, texto blanco centrado)
         for (String titulo : titulos) {
-            PdfPCell h = new PdfPCell(new Phrase(titulo, new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE)));
-            h.setBackgroundColor(BaseColor.DARK_GRAY);
-            h.setHorizontalAlignment(Element.ALIGN_CENTER);
+            Cell h = new Cell().add(new Paragraph(titulo).setFont(bold).setFontColor(ColorConstants.WHITE));
+            h.setBackgroundColor(ColorConstants.DARK_GRAY);
+            h.setTextAlignment(TextAlignment.CENTER);
             tabla.addCell(h);
         }
     
-        // Datos
+        // Inyección de celdas a partir de su JTable
         for (int i = 0; i < modelo.getRowCount(); i++) {
             for (int j = 0; j < modelo.getColumnCount(); j++) {
-                tabla.addCell(modelo.getValueAt(i, j).toString());
+                Object celda = modelo.getValueAt(i, j);
+                tabla.addCell(new Cell().add(new Paragraph(celda != null ? celda.toString() : "").setFont(normal)));
             }
         }
         return tabla;
     }
+
     
 }

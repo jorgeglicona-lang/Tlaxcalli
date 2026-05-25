@@ -1,5 +1,5 @@
 package com.ometeotl.tlaxcalli.IGU;
-import com.ometeotl.tlaxcalli.LOGICA.C_GenerarReporte;
+import com.ometeotl.tlaxcalli.LOGICA.GeneradorReportes;
 import javax.swing.JOptionPane;
 
 public class Reportes extends javax.swing.JFrame {
@@ -197,7 +197,7 @@ public class Reportes extends javax.swing.JFrame {
         String inicio = datePicker1.getDate().toString();
         String fin = datePicker4.getDate().toString();
 
-        C_GenerarReporte orquestador = new C_GenerarReporte();
+        GeneradorReportes orquestador = new GeneradorReportes();
         orquestador.prepararPDF(inicio, fin, empleado);
     }//GEN-LAST:event_B_GenPDFActionPerformed
 

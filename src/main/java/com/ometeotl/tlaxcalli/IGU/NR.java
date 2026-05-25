@@ -339,7 +339,7 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void BoxRepartidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BoxRepartidorActionPerformed
-        c_entregar.setText("$0.00");
+        c_entregar.setText("Total a Entregar: $0.00");
         controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,
                                                 s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
                                                 cb_gastos, cb_producto);

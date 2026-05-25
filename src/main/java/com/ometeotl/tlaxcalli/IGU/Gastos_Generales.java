@@ -72,6 +72,7 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jPanel1.add(B_GyS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 430, -1, -1));
 
         B_SalirGAd.setText("Salir");
+        B_SalirGAd.addActionListener(this::B_SalirGAdActionPerformed);
         jPanel1.add(B_SalirGAd, new org.netbeans.lib.awtextra.AbsoluteConstraints(37, 441, -1, -1));
 
         jLabel4.setText("Total de gastos operativos");
@@ -173,6 +174,10 @@ public class Gastos_Generales extends javax.swing.JFrame {
     controlador.buscarPorFechas(datePicker1.getDate().toString(), datePicker2.getDate().toString(), T_GAd, TotalGAd);
 
     }//GEN-LAST:event_B_BuscarGActionPerformed
+
+    private void B_SalirGAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_SalirGAdActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_B_SalirGAdActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton B_AgregarGAd;

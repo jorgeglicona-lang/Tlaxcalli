@@ -1,24 +1,23 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.ReportesDAO;
-import com.ometeotl.tlaxcalli.PERSISTENCIA.GGAdministrativosDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import javax.swing.table.DefaultTableModel;
-import java.util.ArrayList;
-import java.util.List;
-import com.ometeotl.tlaxcalli.IGU.Reportes;
-
-
 
 public class C_GenerarReporte {
     
-    private ReportesDAO reportesDao = new ReportesDAO();
-    private GGAdministrativosDAO gastosAdmDao = new GGAdministrativosDAO();
+    // 🛠️ ¡REPARADO! Enchufamos las interfaces limpias a través de la fábrica genérica
+    private IReportesDAO reportesDao = DAOFactory.getReportesDAO();
+    private IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
 
     public void prepararPDF(String fechaInicio, String fechaFin, String empleadoFiltro) {
         // 1. Creamos modelos temporales para extraer la info de los DAOs
         DefaultTableModel modeloVentas = new DefaultTableModel();
         DefaultTableModel modeloGastosOp = new DefaultTableModel();
-        DefaultTableModel modeloGastosAdm = gastosAdmDao.obtenerGastosPorRango(fechaInicio, fechaFin);
+        
+        // 🛠️ ¡REPARADO! Usamos el DAO unificado de Gastos Generales mediante la fábrica
+        DefaultTableModel modeloGastosAdm = gastosGeneralesDao.obtenerGastosPorRango(fechaInicio, fechaFin);
         
         modeloVentas.addColumn("Empleado");
         modeloVentas.addColumn("Producto");
@@ -28,17 +27,17 @@ public class C_GenerarReporte {
         modeloGastosOp.addColumn("Descripción");
         modeloGastosOp.addColumn("Monto ($)");
 
-        // 2. Ejecutamos las consultas que ya tenemos (usando sus DAOs actuales)
+        // 2. Ejecutamos las consultas portátiles desde SQLite
         double totalV = reportesDao.llenarVentas(empleadoFiltro, fechaInicio, fechaFin, modeloVentas);
         double totalGOp = reportesDao.llenarGastos(empleadoFiltro, fechaInicio, fechaFin, modeloGastosOp);
         
-        // 3. Calculamos totales generales
+        // 3. Calculamos totales generales de la tabla administrativa (La columna 2 es el Monto)
         double totalGAdm = 0;
         for (int i = 0; i < modeloGastosAdm.getRowCount(); i++) {
             totalGAdm += Double.parseDouble(modeloGastosAdm.getValueAt(i, 2).toString());
         }
 
-        // 4. Llamamos al generador visual enviando todos los datos recolectados
+        // 4. Llamamos al generador de PDF enviando toda la información recolectada
         GeneradorReportes pdf = new GeneradorReportes();
         pdf.crearDocumento(fechaInicio, fechaFin, empleadoFiltro, modeloVentas, modeloGastosOp, modeloGastosAdm, totalV, totalGOp, totalGAdm);
     }

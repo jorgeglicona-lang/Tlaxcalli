@@ -2,10 +2,12 @@ package com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces;
 
 import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLiteDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.GastosGeneralesSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.SQLiteInicioDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoSQLiteDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.ReportesSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.VentasSQLiteDAO;
 
 public class DAOFactory {
@@ -47,6 +49,20 @@ public class DAOFactory {
     public static IVentasDAO getVentasDAO(){
         if (MODO_PORTATIL){
             return new VentasSQLiteDAO();
+        }
+        return null;
+    }
+    
+    public static IGastosGeneralesDAO getGastosGeneralesDAO() {
+        if (MODO_PORTATIL) {
+            return new GastosGeneralesSQLiteDAO();
+        }
+        return null;
+    }
+    
+    public static IReportesDAO getReportesDAO() {
+        if (MODO_PORTATIL) {
+            return new ReportesSQLiteDAO();
         }
         return null;
     }

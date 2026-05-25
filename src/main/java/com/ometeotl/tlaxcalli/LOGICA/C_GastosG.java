@@ -1,13 +1,14 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.GGAdministrativosDAO;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class C_GastosG {
     
-    private GGAdministrativosDAO dao = new GGAdministrativosDAO();
+    private IGastosGeneralesDAO dao = DAOFactory.getGastosGeneralesDAO();
 
     // Llena la tabla y calcula el total automáticamente
     public void cargarSemanaActual(JTable tabla, JTextField txtTotal) {
