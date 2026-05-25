@@ -19,6 +19,18 @@ public class VentasSQLiteDAO implements IVentasDAO {
         try {
             con = conMngr.establecerConexionPortatil();
             con.setAutoCommit(false); // MODO TRANSACCIÓN
+            
+            // Limpiamos los registros viejos de HOY para este empleado antes de inyectar el nuevo estado limpio.
+            String sqlDelVentas = "DELETE FROM Ventas_Diarias WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime')";
+            String sqlDelGastos = "DELETE FROM Gastos WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime')";
+            
+            try (PreparedStatement psDelV = con.prepareStatement(sqlDelVentas);
+                 PreparedStatement psDelG = con.prepareStatement(sqlDelGastos)) {
+                psDelV.setInt(1, idEmpleado);
+                psDelG.setInt(1, idEmpleado);
+                psDelV.executeUpdate();
+                psDelG.executeUpdate();
+            }
 
             // 1. GUARDAR VENTAS FIJAS
             // En SQLite usamos datetime('now', 'localtime') para la estampa de tiempo
@@ -158,5 +170,87 @@ public class VentasSQLiteDAO implements IVentasDAO {
             System.err.println("Error obteniendo precio: " + e.getMessage());
         }
         return 0.0; // En caso de error catastrófico
+    }
+    
+    @Override
+    public double[] obtenerCorteEmpleadoHoy(int idEmpleado) {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "SELECT Id_producto, Cantidad FROM Ventas_Diarias " +
+                     "WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime') " +
+                     "AND Id_producto IN (1, 2, 3)";
+        
+        try (Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, idEmpleado);
+            try (ResultSet rs = ps.executeQuery()) {
+                double[] datos = new double[3];
+                boolean tieneRegistros = false;
+                
+                while (rs.next()) {
+                    tieneRegistros = true;
+                    int idProd = rs.getInt("Id_producto");
+                    double cantidad = rs.getDouble("Cantidad");
+                    
+                    // Mapeamos: ID 1 -> posición 0, ID 2 -> posición 1, ID 3 -> posición 2
+                    if (idProd >= 1 && idProd <= 3) {
+                        datos[idProd - 1] = cantidad;
+                    }
+                }
+                // Si encontramos al menos una fila, regresamos el array. Si no, null.
+                return tieneRegistros ? datos : null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error buscando corte previo en SQLite: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    @Override
+    public List<Object[]> obtenerProductosCorteHoy(int idEmpleado) {
+        List<Object[]> lista = new ArrayList<>();
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "SELECT v.Id_producto, p.Nom_producto, v.Cantidad, p.Precio, v.Total_Dinero " +
+                     "FROM Ventas_Diarias v " +
+                     "JOIN Productos p ON v.Id_producto = p.Id_producto " +
+                     "WHERE v.Id_empleado = ? AND date(v.Fecha) = date('now', 'localtime') AND v.Id_producto > 3";
+        
+        try (Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idEmpleado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Object[] fila = new Object[5];
+                    fila[0] = rs.getInt("Id_producto");
+                    fila[1] = rs.getString("Nom_producto");
+                    fila[2] = rs.getDouble("Cantidad");
+                    fila[3] = rs.getDouble("Precio");
+                    fila[4] = rs.getDouble("Total_Dinero");
+                    lista.add(fila);
+                }
+            }
+        } catch (Exception e) { System.err.println("Error cargando tabla productos hoy: " + e.getMessage()); }
+        return lista;
+    }
+
+    @Override
+    public List<Object[]> obtenerGastosCorteHoy(int idEmpleado) {
+        List<Object[]> lista = new ArrayList<>();
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        String sql = "SELECT Descripcion, Monto FROM Gastos WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime')";
+        
+        try (Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idEmpleado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Object[] fila = new Object[2];
+                    fila[0] = rs.getString("Descripcion");
+                    fila[1] = rs.getDouble("Monto");
+                    lista.add(fila);
+                }
+            }
+        } catch (Exception e) { System.err.println("Error cargando tabla gastos hoy: " + e.getMessage()); }
+        return lista;
     }
 }

@@ -80,22 +80,106 @@ public class C_NR {
     }
 
     // 3. LÓGICA DE REPARTIDOR VS MOSTRADOR
-    public void procesarSeleccionRepartidor(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto, JTextField tVenta) {
+    public void procesarSeleccionRepartidor(JFrame parent, JComboBox<Object> boxRepartidor, 
+                                            JTextField tReparto, JTextField tVenta, JTextField tMasa, 
+                                            JRadioButton sMasa, JCheckBox Pro, JCheckBox Gas,
+                                            JTable tProd, JTable tGastos, JLabel cEntregar, 
+                                            JComboBox cb_gas, JComboBox cb_pro) { // 🚀 NUEVOS PARÁMETROS
+
         if (boxRepartidor.getSelectedItem() == null) return;
-        String seleccionado = boxRepartidor.getSelectedItem().toString();
         
-        tReparto.setText("");
+        Object item = boxRepartidor.getSelectedItem();
+        int idEmpleado = 0;
+        if (item instanceof EmpleadoItem) {
+            idEmpleado = ((EmpleadoItem) item).getId();
+        }
         
-        if(seleccionado.equalsIgnoreCase("Seleccione...")){
-            tReparto.setEnabled(false);
-            tVenta.setEnabled(false);
+        String seleccionado = item.toString();
+        DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
+        DefaultTableModel modeloGastos = (DefaultTableModel) tGastos.getModel();
+        
+        // Limpieza inicial estándar
+        tReparto.setText(""); tVenta.setText(""); tMasa.setText("");
+        tReparto.setBackground(Color.WHITE); tVenta.setBackground(Color.WHITE); tMasa.setBackground(Color.WHITE);
+        tVenta.setForeground(Color.BLACK);
+        modeloProd.setRowCount(0);
+        modeloGastos.setRowCount(0);
+        
+        if (seleccionado.equalsIgnoreCase("Seleccione...")) {
+            tReparto.setEnabled(false); tVenta.setEnabled(false); tMasa.setEnabled(false);
+            calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
             return;
         }
         
+        IVentasDAO ventasDao = DAOFactory.getVentasDAO();
+        double[] corteExistente = ventasDao.obtenerCorteEmpleadoHoy(idEmpleado);
+        
+        if (corteExistente != null) {
+            // 🛑 ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
+            tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
+            tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
+            tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
+            
+            Color amarilloAlerta = new Color(255, 255, 200);
+            tReparto.setBackground(amarilloAlerta);
+            tVenta.setBackground(amarilloAlerta); 
+            tMasa.setBackground(amarilloAlerta);
+            // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
+            if (!seleccionado.equalsIgnoreCase("Mostrador")) {
+                tReparto.setEnabled(true);
+                tReparto.setEditable(true);
+                tVenta.setEnabled(true);   
+                tVenta.setEditable(true);
+                tReparto.setDisabledTextColor(Color.BLACK);
+            } else {
+                tReparto.setEnabled(false);
+                tVenta.setEnabled(false);
+                tReparto.setDisabledTextColor(Color.BLACK);
+            }
+            
+            // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
+            // Si tiene más de 0 kilos, la habilitamos.
+            String textoMasa = tMasa.getText();
+            if (!textoMasa.equals("0.00") && !textoMasa.equals("0.0") && !textoMasa.isEmpty()) {
+                tMasa.setEnabled(true);   
+                tMasa.setEditable(true);
+                sMasa.setSelected(true);
+            } else {
+                tMasa.setEnabled(false);
+            }
+            // 🚀 🛠️ ¡REPARADO! Llenamos las tablas visuales de productos adicionales y gastos
+            List<Object[]> productosHoy = ventasDao.obtenerProductosCorteHoy(idEmpleado);
+            for (Object[] fila : productosHoy) {
+                modeloProd.addRow(fila);
+            }
+            
+            List<Object[]> gastosHoy = ventasDao.obtenerGastosCorteHoy(idEmpleado);
+            for (Object[] fila : gastosHoy) {
+                modeloGastos.addRow(fila);
+            }
+            if(modeloGastos.getRowCount()>0){
+                Gas.setSelected(true);
+                cb_gas.setEnabled(true);
+                tGastos.setEnabled(true);
+            }
+            if(modeloProd.getRowCount()>0){
+                Pro.setSelected(true);
+                cb_pro.setEnabled(true);
+                tProd.setEnabled(true);
+            }
+            
+            // Forzamos el recalculo inmediato del dinero para que coincida con las tablas cargadas
+            calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
+            JOptionPane.showMessageDialog(parent, 
+                "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos y gastos en las tablas.", 
+                "Información", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+
+        // 🟢 ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
         if (seleccionado.equalsIgnoreCase("Mostrador")) {
             IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
-            IVentasDAO ventasDao = DAOFactory.getVentasDAO();
-            
             double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
             
             if (produccionTotal <= 0) {
@@ -104,40 +188,33 @@ public class C_NR {
                 return; 
             }
 
-            tReparto.setEditable(false);
-            tReparto.setBackground(new Color(220, 220, 220));
-            tVenta.setEditable(false);
-            tVenta.setBackground(new Color(220, 220, 220)); 
+            tReparto.setEditable(false); tReparto.setBackground(new Color(220, 220, 220));
+            tVenta.setEditable(false);   tVenta.setBackground(new Color(220, 220, 220)); 
+            tMasa.setEnabled(true);     tMasa.setEditable(true);
             
             try {
                 double vendidoReparto = ventasDao.obtenerTotalRepartoHoy();
                 double sobranteMostrador = produccionTotal - vendidoReparto;
-                
                 if (sobranteMostrador < 0) {
                      tVenta.setForeground(Color.RED);
                      JOptionPane.showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
-                } else {
-                     tVenta.setForeground(Color.BLACK);
                 }
-                // Usamos replace para evitar bugs con la coma de los decimales
                 tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage());
-            }
+            } catch (Exception e) { JOptionPane.showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage()); }
         } else {
-            tReparto.setEnabled(true);
-            tVenta.setEnabled(true);
-            tReparto.setEditable(true);
-            tVenta.setEditable(true);
-            tVenta.setText("");
-            tVenta.setBackground(Color.WHITE);
-            tVenta.setForeground(Color.BLACK);
+            tReparto.setEnabled(true); tReparto.setEditable(true);
+            tVenta.setEnabled(true);   tVenta.setEditable(true);
+            tMasa.setEnabled(true);   tMasa.setEditable(true);
         }
+        
+        // Forzamos el recalculo inmediato del dinero para que coincida con las tablas cargadas
+        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
     }
 
     // 4. GUARDADO FINAL
     public void guardarCorte(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto, JTextField tVenta, 
-                             JTextField tMasa, JTable tProd, JTable tGastos, JRadioButton sMasaNo, JCheckBox sPAdicionales) {
+                             JTextField tMasa, JTable tProd, JTable tGastos, JRadioButton sMasaNo, 
+                             JCheckBox sPAdicionales, JCheckBox cGastos) { // 🚀 NUEVO PARÁMETRO: cGastos
         
         Object itemSeleccionado = boxRepartidor.getSelectedItem();
         int idEmpleado = 0;
@@ -160,18 +237,44 @@ public class C_NR {
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(parent, "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-
+        // ==========================================
+        // 🛡️ LÓGICA DE ADVERTENCIAS INTELIGENTES
+        // ==========================================
         DefaultTableModel modeloProductos = (DefaultTableModel) tProd.getModel();
         DefaultTableModel modeloGastos = (DefaultTableModel) tGastos.getModel();
 
+        boolean ignoraProductos = !sPAdicionales.isSelected() && modeloProductos.getRowCount() > 0;
+        boolean ignoraGastos = !cGastos.isSelected() && modeloGastos.getRowCount() > 0;
+
+        String mensajeConfirmacion = "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?";
+
+        if (ignoraProductos) {
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay productos en la tabla, pero la casilla 'Productos Adicionales' está desactivada. NO SE GUARDARÁN.";
+        }
+        if (ignoraGastos) {
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay gastos en la tabla, pero la casilla 'Gastos' está desactivada. NO SE GUARDARÁN.";
+        }
+
+        // Mostramos el cuadro de diálogo (usamos WARNING_MESSAGE si hay avisos, QUESTION_MESSAGE si todo está normal)
+        int tipoMensaje = (ignoraProductos || ignoraGastos) ? JOptionPane.WARNING_MESSAGE : JOptionPane.QUESTION_MESSAGE;
+        int confirm = JOptionPane.showConfirmDialog(parent, mensajeConfirmacion, "Confirmar Guardado", JOptionPane.YES_NO_OPTION, tipoMensaje);
+        
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        // ==========================================
+        // 🚀 FILTRO DE GUARDADO
+        // Si el usuario aceptó ignorarlos, mandamos modelos vacíos al DAO para que no guarde basura
+        // ==========================================
+        DefaultTableModel prodParaGuardar = ignoraProductos ? new DefaultTableModel() : modeloProductos;
+        DefaultTableModel gastosParaGuardar = ignoraGastos ? new DefaultTableModel() : modeloGastos;
+
         IVentasDAO dao = DAOFactory.getVentasDAO();
-        boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, modeloProductos, modeloGastos);
+        boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
         
         if (exito) {
             JOptionPane.showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
-            // Limpieza
+            
+            // Limpieza general
             boxRepartidor.setSelectedIndex(0);
             tReparto.setText("");
             tVenta.setText("");
@@ -179,9 +282,16 @@ public class C_NR {
             modeloProductos.setRowCount(0);
             modeloGastos.setRowCount(0);
             sMasaNo.setSelected(true);
-            sPAdicionales.setSelected(false);
-            // Al desmarcar los adicionales, forzamos la actualización visual
-            sPAdicionales.getActionListeners()[0].actionPerformed(null);
+            
+            // Forzamos el apagado de las casillas y sus eventos visuales
+            if (sPAdicionales.isSelected()) {
+                sPAdicionales.setSelected(false);
+                sPAdicionales.getActionListeners()[0].actionPerformed(null);
+            }
+            if (cGastos.isSelected()) {
+                cGastos.setSelected(false);
+                cGastos.getActionListeners()[0].actionPerformed(null);
+            }
             
         } else {
             JOptionPane.showMessageDialog(parent, "❌ Error al guardar en la base de datos.");

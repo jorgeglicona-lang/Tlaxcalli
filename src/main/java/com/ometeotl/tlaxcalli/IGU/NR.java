@@ -330,7 +330,8 @@ public class NR extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void b_guardarVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_guardarVActionPerformed
-        controlador.guardarCorte(this, BoxRepartidor, t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, s_masaNo, s_PAdicionales);
+        controlador.guardarCorte(this, BoxRepartidor, t_reparto, t_venta, t_masa, 
+                                 tabla_detalles, tabla_gastos, s_masaNo, s_PAdicionales, c_Gastos);
     }//GEN-LAST:event_b_guardarVActionPerformed
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed
@@ -338,7 +339,10 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void BoxRepartidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BoxRepartidorActionPerformed
-        controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta);
+        c_entregar.setText("$0.00");
+        controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,
+                                                s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
+                                                cb_gastos, cb_producto);
     }//GEN-LAST:event_BoxRepartidorActionPerformed
 
     private void b_molinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_molinoActionPerformed
@@ -349,22 +353,36 @@ public class NR extends javax.swing.JFrame {
 
     private void cb_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_productoActionPerformed
         if (cb_producto.getSelectedItem() == null) return;
-        com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
+        com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = 
+                (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
         t_cantidad.setText("");
         t_precio.setText("");
         t_detalle.setText("");
             
         if (item.getId() == 0) {
-            t_cantidad.setEnabled(false); t_precio.setEnabled(false); t_detalle.setEnabled(false); b_agregarProd.setEnabled(false); 
+            t_cantidad.setEnabled(false);
+            t_precio.setEnabled(false);
+            t_detalle.setEnabled(false);
+            b_agregarProd.setEnabled(false); 
             return;
         }
         
-        b_agregarProd.setEnabled(true); t_cantidad.setEnabled(true); t_cantidad.setEditable(true); t_cantidad.requestFocus();
+        b_agregarProd.setEnabled(true);
+        t_cantidad.setEnabled(true);
+        t_cantidad.setEditable(true);
+        t_cantidad.requestFocus();
         
         if (item.isComodin()) {
-            t_precio.setEnabled(true); t_precio.setEditable(true); t_detalle.setEnabled(true); t_detalle.setEditable(true); t_detalle.requestFocus();
+            t_precio.setEnabled(true);
+            t_precio.setEditable(true);
+            t_detalle.setEnabled(true);
+            t_detalle.setEditable(true);
+            t_detalle.requestFocus();
         } else {
-            t_detalle.setEnabled(false); t_detalle.setText(item.toString()); t_precio.setEnabled(false); t_precio.setText(String.valueOf(item.getPrecio()));
+            t_detalle.setEnabled(false);
+            t_detalle.setText(item.toString());
+            t_precio.setEnabled(false);
+            t_precio.setText(String.valueOf(item.getPrecio()));
         }
     }//GEN-LAST:event_cb_productoActionPerformed
 
@@ -379,30 +397,48 @@ public class NR extends javax.swing.JFrame {
             javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
             modelo.addRow(new Object[] { item.getId(), observacion, cantidad, precioUnitario, subtotal });
             
-            t_cantidad.setText(""); t_precio.setText(""); t_detalle.setText("");
-        } catch (NumberFormatException e) { javax.swing.JOptionPane.showMessageDialog(this, "Verifica la cantidad y precio."); }
+            t_cantidad.setText("");
+            t_precio.setText("");
+            t_detalle.setText("");
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Verifica la cantidad y precio.");
+        }
+        
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_agregarProdActionPerformed
 
     private void cb_gastosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_gastosActionPerformed
         if (cb_gastos.getSelectedItem() == null) return;
+        
         com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
-        t_montoGasto.setText(""); t_detalleGasto.setText("");
         
-        if (item.getId() == 0) { t_detalleGasto.setEnabled(false); b_agregarGasto.setEnabled(false); return; }
+        t_montoGasto.setText("");
+        t_detalleGasto.setText("");
         
-        b_agregarGasto.setEnabled(true); t_montoGasto.setEnabled(true); t_montoGasto.setEditable(true); t_montoGasto.requestFocus();
+        if (item.getId() == 0) { 
+            t_detalleGasto.setEnabled(false);
+            b_agregarGasto.setEnabled(false);
+            return;
+        }
+        
+        b_agregarGasto.setEnabled(true); 
+        t_montoGasto.setEnabled(true); 
+        t_montoGasto.setEditable(true); 
+        t_montoGasto.requestFocus();
         
         if (item.isRequiereDescripcion()) {
-            t_detalleGasto.setEnabled(true); t_detalleGasto.setEditable(true);
+            t_detalleGasto.setEnabled(true); 
+            t_detalleGasto.setEditable(true);
         } else {
-            t_detalleGasto.setEnabled(false); t_detalleGasto.setText(item.toString()); 
+            t_detalleGasto.setEnabled(false); 
+            t_detalleGasto.setText(item.toString()); 
         }
     }//GEN-LAST:event_cb_gastosActionPerformed
 
     private void b_agregarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarGastoActionPerformed
         try {
             com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
+            
             double monto = Double.parseDouble(t_montoGasto.getText());
             String descripcion = item.isRequiereDescripcion() ? t_detalleGasto.getText() : item.toString();
 
@@ -413,8 +449,12 @@ public class NR extends javax.swing.JFrame {
             javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
             modelo.addRow(new Object[] { descripcion, monto });
             
-            t_montoGasto.setText(""); t_detalleGasto.setText("");
-        } catch (NumberFormatException e) { javax.swing.JOptionPane.showMessageDialog(this, "El monto debe ser numérico."); }
+            t_montoGasto.setText(""); 
+            t_detalleGasto.setText("");
+        } catch (NumberFormatException e) { 
+            javax.swing.JOptionPane.showMessageDialog(this, "El monto debe ser numérico."); 
+        }
+        
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_agregarGastoActionPerformed
 
