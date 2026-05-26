@@ -13,13 +13,10 @@ public class ProductoItem {
         this.esComodin = esComodin;
     }
 
-    // Getters
     public int getId() { return id; }
     public double getPrecio() { return precio; }
     public boolean isComodin() { return esComodin; }
-
+    
     @Override
-    public String toString() {
-        return nombre; // Esto es lo que se verá en el ComboBox
-    }
+    public String toString() { return nombre; }
 }

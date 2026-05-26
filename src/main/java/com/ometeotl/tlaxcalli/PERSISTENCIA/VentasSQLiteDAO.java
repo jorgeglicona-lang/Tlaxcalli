@@ -1,5 +1,7 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
+import com.ometeotl.tlaxcalli.LOGICA.GastoItem;
+import com.ometeotl.tlaxcalli.LOGICA.ProductoItem;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IVentasDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -114,7 +116,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
     }
 
     @Override
-    public List<com.ometeotl.tlaxcalli.LOGICA.ProductoItem> obtenerProductosParaVenta() {
+    public List<ProductoItem> obtenerProductosParaVenta() {
         List<com.ometeotl.tlaxcalli.LOGICA.ProductoItem> lista = new ArrayList<>();
         CSQLiteConnection conMngr = new CSQLiteConnection();
         String sql = "SELECT * FROM Productos WHERE id_Producto > 3"; 
@@ -124,7 +126,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
              ResultSet rs = ps.executeQuery()) {
              
             while(rs.next()) {
-                lista.add(new com.ometeotl.tlaxcalli.LOGICA.ProductoItem(
+                lista.add(new ProductoItem(
                     rs.getInt("Id_producto"),
                     rs.getString("Nom_producto"),
                     rs.getDouble("Precio"),
@@ -136,7 +138,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
     }
 
     @Override
-    public List<com.ometeotl.tlaxcalli.LOGICA.GastoItem> obtenerGastosParaVenta() {
+    public List<GastoItem> obtenerGastosParaVenta() {
         List<com.ometeotl.tlaxcalli.LOGICA.GastoItem> lista = new ArrayList<>();
         CSQLiteConnection conMngr = new CSQLiteConnection();
         String sql = "SELECT * FROM Cat_Gastos"; 
@@ -146,7 +148,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
              ResultSet rs = ps.executeQuery()) {
              
             while(rs.next()) {
-                lista.add(new com.ometeotl.tlaxcalli.LOGICA.GastoItem(
+                lista.add(new GastoItem(
                     rs.getInt("Id_tipo"),
                     rs.getString("Nombre"),
                     rs.getInt("Requiere_Descripcion") == 1

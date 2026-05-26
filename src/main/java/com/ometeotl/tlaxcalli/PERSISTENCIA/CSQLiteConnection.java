@@ -14,24 +14,48 @@ public class CSQLiteConnection {
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
-            String url = "jdbc:sqlite:" + DB_NAME;
-            File archivoDb = new File(DB_NAME);
+            // 1. EL GPS: Obligamos a Java a decirnos la ruta exacta donde estamos parados
+            String rutaBase = System.getProperty("user.dir");
+            String rutaCompletaDb = rutaBase + java.io.File.separator + DB_NAME;
+            
+            // 2. Usamos la ruta absoluta y exacta para evitar que Windows esconda el archivo
+            String url = "jdbc:sqlite:" + rutaCompletaDb;
+            File archivoDb = new File(rutaCompletaDb);
             
             boolean esNueva = !archivoDb.exists();
             
-            // SQLite necesita que las llaves foráneas se activen por conexión
+            // ⏰ EL DESPERTADOR: Obligamos a Java a cargar el traductor de SQLite en memoria
+            try {
+                Class.forName("org.sqlite.JDBC");
+            } catch (ClassNotFoundException ex) {
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                    "❌ ¡Falta la librería sqlite-jdbc en el proyecto!\nMaven no empacó el driver.", 
+                    "Error de Librería", javax.swing.JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+            
             con = DriverManager.getConnection(url);
             try (Statement pragma = con.createStatement()) {
                 pragma.execute("PRAGMA foreign_keys = ON;");
             }
             
             if (esNueva) {
-                System.out.println("Ometeotl Portátil: Traducción estricta de tablas.sql iniciada...");
+                System.out.println("Creando nueva estructura...");
                 inicializarEstructuraSQLite(con);
+                
+                // EL MEGÁFONO DE ÉXITO: Nos avisa exactamente dónde dejó el archivo
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                    "✅ Base de datos inicializada correctamente en:\n" + rutaCompletaDb, 
+                    "Ometeotl Portátil", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
             }
             
         } catch (SQLException e) {
-            System.err.println("Error crítico en conexión portátil SQLite: " + e.getMessage());
+            // EL MEGÁFONO DE ERROR: Si algo falla, lo vemos en pantalla sí o sí
+            javax.swing.JOptionPane.showMessageDialog(null, 
+                "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
+                "Error de Sistema", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
         }
         return con;
     }
@@ -146,7 +170,7 @@ public class CSQLiteConnection {
             // ==========================================
             // INYECCIÓN DE USUARIOS SEMILLA REQUERIDOS
             // ==========================================
-            String contraseniaCifrada = generarSHA512("Admin123");
+            String contraseniaCifrada = generarSHA512("Root");
             
             // A. Insertar al Super Usuario Master en Empleados (Id_empleado = 1)
             stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
@@ -154,7 +178,16 @@ public class CSQLiteConnection {
             
             // B. Crear su login amarrado al Id_empleado 1 (Admin - Admin123)
             stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
-                    + "VALUES (1, 'Admin', '" + contraseniaCifrada + "')");
+                    + "VALUES (1, 'Root', '" + contraseniaCifrada + "')");
+            
+            String contraseniaCifrada1 = generarSHA512("Admin123");
+            
+            // A. Insertar al Super Usuario Master en Empleados (Id_empleado = 1)
+            stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
+                    + "VALUES ('Aministrador', 'Del', 'Negocio', 'Administrador')");
+            
+            stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
+                    + "VALUES (2, 'Admin', '" + contraseniaCifrada1 + "')");
             
             // C. Insertar al trabajador "Mostrador" vacío en apellidos con puesto Mostrador (Id_empleado = 2)
             stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "

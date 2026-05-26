@@ -1,9 +1,7 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.EmpleadosSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.GastosGeneralesSQLiteDAO;
-import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLServerDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.LoginSQLiteDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.SQLiteInicioDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.MolinoSQLiteDAO;
@@ -18,12 +16,12 @@ public class DAOFactory {
         if (MODO_PORTATIL) {
             return new LoginSQLiteDAO();
         } else {
-            return new LoginSQLServerDAO();
+            return null;
         }
     }
 
     // Nuevo interruptor para catálogo de productos
-    public static SQLiteInicioDAO getInicioDAO() {
+    public static I_InicioDAO getInicioDAO() {
         if (MODO_PORTATIL) {
             return new SQLiteInicioDAO();
         }
@@ -36,7 +34,7 @@ public class DAOFactory {
         if (MODO_PORTATIL) {
             return new EmpleadosSQLiteDAO();
         }
-        return new EmpleadosSQLServerDAO(); //<-- Cuando renombre el viejo
+        return null;
     }
     
     public static IMolinoDAO getMolinoDAO() {

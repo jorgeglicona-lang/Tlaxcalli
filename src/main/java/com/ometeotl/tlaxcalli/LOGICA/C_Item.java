@@ -12,5 +12,7 @@ public class EmpleadoItem {
     public int getId() { return id; }
     
     @Override
-    public String toString() { return nombre; }
+    public String toString() {
+        return nombre; // Esto se muestra en el ComboBox
+    }
 }

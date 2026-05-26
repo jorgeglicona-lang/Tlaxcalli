@@ -1,9 +1,7 @@
 package com.ometeotl.tlaxcalli.IGU;
 
-import com.ometeotl.tlaxcalli.PERSISTENCIA.GastosAdmDAO;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
 
 public class Gastos_Generales extends javax.swing.JFrame {
     

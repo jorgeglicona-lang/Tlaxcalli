@@ -9,6 +9,10 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         pintarImagen(Logolb, "/imagen/logazul.png");
+        pintarImagen(Information, "/imagen/informacion.png");
+        Information.setToolTipText("<html>Primer ingreso del sistema:"
+                + "<br>Usuario: <b>Admin</b><br>Contraseña: <b>Admin123</b>"
+                + "<br><br> Recuerde cambiar la contraseña</html>");
     }
 
     @SuppressWarnings("unchecked")
@@ -19,6 +23,7 @@ public class Login extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         usertxt = new javax.swing.JTextField();
@@ -32,6 +37,7 @@ public class Login extends javax.swing.JFrame {
         exbg = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
+        Information = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -54,8 +60,12 @@ public class Login extends javax.swing.JFrame {
         jLabel4.setText("Tlaxcalli");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 190, -1, -1));
 
+        jLabel8.setForeground(new java.awt.Color(181, 181, 181));
+        jLabel8.setText("Info - Iconos creados por Roundicons - Flaticon");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 380, -1, -1));
+
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagen/loginclaro.png"))); // NOI18N
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 0, 270, 400));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 0, 260, 400));
 
         jLabel5.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
         jLabel5.setText("Contraseña");
@@ -104,11 +114,11 @@ public class Login extends javax.swing.JFrame {
 
         button.setBackground(new java.awt.Color(49, 191, 71));
 
+        jLabel7.setFont(new java.awt.Font("Roboto Black", 0, 18)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(226, 251, 244));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("ENTRAR");
         jLabel7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel7.setFont(new java.awt.Font("Roboto Black", 0, 18)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(226, 251, 244));
         jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel7MouseClicked(evt);
@@ -142,10 +152,10 @@ public class Login extends javax.swing.JFrame {
 
         exbg.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel9.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("X");
         jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel9.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
         jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel9MouseClicked(evt);
@@ -195,6 +205,7 @@ public class Login extends javax.swing.JFrame {
         );
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 40));
+        jPanel1.add(Information, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 190, 20, 20));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -252,10 +263,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel7MouseExited
 
     private void usertxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_usertxtFocusGained
-        /*if (usertxt.getText().equals("Ingrese su usuario")) {
-            usertxt.setText("");
-            usertxt.setForeground(java.awt.Color.BLACK); // Color normal
-        }*/
+        
     }//GEN-LAST:event_usertxtFocusGained
 
     private void usertxtFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_usertxtFocusLost
@@ -302,6 +310,7 @@ public class Login extends javax.swing.JFrame {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Information;
     private javax.swing.JLabel Logolb;
     private javax.swing.JPanel button;
     private javax.swing.JPanel exbg;
@@ -312,6 +321,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;

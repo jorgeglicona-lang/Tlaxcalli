@@ -1,6 +1,5 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
-// 🚀 NUEVOS IMPORTS DE ITEXT 7 (Adiós al paquete .text anterior)
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.geom.PageSize;
@@ -99,7 +98,7 @@ public class GeneradorReportes {
                 java.net.URL urlLogo = getClass().getResource("/imagen/transparencia.png");
                 if (urlLogo != null) {
                     Image logo = new Image(ImageDataFactory.create(urlLogo));
-                    logo.scaleToFit(35, 35);
+                    logo.scaleToFit(45, 45);
                     
                     Cell celdaLogo = new Cell().add(logo);
                     celdaLogo.setBorder(com.itextpdf.layout.borders.Border.NO_BORDER);
@@ -120,10 +119,10 @@ public class GeneradorReportes {
                     .setFont(fontBold).setFontSize(18).setTextAlignment(TextAlignment.CENTER));
             
             celdaTextos.add(new Paragraph("Periodo: " + fInicio + " al " + fFin)
-                    .setFont(fontNormal).setFontSize(11).setTextAlignment(TextAlignment.CENTER));
+                    .setFont(fontNormal).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
             
             celdaTextos.add(new Paragraph("Filtro Empleado: " + empleado)
-                    .setFont(fontNormal).setFontSize(11).setTextAlignment(TextAlignment.CENTER));
+                    .setFont(fontNormal).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
 
             tablaEncabezado.addCell(celdaTextos);
             documento.add(tablaEncabezado);
@@ -133,7 +132,7 @@ public class GeneradorReportes {
             // 📊 SECCIÓN 1: RESUMEN FINANCIERO
             // ==========================================
             documento.add(new Paragraph("1. RESUMEN FINANCIERO")
-                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
             
             Table tablaResumen = new Table(UnitValue.createPercentArray(2));
             tablaResumen.setWidth(UnitValue.createPercentValue(100));
@@ -152,20 +151,20 @@ public class GeneradorReportes {
             // 🏢 SECCIÓN 2: DESGLOSE ADMINISTRATIVO
             // ==========================================
             documento.add(new Paragraph("2. DESGLOSE ADMINISTRATIVO")
-                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
             
             Table tablaAdm = crearTablaDesdeModelo(gAdm, new String[]{"ID", "Descripción", "Monto ($)", "Fecha"}, fontNormal, fontBold);
             documento.add(tablaAdm);
             
             documento.add(new Paragraph("Subtotal Administrativo: $" + String.format("%.2f", tGAdm))
-                    .setFont(fontBold).setFontSize(10));
+                    .setFont(fontBold).setFontSize(18));
             documento.add(new Paragraph("\n"));
 
             // ==========================================
             // 🛵 SECCIÓN 3: ACTIVIDAD OPERATIVA
             // ==========================================
             documento.add(new Paragraph("3. ACTIVIDAD OPERATIVA (MOSTRADOR/REPARTIDORES)")
-                    .setFont(fontBold).setFontSize(14).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
         
             documento.add(new Paragraph("Ventas registradas:").setFont(fontBold).setFontSize(10));
             documento.add(crearTablaDesdeModelo(vtas, new String[]{"Empleado", "Producto", "Monto ($)"}, fontNormal, fontBold));

@@ -10,12 +10,10 @@ public class GastoItem {
         this.nombre = nombre;
         this.requiereDescripcion = requiereDescripcion;
     }
-    public int getId() { 
-        return id; 
-    }
-    
+
+    public int getId() { return id; }
     public boolean isRequiereDescripcion() { return requiereDescripcion; }
     
     @Override
-    public String toString() { return nombre; } // Esto se muestra en el Combo
+    public String toString() { return nombre; }
 }
