@@ -5,16 +5,11 @@ import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.ILoginDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 
 public class C_Login {
-    private String Usuario;
-    private String password;
-  
-    public void logeo(String User, String Passw) {
-        this.Usuario = User;
-        this.password = Passw;
-    }
     
-    public boolean ValUsuario() {
+    public boolean ValUsuario(String User, String Passw) {
         // En lugar de escribir el Query aquí, llamamos al contrato a través de la fábrica
+        String Usuario=User;
+        String password=Passw;
         ILoginDAO loginDAO = DAOFactory.getLoginDAO();
         
         // Le pedimos al DAO seleccionado que valide las credenciales
@@ -30,7 +25,6 @@ public class C_Login {
                 Inicio ini = new Inicio();
                 ini.setVisible(true);
                 ini.setLocationRelativeTo(null);
-                ini.settext(C_Sesion_login.nombre);
                 
                 return true; 
             } else {

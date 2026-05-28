@@ -1,26 +1,36 @@
 package com.ometeotl.tlaxcalli.IGU;
+
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import com.ometeotl.tlaxcalli.LOGICA.C_Reportes;
 import com.ometeotl.tlaxcalli.LOGICA.GeneradorReportes;
-import javax.swing.JOptionPane;
+import java.awt.Color;
+import java.awt.Font;
 
 public class Reportes extends javax.swing.JFrame {
-
+    
+    private C_Reportes controlador = new C_Reportes();
+    
     public Reportes() {
         initComponents();
         controlador.cargarEmpleados(CB_Empleados);
-        
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
         // Poner la fecha de hoy por defecto para que no aparezcan vacíos
         datePicker1.setDateToToday();
         datePicker4.setDateToToday();
     
         // Opcional: hacer el texto un poco más pequeño si se sigue cortando
-        datePicker1.getComponentDateTextField().setFont(new java.awt.Font("Segoe UI", 0, 11));
-        datePicker4.getComponentDateTextField().setFont(new java.awt.Font("Segoe UI", 0, 11));
+        datePicker1.getComponentDateTextField().setFont(new Font("Segoe UI", 0, 11));
+        datePicker4.getComponentDateTextField().setFont(new Font("Segoe UI", 0, 11));
     
         TotalV.setText("$0.00");
         TotalG.setText("$0.00");
         IngresosN.setText("$0.00");
+        
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
+        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
     }
-     private com.ometeotl.tlaxcalli.LOGICA.C_Reportes controlador = new com.ometeotl.tlaxcalli.LOGICA.C_Reportes();
+     
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -50,9 +60,13 @@ public class Reportes extends javax.swing.JFrame {
         B_SalirInicio = new javax.swing.JButton();
         datePicker4 = new com.github.lgooddatepicker.components.DatePicker();
         datePicker1 = new com.github.lgooddatepicker.components.DatePicker();
+        jPanel3 = new javax.swing.JPanel();
+        jBext = new javax.swing.JPanel();
+        ext = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Reportes");
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -151,54 +165,66 @@ public class Reportes extends javax.swing.JFrame {
         jPanel1.add(datePicker4, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 150, -1, -1));
         jPanel1.add(datePicker1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 110, -1, -1));
 
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        jBext.setBackground(new java.awt.Color(255, 255, 255));
+
+        ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ext.setText("X");
+        ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
+
+        javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
+        jBext.setLayout(jBextLayout);
+        jBextLayout.setHorizontalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(ext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+        );
+        jBextLayout.setVerticalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBextLayout.createSequentialGroup()
+                .addComponent(ext, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 734, Short.MAX_VALUE)
+                .addComponent(jBext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jBext, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 780, 40));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 779, 660));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void B_GAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_GAdActionPerformed
-        Gastos_Generales ventanaGastos = new Gastos_Generales();
-        ventanaGastos.setVisible(true);
-        ventanaGastos.setLocationRelativeTo(null); // Para que salga al centro
-
+        Gastos_Generales vgg = new Gastos_Generales();
+        HerramientasVisuales.GenV(vgg);
     }//GEN-LAST:event_B_GAdActionPerformed
 
     private void B_SalirInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_SalirInicioActionPerformed
-        Inicio ventanaInicio = new Inicio();
-        ventanaInicio.setVisible(true);
-        ventanaInicio.setLocationRelativeTo(null);
-        // Cerramos la ventana actual de Reportes
         this.dispose();
     }//GEN-LAST:event_B_SalirInicioActionPerformed
 
     private void BBuscarVGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BBuscarVGActionPerformed
-    String empleadoSel = CB_Empleados.getSelectedItem().toString();
-    
-    // Capturamos las fechas de los DatePicker
-    java.time.LocalDate date1 = datePicker1.getDate(); // El de "De:"
-    java.time.LocalDate date2 = datePicker4.getDate(); // El de "A:"
-    
-    // Validación de seguridad: que no busquen sin fechas
-    if (date1 == null || date2 == null) {
-        JOptionPane.showMessageDialog(this, "Jefe, debe seleccionar ambas fechas para filtrar.");
-        return;
-    }
-    
-    // Convertimos a String (LGoodDatePicker ya nos da el formato YYYY-MM-DD listo)
-    String fInicio = date1.toString();
-    String fFin = date2.toString();
-    
-    // Le pasamos todo al controlador
-    controlador.procesarReporte(empleadoSel, fInicio, fFin, T_Ventas, T_Gastos, TotalV, TotalG, IngresosN);
+    controlador.procesarReporte(this, CB_Empleados, T_Ventas, T_Gastos, TotalV, TotalG, IngresosN,
+                                datePicker1, datePicker4);
     }//GEN-LAST:event_BBuscarVGActionPerformed
 
     private void B_GenPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_GenPDFActionPerformed
-        String empleado = CB_Empleados.getSelectedItem().toString();
-        String inicio = datePicker1.getDate().toString();
-        String fin = datePicker4.getDate().toString();
-
         GeneradorReportes orquestador = new GeneradorReportes();
-        orquestador.prepararPDF(inicio, fin, empleado);
+        orquestador.prepararPDF(datePicker1, datePicker4, CB_Empleados);
     }//GEN-LAST:event_B_GenPDFActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -214,6 +240,8 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JLabel TotalV;
     private com.github.lgooddatepicker.components.DatePicker datePicker1;
     private com.github.lgooddatepicker.components.DatePicker datePicker4;
+    private javax.swing.JLabel ext;
+    private javax.swing.JPanel jBext;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -224,6 +252,7 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables

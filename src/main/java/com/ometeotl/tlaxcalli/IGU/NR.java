@@ -1,17 +1,22 @@
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_NR;
+import java.awt.Color;
 import com.ometeotl.tlaxcalli.LOGICA.C_Inicio; // Para usar pintarImagen()
 
 public class NR extends javax.swing.JFrame {
 
     // Instanciamos el cerebro
     private C_NR controlador = new C_NR();
+    
+    int xMause, yMause;
 
     public NR() {
         initComponents();
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
-        
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
         // Ocultar ID en la tabla
         tabla_detalles.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_detalles.getColumnModel().getColumn(0).setMaxWidth(0);
@@ -24,6 +29,9 @@ public class NR extends javax.swing.JFrame {
         controlador.inicializarCombos(BoxRepartidor, cb_producto, cb_gastos);
         controlador.cargarPreciosBase();
         configurarSeccionMasa(); // Lógica puramente visual, se queda aquí
+        
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
+        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -72,10 +80,14 @@ public class NR extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         t_detalle = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jBext = new javax.swing.JPanel();
+        ext = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nuevo Registro");
         setLocationByPlatform(true);
+        setUndecorated(true);
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -311,6 +323,65 @@ public class NR extends javax.swing.JFrame {
         t_detalle.setEditable(false);
         jPanel1.add(t_detalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 340, 100, -1));
 
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel4MouseDragged(evt);
+            }
+        });
+        jPanel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel4MousePressed(evt);
+            }
+        });
+
+        jBext.setBackground(new java.awt.Color(255, 255, 255));
+
+        ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
+        ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ext.setText("X");
+        ext.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                extMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                extMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                extMouseExited(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
+        jBext.setLayout(jBextLayout);
+        jBextLayout.setHorizontalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(ext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+        );
+        jBextLayout.setVerticalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBextLayout.createSequentialGroup()
+                .addComponent(ext, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 694, Short.MAX_VALUE)
+                .addComponent(jBext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jBext, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 740, 40));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -532,6 +603,32 @@ public class NR extends javax.swing.JFrame {
         if (tabla_gastos.getSelectedRow() != -1) b_EliminarGasto.setEnabled(true);
     }//GEN-LAST:event_tabla_gastosMouseClicked
 
+    private void extMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseClicked
+        System.exit(0);
+    }//GEN-LAST:event_extMouseClicked
+
+    private void extMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseEntered
+        jBext.setBackground(Color.RED);
+        ext.setForeground(Color.white);
+    }//GEN-LAST:event_extMouseEntered
+
+    private void extMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseExited
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
+    }//GEN-LAST:event_extMouseExited
+
+    private void jPanel4MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MouseDragged
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+
+        this.setLocation(x-xMause, y-yMause);
+    }//GEN-LAST:event_jPanel4MouseDragged
+
+    private void jPanel4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MousePressed
+        xMause = evt.getX();
+        yMause = evt.getY();
+    }//GEN-LAST:event_jPanel4MousePressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<Object> BoxRepartidor;
@@ -548,6 +645,8 @@ public class NR extends javax.swing.JFrame {
     private javax.swing.JLabel c_entregar;
     private javax.swing.JComboBox<Object> cb_gastos;
     private javax.swing.JComboBox<Object> cb_producto;
+    private javax.swing.JLabel ext;
+    private javax.swing.JPanel jBext;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -562,6 +661,7 @@ public class NR extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JCheckBox s_PAdicionales;

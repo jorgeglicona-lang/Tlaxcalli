@@ -1,5 +1,6 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
+import com.github.lgooddatepicker.components.DatePicker;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.geom.PageSize;
@@ -19,6 +20,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
+import javax.swing.JComboBox;
 
 import javax.swing.table.DefaultTableModel;
 public class GeneradorReportes {
@@ -26,11 +28,14 @@ public class GeneradorReportes {
     private IReportesDAO reportesDao = DAOFactory.getReportesDAO();
     private IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
 
-    public void prepararPDF(String fechaInicio, String fechaFin, String empleadoFiltro) {
+    public void prepararPDF(DatePicker FI, DatePicker FF, JComboBox EF) {
         // 1. Creamos modelos temporales para extraer la info de los DAOs
         DefaultTableModel modeloVentas = new DefaultTableModel();
         DefaultTableModel modeloGastosOp = new DefaultTableModel();
-        
+        String empleadoFiltro = EF.getSelectedItem().toString();
+        String fechaInicio = FI.getDate().toString();
+        String fechaFin = FF.getDate().toString();
+
         // 🛠️ ¡REPARADO! Usamos el DAO unificado de Gastos Generales mediante la fábrica
         DefaultTableModel modeloGastosAdm = gastosGeneralesDao.obtenerGastosPorRango(fechaInicio, fechaFin);
         

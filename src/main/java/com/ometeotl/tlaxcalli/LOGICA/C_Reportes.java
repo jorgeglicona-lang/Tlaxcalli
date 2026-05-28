@@ -7,6 +7,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
+import javax.swing.JFrame;
+import com.github.lgooddatepicker.components.DatePicker;
 
 public class C_Reportes {
     
@@ -24,12 +26,16 @@ public class C_Reportes {
     }
 
     // Lógica para coordinar las tablas, hacer las restas y actualizar textos
-    // Lógica para coordinar las tablas, hacer las restas y actualizar textos
-    public void procesarReporte(String empleado, String fInicio, String fFin, JTable tablaVentas, JTable tablaGastos, JLabel lblTotalV, JLabel lblTotalG, JLabel lblNeto) {
+    public void procesarReporte(JFrame parent, JComboBox CB_Empleados,
+            JTable tablaVentas, JTable tablaGastos, JLabel lblTotalV, 
+            JLabel lblTotalG, JLabel lblNeto,DatePicker ini,DatePicker fin) {
+        
+        String empleado = CB_Empleados.getSelectedItem().toString();
+        String fInicio= ini.getDate().toString();
+        String fFin = fin.getDate().toString();
         DefaultTableModel modVentas = (DefaultTableModel) tablaVentas.getModel();
         DefaultTableModel modGastos = (DefaultTableModel) tablaGastos.getModel();
         
-        // --- ¡ESTA ES LA MAGIA QUE FALTABA, JEFE! ---
         // Si las tablas no tienen columnas, se las creamos para que puedan mostrar la info.
         if (modVentas.getColumnCount() == 0) {
             modVentas.addColumn("Empleado"); 

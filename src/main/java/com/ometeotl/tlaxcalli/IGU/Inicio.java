@@ -1,7 +1,9 @@
 
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
+import com.ometeotl.tlaxcalli.LOGICA.C_Sesion_login;
 import com.ometeotl.tlaxcalli.Tlaxcalli;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO;
@@ -9,13 +11,19 @@ import java.awt.Color;
 
 public class Inicio extends javax.swing.JFrame {
 
-    int xMause, yMause;
     private Tlaxcalli nom = new Tlaxcalli();
     private C_Inicio controlador = new C_Inicio();
+    
     public Inicio() {
         initComponents();
+        
         controlador.pintarImagen(Logolb, "/imagen/transparencia.png");
         nom.inicializarNombreNegocio(this, negocio);
+        this.nomU.setText("¡Bienvenido "+C_Sesion_login.nombre+"!");
+        
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
+        
         // 1. Le pedimos a la fábrica el "enchufe" de la sala
         I_InicioDAO inicioDAO = DAOFactory.getInicioDAO();
     
@@ -28,17 +36,25 @@ public class Inicio extends javax.swing.JFrame {
         tablaProductos.getColumnModel().getColumn(3).setMaxWidth(0);
         tablaProductos.getColumnModel().getColumn(3).setWidth(0);
         tablaProductos.getColumnModel().getColumn(3).setPreferredWidth(0);
-
+        tablaProductos.getColumnModel().getColumn(0).setMinWidth(0);
+        tablaProductos.getColumnModel().getColumn(0).setMaxWidth(0);
+        tablaProductos.getColumnModel().getColumn(0).setWidth(0);
+        tablaProductos.getColumnModel().getColumn(0).setPreferredWidth(0);
+        
         // Ocultamos "Requiere Descripción" en la tabla de Gastos (Es la Columna Índice 2)
         tablaCatGastos.getColumnModel().getColumn(2).setMinWidth(0);
         tablaCatGastos.getColumnModel().getColumn(2).setMaxWidth(0);
         tablaCatGastos.getColumnModel().getColumn(2).setWidth(0);
         tablaCatGastos.getColumnModel().getColumn(2).setPreferredWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(0).setMinWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(0).setMaxWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(0).setWidth(0);
+        tablaCatGastos.getColumnModel().getColumn(0).setPreferredWidth(0);
+        
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
+        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, true);
     }
     
-    public void settext(String nombre){
-        this.nombre.setText("¡Bienvenido "+nombre+"!");
-    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -56,7 +72,7 @@ public class Inicio extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jBext = new javax.swing.JPanel();
         ext = new javax.swing.JLabel();
-        nombre = new javax.swing.JLabel();
+        nomU = new javax.swing.JLabel();
         negocio = new javax.swing.JLabel();
         panelPestanias = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -215,33 +231,12 @@ public class Inicio extends javax.swing.JFrame {
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPanel3MouseDragged(evt);
-            }
-        });
-        jPanel3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jPanel3MousePressed(evt);
-            }
-        });
 
         jBext.setBackground(new java.awt.Color(255, 255, 255));
 
         ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
         ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ext.setText("X");
-        ext.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                extMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                extMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                extMouseExited(evt);
-            }
-        });
 
         javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
         jBext.setLayout(jBextLayout);
@@ -273,8 +268,8 @@ public class Inicio extends javax.swing.JFrame {
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 40));
 
-        nombre.setText("Nombre");
-        jPanel1.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 90, -1, -1));
+        nomU.setText("Nombre");
+        jPanel1.add(nomU, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 90, -1, -1));
 
         negocio.setText("negocio");
         jPanel1.add(negocio, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 140, -1, -1));
@@ -334,20 +329,6 @@ public class Inicio extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void extMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_extMouseClicked
-
-    private void extMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseEntered
-        jBext.setBackground(Color.red);
-        ext.setForeground(Color.white);
-    }//GEN-LAST:event_extMouseEntered
-
-    private void extMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseExited
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
-    }//GEN-LAST:event_extMouseExited
-
     private void b_registrosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_registrosMouseEntered
         jPBoton1.setBackground(new Color(35,140,35));
     }//GEN-LAST:event_b_registrosMouseEntered
@@ -373,37 +354,20 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_b_empleadosMouseExited
 
     private void b_registrosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_registrosMouseClicked
-        NR nuevo=new NR();
-        nuevo.setVisible(true);
-        nuevo.setLocationRelativeTo(null);
-        
+        NR n=new NR();
+        HerramientasVisuales.GenV(n);
         Molino mol=new Molino();
-        mol.setVisible(true);
-        mol.setLocationRelativeTo(null);
+        HerramientasVisuales.GenV(mol);
     }//GEN-LAST:event_b_registrosMouseClicked
 
     private void b_empleadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_empleadosMouseClicked
         Emplados reg=new Emplados();
-        reg.setVisible(true);
-        reg.setLocationRelativeTo(null);
+        HerramientasVisuales.GenV(reg);
     }//GEN-LAST:event_b_empleadosMouseClicked
-
-    private void jPanel3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MousePressed
-        xMause = evt.getX();
-        yMause = evt.getY();
-    }//GEN-LAST:event_jPanel3MousePressed
-
-    private void jPanel3MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MouseDragged
-        int x = evt.getXOnScreen();
-        int y = evt.getYOnScreen();
-        
-        this.setLocation(x-xMause, y-yMause);
-    }//GEN-LAST:event_jPanel3MouseDragged
 
     private void b_reportesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_reportesMouseClicked
         Reportes reg=new Reportes();
-        reg.setVisible(true);
-        reg.setLocationRelativeTo(null);
+        HerramientasVisuales.GenV(reg);
     }//GEN-LAST:event_b_reportesMouseClicked
 
     private void b_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarActionPerformed
@@ -439,7 +403,7 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel negocio;
-    private javax.swing.JLabel nombre;
+    private javax.swing.JLabel nomU;
     private javax.swing.JTabbedPane panelPestanias;
     private javax.swing.JTable tablaCatGastos;
     private javax.swing.JTable tablaProductos;

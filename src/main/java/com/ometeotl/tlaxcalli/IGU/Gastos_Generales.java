@@ -1,22 +1,26 @@
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import com.ometeotl.tlaxcalli.LOGICA.C_GastosG;
+import java.awt.Color;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 public class Gastos_Generales extends javax.swing.JFrame {
     
-    private com.ometeotl.tlaxcalli.LOGICA.C_GastosG controlador = new com.ometeotl.tlaxcalli.LOGICA.C_GastosG();
-
+    private C_GastosG controlador = new C_GastosG();
+    
     public Gastos_Generales() {
         initComponents();
-        llenarTablaSemanal(); 
+        
+        controlador.cargarSemanaActual(T_GAd, TotalGAd);
         datePicker1.setDateToToday();
         datePicker2.setDateToToday();
-    }
-
-    public void llenarTablaSemanal() {
-        // Le pasamos la tabla y el campo de texto para que el controlador haga todo
-        controlador.cargarSemanaActual(T_GAd, TotalGAd);
+        
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
+        
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
+        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -24,6 +28,10 @@ public class Gastos_Generales extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jBext = new javax.swing.JPanel();
+        ext = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         T_GAd = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
@@ -37,14 +45,57 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         datePicker1 = new com.github.lgooddatepicker.components.DatePicker();
         datePicker2 = new com.github.lgooddatepicker.components.DatePicker();
-        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Gastos generales");
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel6.setText("Gastos Generales");
+        jLabel6.setFont(new java.awt.Font("Copperplate Gothic Light", 0, 24)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 240, 30));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        jBext.setBackground(new java.awt.Color(255, 255, 255));
+
+        ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ext.setText("X");
+        ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
+
+        javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
+        jBext.setLayout(jBextLayout);
+        jBextLayout.setHorizontalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(ext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+        );
+        jBextLayout.setVerticalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBextLayout.createSequentialGroup()
+                .addComponent(ext, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 564, Short.MAX_VALUE)
+                .addComponent(jBext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jBext, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 40));
 
         T_GAd.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -61,8 +112,8 @@ public class Gastos_Generales extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(37, 89, 300, 280));
 
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Fecha :");
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 80, -1, -1));
 
         B_GyS.setText("Guardar y Salir");
@@ -98,65 +149,17 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jPanel1.add(datePicker1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 100, -1, -1));
         jPanel1.add(datePicker2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 150, -1, -1));
 
-        jLabel6.setFont(new java.awt.Font("Copperplate Gothic Light", 0, 24)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("Gastos Generales");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 240, 30));
-
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 500));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void B_AgregarGAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_AgregarGAdActionPerformed
-        JTextField txtDesc = new JTextField();
-    JTextField txtMonto = new JTextField(); 
-    com.github.lgooddatepicker.components.DatePicker dpFecha = new com.github.lgooddatepicker.components.DatePicker();
-    dpFecha.setDateToToday(); // Por defecto hoy
-    
-    Object[] message = { 
-        "Descripción del Gasto:", txtDesc, 
-        "Monto ($):", txtMonto,
-        "Fecha del gasto:", dpFecha 
-    };
-    
-    int option = JOptionPane.showConfirmDialog(this, message, "Nuevo Gasto Administrativo", JOptionPane.OK_CANCEL_OPTION);
-    
-    if (option == JOptionPane.OK_OPTION) {
-        try {
-            String descripcion = txtDesc.getText().trim();
-            double monto = Double.parseDouble(txtMonto.getText().trim());
-            String fecha = dpFecha.getDate().toString();
-            
-            if (monto > 0 && !descripcion.isEmpty()) {
-                if (controlador.agregarGasto(descripcion, monto, fecha)) {
-                    JOptionPane.showMessageDialog(this, "Gasto registrado.");
-                    llenarTablaSemanal(); // Refresca a la semana actual o puede dejar la búsqueda activa
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Revise los datos. El monto debe ser mayor a 0.");
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error en los datos ingresados.");
-        }
-    }
+        controlador.agregarGasto(this, T_GAd, TotalGAd);
     }//GEN-LAST:event_B_AgregarGAdActionPerformed
 
     private void B_EliminarGAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_EliminarGAdActionPerformed
-        int fila = T_GAd.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(this, "Debe seleccionar un gasto de la tabla.");
-        return;
-    }
-    
-    int id = (int) T_GAd.getValueAt(fila, 0); 
-    int confirmar = JOptionPane.showConfirmDialog(this, "¿Seguro que quiere eliminar este gasto?");
-    
-    if (confirmar == JOptionPane.YES_OPTION) {
-        if (controlador.eliminarGasto(id)) {
-            llenarTablaSemanal(); // Actualiza la tabla y el total al instante
-        }
-    }
+        controlador.eliminarGasto(this, T_GAd, TotalGAd);
     }//GEN-LAST:event_B_EliminarGAdActionPerformed
 
     private void B_GySActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_GySActionPerformed
@@ -165,12 +168,7 @@ public class Gastos_Generales extends javax.swing.JFrame {
     }//GEN-LAST:event_B_GySActionPerformed
 
     private void B_BuscarGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_BuscarGActionPerformed
-    if (datePicker1.getDate() == null || datePicker2.getDate() == null) {
-        JOptionPane.showMessageDialog(this, "Seleccione ambas fechas, Jefe.");
-        return;
-    }
-    controlador.buscarPorFechas(datePicker1.getDate().toString(), datePicker2.getDate().toString(), T_GAd, TotalGAd);
-
+        controlador.buscarPorFechas(datePicker1.getDate().toString(), datePicker2.getDate().toString(), T_GAd, TotalGAd);
     }//GEN-LAST:event_B_BuscarGActionPerformed
 
     private void B_SalirGAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_SalirGAdActionPerformed
@@ -187,11 +185,14 @@ public class Gastos_Generales extends javax.swing.JFrame {
     private javax.swing.JTextField TotalGAd;
     private com.github.lgooddatepicker.components.DatePicker datePicker1;
     private com.github.lgooddatepicker.components.DatePicker datePicker2;
+    private javax.swing.JLabel ext;
+    private javax.swing.JPanel jBext;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

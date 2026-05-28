@@ -1,22 +1,25 @@
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_Empleados;
+import java.awt.Color;
 
 public class Emplados extends javax.swing.JFrame {
 
-    // Instanciamos el controlador que hará el trabajo pesado
     private C_Empleados controlador;
-
+    
     public Emplados() {
         initComponents();
+        
+        jBext.setBackground(Color.white);
+        ext.setForeground(new Color(204,204,204));
+        
         controlador = new C_Empleados();
-        
-        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
-        this.setLocationRelativeTo(null);
-        
-        // Delegamos las tareas de inicio al controlador
         controlador.cargarTabla(l_empleados);
         controlador.aplicarPermisos(this, b_agregar, b_eliminar, b_modificar);
+        
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
+        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
     }
     
     @SuppressWarnings("unchecked")
@@ -30,21 +33,22 @@ public class Emplados extends javax.swing.JFrame {
         b_eliminar = new javax.swing.JButton();
         b_modificar = new javax.swing.JButton();
         b_atras = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jBext = new javax.swing.JPanel();
+        ext = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         l_empleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         jScrollPane1.setViewportView(l_empleados);
@@ -77,6 +81,42 @@ public class Emplados extends javax.swing.JFrame {
             }
         });
 
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+
+        jBext.setBackground(new java.awt.Color(255, 255, 255));
+
+        ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
+        ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ext.setText("X");
+
+        javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
+        jBext.setLayout(jBextLayout);
+        jBextLayout.setHorizontalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(ext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+        );
+        jBextLayout.setVerticalGroup(
+            jBextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jBextLayout.createSequentialGroup()
+                .addComponent(ext, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 654, Short.MAX_VALUE)
+                .addComponent(jBext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jBext, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -86,36 +126,40 @@ public class Emplados extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(48, 48, 48)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(b_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(b_agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(b_modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(b_atras, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(70, 70, 70)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(b_agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(b_agregar)
                         .addGap(18, 18, 18)
-                        .addComponent(b_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(b_eliminar)
                         .addGap(18, 18, 18)
-                        .addComponent(b_modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(b_modificar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(b_atras, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(32, Short.MAX_VALUE))
+                        .addComponent(b_atras))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 470));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 420));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void b_atrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_atrasActionPerformed
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_b_atrasActionPerformed
 
     private void b_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarActionPerformed
@@ -136,7 +180,10 @@ public class Emplados extends javax.swing.JFrame {
     private javax.swing.JButton b_atras;
     private javax.swing.JButton b_eliminar;
     private javax.swing.JButton b_modificar;
+    private javax.swing.JLabel ext;
+    private javax.swing.JPanel jBext;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable l_empleados;
     // End of variables declaration//GEN-END:variables

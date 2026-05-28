@@ -1,18 +1,32 @@
-
 package com.ometeotl.tlaxcalli.IGU;
 
+import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_Login;
 import java.awt.Color;
+import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
+
 public class Login extends javax.swing.JFrame {
 
-    int xMause, yMause;
+    private final C_Inicio ima = new C_Inicio();
+    private final C_Login l = new C_Login();
+    String valorPass;
+    
     public Login() {
         initComponents();
-        pintarImagen(Logolb, "/imagen/logazul.png");
-        pintarImagen(Information, "/imagen/informacion.png");
+        ima.pintarImagen(Logolb, "/imagen/logazul.png");
+        ima.pintarImagen(Information, "/imagen/informacion.png");
+        
         Information.setToolTipText("<html>Primer ingreso del sistema:"
                 + "<br>Usuario: <b>Admin</b><br>Contraseña: <b>Admin123</b>"
                 + "<br><br> Recuerde cambiar la contraseña</html>");
+        
+        exbg.setBackground(Color.white);
+        jLabel9.setForeground(new Color(204,204,204));
+        HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
+        HerramientasVisuales.configurarBotonCerrar(this, exbg, jLabel9, true);
+        HerramientasVisuales.configurarPlaceholderTexto(usertxt, "Ingrese su usuario");
+        HerramientasVisuales.configurarPlaceholderClave(passtst, "**********");
+        HerramientasVisuales.configurarSaltoEnter(usertxt, passtst);
     }
 
     @SuppressWarnings("unchecked")
@@ -75,19 +89,6 @@ public class Login extends javax.swing.JFrame {
         usertxt.setForeground(new java.awt.Color(153, 153, 153));
         usertxt.setText("Ingrese su usuario");
         usertxt.setBorder(null);
-        usertxt.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                usertxtFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                usertxtFocusLost(evt);
-            }
-        });
-        usertxt.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                usertxtKeyPressed(evt);
-            }
-        });
         jPanel1.add(usertxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 280, 30));
 
         jLabel6.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
@@ -97,14 +98,6 @@ public class Login extends javax.swing.JFrame {
         passtst.setForeground(new java.awt.Color(153, 153, 153));
         passtst.setText("**********");
         passtst.setBorder(null);
-        passtst.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                pasststFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                pasststFocusLost(evt);
-            }
-        });
         passtst.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 pasststKeyPressed(evt);
@@ -156,17 +149,6 @@ public class Login extends javax.swing.JFrame {
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("X");
         jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel9MouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jLabel9MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jLabel9MouseExited(evt);
-            }
-        });
 
         javax.swing.GroupLayout exbgLayout = new javax.swing.GroupLayout(exbg);
         exbg.setLayout(exbgLayout);
@@ -182,16 +164,6 @@ public class Login extends javax.swing.JFrame {
         jPanel1.add(exbg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 40, 40));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPanel4MouseDragged(evt);
-            }
-        });
-        jPanel4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jPanel4MousePressed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -221,40 +193,22 @@ public class Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jPanel4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MousePressed
-        xMause = evt.getX();
-        yMause = evt.getY();
-    }//GEN-LAST:event_jPanel4MousePressed
-
-    private void jPanel4MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MouseDragged
-        int x = evt.getXOnScreen();
-        int y = evt.getYOnScreen();
-        
-        this.setLocation(x-xMause, y-yMause);
-    }//GEN-LAST:event_jPanel4MouseDragged
-
-    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_jLabel9MouseClicked
-
-    private void jLabel9MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseEntered
-        exbg.setBackground(Color.red);
-        jLabel9.setForeground(Color.white);
-        
-    }//GEN-LAST:event_jLabel9MouseEntered
-
-    private void jLabel9MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseExited
-        exbg.setBackground(Color.white);
-        jLabel9.setForeground(new Color(204,204,204));
-    }//GEN-LAST:event_jLabel9MouseExited
-
     private void jLabel7MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseEntered
         button.setBackground(new Color(26,230,63));
         jLabel7.setBackground(Color.white);
     }//GEN-LAST:event_jLabel7MouseEntered
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        intentarLogin();
+        button.setBackground(new java.awt.Color(49,191,71));
+        valorPass = new String (passtst.getPassword());
+        
+        if(valorPass.equals("**********") || usertxt.getText().equals("Ingrese su usuario")) {
+            return; // Cortamos la acción si los campos son los falsos
+        }
+            
+        if (l.ValUsuario(usertxt.getText(), valorPass)) {
+            this.dispose(); // Cierra el login y abre el sistema
+        }
     }//GEN-LAST:event_jLabel7MouseClicked
 
     private void jLabel7MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseExited
@@ -262,48 +216,17 @@ public class Login extends javax.swing.JFrame {
         jLabel7.setBackground(new Color(226,251,244));
     }//GEN-LAST:event_jLabel7MouseExited
 
-    private void usertxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_usertxtFocusGained
-        
-    }//GEN-LAST:event_usertxtFocusGained
-
-    private void usertxtFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_usertxtFocusLost
-        if (usertxt.getText().isEmpty()) {
-            usertxt.setText("Ingrese su usuario");
-            usertxt.setForeground(java.awt.Color.GRAY); // Color gris bajito
-        }
-    }//GEN-LAST:event_usertxtFocusLost
-
-    private void pasststFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_pasststFocusGained
-        if (passtst.getText().equals("**********")) {
-            passtst.setText("");
-            passtst.setForeground(java.awt.Color.BLACK); // Color normal
-        }
-    }//GEN-LAST:event_pasststFocusGained
-
-    private void pasststFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_pasststFocusLost
-        if (passtst.getText().isEmpty()) {
-            passtst.setText("**********");
-            passtst.setForeground(java.awt.Color.GRAY); // Color normal
-        }
-    }//GEN-LAST:event_pasststFocusLost
-
-    private void usertxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_usertxtKeyPressed
-        String textoActual = usertxt.getText();
-        
-        // 2. SOLO BORRAMOS SI ES EL TEXTO POR DEFECTO
-        if (textoActual.equals("Ingrese su usuario")) {
-            usertxt.setText("");
-            usertxt.setForeground(java.awt.Color.black);
-        }
-        
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-            intentarLogin(); // ... ¡Ejecuta la misma lógica que el botón!
-        }
-    }//GEN-LAST:event_usertxtKeyPressed
-
     private void pasststKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pasststKeyPressed
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-            intentarLogin(); // ... ¡Ejecuta la misma lógica que el botón!
+            valorPass = new String (passtst.getPassword());
+            // Validamos que no intenten entrar con el texto de relleno
+            if(valorPass.equals("**********") || usertxt.getText().equals("Ingrese su usuario")) {
+                return; // Cortamos la acción si los campos son los falsos
+            }
+            
+            if (l.ValUsuario(usertxt.getText(), valorPass)) {
+                this.dispose(); // Cierra el login y abre el sistema
+            }
         }
     }//GEN-LAST:event_pasststKeyPressed
 
@@ -330,58 +253,4 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPasswordField passtst;
     private javax.swing.JTextField usertxt;
     // End of variables declaration//GEN-END:variables
-
-
-    private void pintarImagen(javax.swing.JLabel lbl, String ruta) {
-        try {
-            // 1. Cargar la imagen desde los recursos del proyecto (funciona dentro del JAR)
-            java.net.URL url = getClass().getResource(ruta);
-            
-            if (url != null) {
-                javax.swing.ImageIcon imagen = new javax.swing.ImageIcon(url);
-                
-                // 2. Obtener dimensiones. Si el layout aún no carga, usamos el tamaño preferido
-                int w = lbl.getWidth();
-                int h = lbl.getHeight();
-                if (w == 0 || h == 0) {
-                    w = lbl.getPreferredSize().width;
-                    h = lbl.getPreferredSize().height;
-                }
-                
-                // 3. Escalar la imagen (SCALE_SMOOTH da mejor calidad que la librería externa)
-                javax.swing.Icon icono = new javax.swing.ImageIcon(
-                    imagen.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH)
-                );
-                
-                // 4. Asignar al label
-                lbl.setIcon(icono);
-                lbl.repaint();
-            } else {
-                System.err.println("No se encontró la imagen en: " + ruta);
-            }
-        } catch (Exception e) {
-            System.err.println("Error cargando imagen: " + e.getMessage());
-        }
-    }
-    
-    // 1. CREA ESTE MÉTODO AL FINAL DE TU CÓDIGO (junto a los otros private)
-    private void intentarLogin() {
-        button.setBackground(new java.awt.Color(49,191,71));
-        
-        C_Login l = new C_Login();
-        String valorPass = new String(passtst.getPassword());
-        
-        // Enviamos datos
-        l.logeo(usertxt.getText(), valorPass);
-        
-        // AQUÍ EL CAMBIO:
-        // Ejecutamos la validación y capturamos el resultado (true o false)
-        boolean accesoCorrecto = l.ValUsuario();
-        
-        // Solo cerramos esta ventana SI el acceso fue correcto
-        if (accesoCorrecto) {
-            this.dispose(); // "dispose" es mejor que setVisible(false) porque libera memoria
-        }
-    }
-
 }

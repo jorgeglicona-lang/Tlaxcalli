@@ -9,7 +9,6 @@ public class Molino extends javax.swing.JFrame {
     public Molino() {
         initComponents();
         controlador = new C_Molino();
-        
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
         this.setLocationRelativeTo(null);
         
@@ -34,6 +33,7 @@ public class Molino extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Molino");
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -45,24 +45,6 @@ public class Molino extends javax.swing.JFrame {
         jLabel3.setText("Harina utilizada:");
 
         jLabel4.setText("Desperdicio o sobrante:");
-
-        t_botes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                t_botesActionPerformed(evt);
-            }
-        });
-
-        t_harina.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                t_harinaActionPerformed(evt);
-            }
-        });
-
-        t_desperdicio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                t_desperdicioActionPerformed(evt);
-            }
-        });
 
         b_guardarR.setText("Guardar");
         b_guardarR.addActionListener(new java.awt.event.ActionListener() {
@@ -134,18 +116,6 @@ public class Molino extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void t_botesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_t_botesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_t_botesActionPerformed
-
-    private void t_harinaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_t_harinaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_t_harinaActionPerformed
-
-    private void t_desperdicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_t_desperdicioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_t_desperdicioActionPerformed
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed
         this.setVisible(false);

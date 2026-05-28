@@ -4,6 +4,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="Molino"/>
+    <Property name="undecorated" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -125,19 +126,10 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="t_botes">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="t_botesActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="t_harina">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="t_harinaActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="t_desperdicio">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="t_desperdicioActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="b_guardarR">
           <Properties>
