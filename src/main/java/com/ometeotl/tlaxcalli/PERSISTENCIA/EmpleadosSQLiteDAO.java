@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.table.DefaultTableModel;
 
@@ -251,5 +252,24 @@ public class EmpleadosSQLiteDAO implements IEmpleadosDAO {
             System.err.println("Error al consultar vendedores en SQLite: " + e.getMessage());
         }
         return modelo;
+    }
+    
+    @Override
+    public int contarAdministradoresActivos() {
+        // Contamos cuántos empleados con puesto de Admin o Gerente tienen un login amarrado
+        String sql = "SELECT COUNT(*) FROM Logeo l "
+                   + "INNER JOIN Empleados e ON l.Id_empleado = e.Id_empleado "
+                   + "WHERE e.Puesto IN ('Administrador', 'Gerente') AND e.Estatus = 'Activo'";
+        try (Connection con = new CSQLiteConnection().establecerConexionPortatil();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt(1); // Devuelve el número de jefes vivos
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al contar jefes: " + e.getMessage());
+        }
+        return 0;
     }
 }

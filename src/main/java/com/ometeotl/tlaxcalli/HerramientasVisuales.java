@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class HerramientasVisuales {
@@ -166,6 +167,15 @@ public class HerramientasVisuales {
             }
         } catch (Exception e) {
             System.err.println("Error cargando imagen: " + e.getMessage());
+        }
+    }
+    
+    public static void ocultarColumna(JTable tabla, int numCol){
+        if (numCol >= 0 && numCol < tabla.getColumnCount()) {
+            tabla.getColumnModel().getColumn(numCol).setMinWidth(0);
+            tabla.getColumnModel().getColumn(numCol).setMaxWidth(0);
+            tabla.getColumnModel().getColumn(numCol).setWidth(0);
+            tabla.getColumnModel().getColumn(numCol).setPreferredWidth(0);
         }
     }
 }

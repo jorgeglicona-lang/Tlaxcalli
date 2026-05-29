@@ -2,6 +2,7 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.ocultarColumna;
 import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
 import com.ometeotl.tlaxcalli.LOGICA.C_Sesion_login;
 import com.ometeotl.tlaxcalli.Tlaxcalli;
@@ -11,8 +12,8 @@ import java.awt.Color;
 
 public class Inicio extends javax.swing.JFrame {
 
-    private Tlaxcalli nom = new Tlaxcalli();
-    private C_Inicio controlador = new C_Inicio();
+    private final Tlaxcalli nom = new Tlaxcalli();
+    private final C_Inicio controlador = new C_Inicio();
     
     public Inicio() {
         initComponents();
@@ -29,24 +30,12 @@ public class Inicio extends javax.swing.JFrame {
         tablaCatGastos.setModel(inicioDAO.obtenerCatGastosTabla());
         
         // Ocultamos "Es Comodín" en la tabla de Productos (Es la Columna Índice 3)
-        tablaProductos.getColumnModel().getColumn(3).setMinWidth(0);
-        tablaProductos.getColumnModel().getColumn(3).setMaxWidth(0);
-        tablaProductos.getColumnModel().getColumn(3).setWidth(0);
-        tablaProductos.getColumnModel().getColumn(3).setPreferredWidth(0);
-        tablaProductos.getColumnModel().getColumn(0).setMinWidth(0);
-        tablaProductos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tablaProductos.getColumnModel().getColumn(0).setWidth(0);
-        tablaProductos.getColumnModel().getColumn(0).setPreferredWidth(0);
+        ocultarColumna(tablaProductos,0);
+        ocultarColumna(tablaProductos,3);
         
         // Ocultamos "Requiere Descripción" en la tabla de Gastos (Es la Columna Índice 2)
-        tablaCatGastos.getColumnModel().getColumn(2).setMinWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(2).setMaxWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(2).setWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(2).setPreferredWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(0).setMinWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(0).setMaxWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(0).setWidth(0);
-        tablaCatGastos.getColumnModel().getColumn(0).setPreferredWidth(0);
+        ocultarColumna(tablaCatGastos,0);
+        ocultarColumna(tablaCatGastos,2);
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
         HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, true);

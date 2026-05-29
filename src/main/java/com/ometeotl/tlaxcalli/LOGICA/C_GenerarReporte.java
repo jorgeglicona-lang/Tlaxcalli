@@ -8,8 +8,8 @@ import javax.swing.table.DefaultTableModel;
 public class C_GenerarReporte {
     
     // 🛠️ ¡REPARADO! Enchufamos las interfaces limpias a través de la fábrica genérica
-    private IReportesDAO reportesDao = DAOFactory.getReportesDAO();
-    private IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
+    private final IReportesDAO reportesDao = DAOFactory.getReportesDAO();
+    private final IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
 
     public void prepararPDF(String fechaInicio, String fechaFin, String empleadoFiltro) {
         // 1. Creamos modelos temporales para extraer la info de los DAOs

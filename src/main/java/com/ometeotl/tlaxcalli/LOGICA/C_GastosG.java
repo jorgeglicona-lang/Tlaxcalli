@@ -1,42 +1,35 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.ocultarColumna;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+import static javax.swing.JOptionPane.OK_OPTION;
+import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class C_GastosG {
     
-    private IGastosGeneralesDAO dao = DAOFactory.getGastosGeneralesDAO();
+    private final IGastosGeneralesDAO dao = DAOFactory.getGastosGeneralesDAO();
 
     // Llena la tabla y calcula el total automáticamente
     public void cargarSemanaActual(JTable tabla, JTextField txtTotal) {
         DefaultTableModel modelo = dao.obtenerGastosSemana();
         tabla.setModel(modelo);
-        
-        // Ocultar la columna ID para que el usuario no la vea, pero podamos usarla
-        if (tabla.getColumnCount() > 0) {
-            tabla.getColumnModel().getColumn(0).setMinWidth(0);
-            tabla.getColumnModel().getColumn(0).setMaxWidth(0);
-            tabla.getColumnModel().getColumn(0).setWidth(0);
-        }
-        
+        ocultarColumna(tabla,0);
         calcularTotal(tabla, txtTotal);
     }
 
     public void buscarPorFechas(String inicio, String fin, JTable tabla, JTextField txtTotal) {
         DefaultTableModel modelo = dao.obtenerGastosPorRango(inicio, fin);
         tabla.setModel(modelo);
-
-        if (tabla.getColumnCount() > 0) {
-            tabla.getColumnModel().getColumn(0).setMinWidth(0);
-            tabla.getColumnModel().getColumn(0).setMaxWidth(0);
-            tabla.getColumnModel().getColumn(0).setWidth(0);
-        }
+        ocultarColumna(tabla,0);
         calcularTotal(tabla, txtTotal);
     }
     
@@ -53,10 +46,10 @@ public class C_GastosG {
             "Fecha del gasto:", dpFecha 
         };
 
-        int option = JOptionPane.showConfirmDialog(parent, message, "Nuevo Gasto Administrativo", 
-                JOptionPane.OK_CANCEL_OPTION);
+        int option = showConfirmDialog(parent, message, "Nuevo Gasto Administrativo", 
+                OK_CANCEL_OPTION);
 
-        if (option == JOptionPane.OK_OPTION) {
+        if (option == OK_OPTION) {
             try {
                 String descripcion = txtDesc.getText().trim();
                 double monto = Double.parseDouble(txtMonto.getText().trim());
@@ -64,14 +57,14 @@ public class C_GastosG {
 
                 if (monto > 0 && !descripcion.isEmpty()) {
                     if(dao.registrarGasto(descripcion, monto, fecha)){
-                        JOptionPane.showMessageDialog(parent, "Gasto registrado.");
+                        showMessageDialog(parent, "Gasto registrado.");
                         cargarSemanaActual(tabla,txTotal);
                     } 
                 }else {
-                    JOptionPane.showMessageDialog(parent, "Revise los datos. El monto debe ser mayor a 0.");
+                    showMessageDialog(parent, "Revise los datos. El monto debe ser mayor a 0.");
                 }
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(parent, "Error en los datos ingresados.");
+                showMessageDialog(parent, "Error en los datos ingresados.");
             }
         }
     }
@@ -79,14 +72,14 @@ public class C_GastosG {
     public void eliminarGasto(JFrame parent, JTable tabla, JTextField txTotal) {
         int fila = tabla.getSelectedRow();
         if (fila == -1) {
-            JOptionPane.showMessageDialog(parent, "Debe seleccionar un gasto de la tabla.");
+            showMessageDialog(parent, "Debe seleccionar un gasto de la tabla.");
             return;
         }
 
         int id = (int) tabla.getValueAt(fila, 0); 
-        int confirmar = JOptionPane.showConfirmDialog(parent, "¿Seguro que quiere eliminar este gasto?");
+        int confirmar = showConfirmDialog(parent, "¿Seguro que quiere eliminar este gasto?");
 
-        if (confirmar == JOptionPane.YES_OPTION) {
+        if (confirmar == YES_OPTION) {
             if (dao.eliminarGasto(id)) {
                 cargarSemanaActual(tabla, txTotal);
             }

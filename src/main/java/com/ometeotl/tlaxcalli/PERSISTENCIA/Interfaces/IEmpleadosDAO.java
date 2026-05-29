@@ -10,4 +10,5 @@ public interface IEmpleadosDAO {
     String obtenerNombreUsuario(int idEmpleado);
     DefaultTableModel consultarEmpleadosVisibles();
     DefaultTableModel consultarVendedores();
+    int contarAdministradoresActivos();
 }

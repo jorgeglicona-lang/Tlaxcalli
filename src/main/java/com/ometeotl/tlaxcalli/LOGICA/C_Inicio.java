@@ -1,21 +1,36 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO;
+import java.awt.Color;
+import java.awt.GridLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+import static javax.swing.JOptionPane.OK_OPTION;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 public class C_Inicio {
+    private final I_InicioDAO dao = DAOFactory.getInicioDAO();
     
     public void recargarTablaProductos(JTable tablaProd) {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-            com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
         tablaProd.setModel(dao.obtenerProductosTabla());
     }
     
     public void recargarTablaCatGastos(JTable tablaGastos) {
-        com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-            com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
         tablaGastos.setModel(dao.obtenerCatGastosTabla());
     }
     
@@ -26,39 +41,39 @@ public class C_Inicio {
         
         if (pestaniaActiva == 0) {
             // --- FORMULARIO DE PRODUCTOS ---
-            javax.swing.JTextField txtNombre = new javax.swing.JTextField();
-            javax.swing.JTextField txtPrecio = new javax.swing.JTextField();
-            javax.swing.JCheckBox chkComodin = new javax.swing.JCheckBox("Es producto Comodín");
+            JTextField txtNombre = new JTextField();
+            JTextField txtPrecio = new JTextField();
+            JCheckBox chkComodin = new JCheckBox("Es producto Comodín");
             
             chkComodin.addActionListener(e -> {
                 if (chkComodin.isSelected()) {
                     txtPrecio.setText("0.0"); // Le ponemos cero por defecto
                     txtPrecio.setEnabled(false); // Bloqueamos la escritura
-                    txtPrecio.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                    txtPrecio.setBackground(new Color(220, 220, 220)); // Lo pintamos de gris
                 } else {
                     txtPrecio.setText(""); // Lo vaciamos
                     txtPrecio.setEnabled(true); // Desbloqueamos
-                    txtPrecio.setBackground(java.awt.Color.WHITE); // Regresa a blanco
+                    txtPrecio.setBackground(Color.WHITE); // Regresa a blanco
                 }
             });
 
-            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
-            panel.add(new javax.swing.JLabel("Nombre del Producto:"));
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Nombre del Producto:"));
             panel.add(txtNombre);
-            panel.add(new javax.swing.JLabel("Precio ($):"));
+            panel.add(new JLabel("Precio ($):"));
             panel.add(txtPrecio);
             panel.add(chkComodin);
 
-            int resultado = JOptionPane.showConfirmDialog(parent, panel, 
-                    "Nuevo Producto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            int resultado = showConfirmDialog(parent, panel, 
+                    "Nuevo Producto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
 
-            if (resultado == JOptionPane.OK_OPTION) {
+            if (resultado == OK_OPTION) {
                 String nombre = txtNombre.getText().trim();
                 String precioStr = txtPrecio.getText().trim();
                 int esComodin = chkComodin.isSelected() ? 1 : 0;
 
                 if (nombre.isEmpty() || precioStr.isEmpty()) {
-                    JOptionPane.showMessageDialog(parent, "Todos los campos son obligatorios.");
+                    showMessageDialog(parent, "Todos los campos son obligatorios.");
                     return; 
                 }
 
@@ -67,50 +82,43 @@ public class C_Inicio {
                     double precio = Double.parseDouble(precioStr);
 
                     // 3. GUARDADO
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                        com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-
                     if (dao.registrarProducto(nombre, precio, esComodin)) {
-                        JOptionPane.showMessageDialog(parent, "✅ Producto guardado.");
+                        showMessageDialog(parent, "✅ Producto guardado.");
                         recargarTablaProductos(tablaProd);
                     } else {
-                        JOptionPane.showMessageDialog(parent, "❌ Error al guardar en base de datos.");
+                        showMessageDialog(parent, "❌ Error al guardar en base de datos.");
                     }
 
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(parent, "El precio debe ser un número válido (ej. 20.50).");
+                    showMessageDialog(parent, "El precio debe ser un número válido (ej. 20.50).");
                 }
             }
         } else if (pestaniaActiva == 1) {
-            javax.swing.JTextField txtNombre = new javax.swing.JTextField();
-            javax.swing.JCheckBox chkRequiere = new javax.swing.JCheckBox("Requiere Descripción detallada");
+            JTextField txtNombre = new JTextField();
+            JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
 
-            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
-            panel.add(new javax.swing.JLabel("Nombre del Gasto (Ej. Gasolina, Luz):"));
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Nombre del Gasto (Ej. Gasolina, Luz):"));
             panel.add(txtNombre);
             panel.add(chkRequiere);
 
-            int resultado = javax.swing.JOptionPane.showConfirmDialog(parent, panel, 
-                    "Nuevo Tipo de Gasto", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+            int resultado = showConfirmDialog(parent, panel, 
+                    "Nuevo Tipo de Gasto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
 
-            if (resultado == javax.swing.JOptionPane.OK_OPTION) {
+            if (resultado == OK_OPTION) {
                 String nombre = txtNombre.getText().trim();
                 
                 if (nombre.isEmpty()) {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "El nombre del gasto es obligatorio.");
+                    showMessageDialog(parent, "El nombre del gasto es obligatorio.");
                     return;
                 }
                 
                 int requiereDesc = chkRequiere.isSelected() ? 1 : 0;
-                
-                com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                
                 if (dao.registrarCatGasto(nombre, requiereDesc)) {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "✅ Gasto registrado.");
+                    showMessageDialog(parent, "✅ Gasto registrado.");
                     recargarTablaCatGastos(tablaGastos);
                 } else {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "❌ Error al guardar.");
+                    showMessageDialog(parent, "❌ Error al guardar.");
                 }
             }
         }
@@ -124,7 +132,7 @@ public class C_Inicio {
         if (pestaniaActiva == 0) {
             int fila = tablaProd.getSelectedRow();
             if (fila == -1) {
-                JOptionPane.showMessageDialog(parent, "Seleccione un Producto para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                showMessageDialog(parent, "Seleccione un Producto para eliminar.", "Aviso", WARNING_MESSAGE);
                 return;
             }
             
@@ -132,62 +140,56 @@ public class C_Inicio {
             String nombre = tablaProd.getValueAt(fila, 1).toString();
             
             if (idProd > 0 && idProd < 4) {
-                JOptionPane.showMessageDialog(parent, 
-                    "⚠️ ACCIÓN DENEGADA:\nEl producto '" + nombre + "' es vital para los cálculos del sistema y no puede ser eliminado.", 
-                    "Seguridad de Tlaxcalli", JOptionPane.ERROR_MESSAGE);
-                return; // Cortamos la ejecución aquí, no se elimina nada
+                showMessageDialog(parent, "⚠️ ACCIÓN DENEGADA:\nEl producto '" + nombre + 
+                        "' es vital para los cálculos del sistema y no puede ser eliminado.",
+                            "Seguridad de Tlaxcalli", ERROR_MESSAGE);
+                return;
             }
             
-            int conf = JOptionPane.showConfirmDialog(parent, "¿Eliminar definitivamente el producto " + nombre + "?", 
-                    "Confirmar", JOptionPane.YES_NO_OPTION);
+            int conf = showConfirmDialog(parent, "¿Eliminar definitivamente el producto " + nombre + "?", 
+                    "Confirmar", YES_NO_OPTION);
                     
-            if (conf == JOptionPane.YES_OPTION) {
-                com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                
+            if (conf == YES_OPTION) {
                 if (dao.eliminarProducto(idProd)) {
-                    JOptionPane.showMessageDialog(parent, "✅ Producto eliminado.");
+                    showMessageDialog(parent, "✅ Producto eliminado.");
                     recargarTablaProductos(tablaProd);
                 } else {
-                    JOptionPane.showMessageDialog(parent, "❌ No se pudo eliminar. Quizá ya tiene ventas registradas.");
+                    showMessageDialog(parent, "❌ No se pudo eliminar. Quizá ya tiene ventas registradas.");
                 }
             }
         } else if (pestaniaActiva == 1) {
             int fila = tablaGastos.getSelectedRow();
             if (fila == -1) {
-                javax.swing.JOptionPane.showMessageDialog(parent, "Seleccione un Gasto para eliminar.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                showMessageDialog(parent, "Seleccione un Gasto para eliminar.", "Aviso",WARNING_MESSAGE);
                 return;
             }
             
             int idTipo = Integer.parseInt(tablaGastos.getValueAt(fila, 0).toString());
             String nombre = tablaGastos.getValueAt(fila, 1).toString();
             
-            int conf = javax.swing.JOptionPane.showConfirmDialog(parent, "¿Eliminar definitivamente el gasto " + nombre + "?", 
-                    "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION);
+            int conf = showConfirmDialog(parent, "¿Eliminar definitivamente el gasto " + nombre + "?", 
+                    "Confirmar", YES_NO_OPTION);
                     
-            if (conf == javax.swing.JOptionPane.YES_OPTION) {
-                com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                
+            if (conf == YES_OPTION) {
                 if (dao.eliminarCatGasto(idTipo)) {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "✅ Gasto eliminado.");
+                    showMessageDialog(parent, "✅ Gasto eliminado.");
                     recargarTablaCatGastos(tablaGastos);
                 } else {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "❌ No se pudo eliminar.");
+                    showMessageDialog(parent, "❌ No se pudo eliminar.");
                 }
             }
         }
     }
     
     public void modificarInteligente(JFrame parent, JTabbedPane pestanias, JTable tablaProd, JTable tablaGastos) {
-        
         int pestaniaActiva = pestanias.getSelectedIndex();
         
         if (pestaniaActiva == 0) {
             // --- ESTAMOS EN LA PESTAÑA PRODUCTOS ---
             int fila = tablaProd.getSelectedRow();
             if (fila == -1) {
-                JOptionPane.showMessageDialog(parent, "Por favor, seleccione un Producto de la tabla para modificarlo.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                showMessageDialog(parent, "Por favor, seleccione un Producto de la tabla para modificarlo.",
+                        "Aviso",WARNING_MESSAGE);
                 return;
             }
             int idProducto = Integer.parseInt(tablaProd.getValueAt(fila, 0).toString());
@@ -196,19 +198,19 @@ public class C_Inicio {
             String comodinActual = tablaProd.getValueAt(fila, 3).toString(); // Recibe "Sí" o "No"
             
             // Pasamos los datos extraídos como valores iniciales a los campos del formulario
-            javax.swing.JTextField txtNombre = new javax.swing.JTextField(nombreActual);
-            javax.swing.JTextField txtPrecio = new javax.swing.JTextField(String.valueOf(precioActual));
-            javax.swing.JCheckBox chkComodin = new javax.swing.JCheckBox("Es producto Comodín");
+            JTextField txtNombre = new JTextField(nombreActual);
+            JTextField txtPrecio = new JTextField(String.valueOf(precioActual));
+            JCheckBox chkComodin = new JCheckBox("Es producto Comodín");
             
             chkComodin.addActionListener(e -> {
                 if (chkComodin.isSelected()) {
                     txtPrecio.setText("0.0"); // Le ponemos cero por defecto
                     txtPrecio.setEnabled(false); // Bloqueamos la escritura
-                    txtPrecio.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                    txtPrecio.setBackground(new Color(220, 220, 220)); // Lo pintamos de gris
                 } else {
                     txtPrecio.setText(""); // Lo vaciamos
                     txtPrecio.setEnabled(true); // Desbloqueamos
-                    txtPrecio.setBackground(java.awt.Color.WHITE); // Regresa a blanco
+                    txtPrecio.setBackground(Color.WHITE); // Regresa a blanco
                 }
             });
             
@@ -217,55 +219,48 @@ public class C_Inicio {
             
             if (idProducto > 0 && idProducto <4) {
                 txtNombre.setEditable(false); // No pueden borrar ni cambiar el texto
-                txtNombre.setBackground(new java.awt.Color(220, 220, 220)); // Lo pintamos de gris
+                txtNombre.setBackground(new Color(220, 220, 220)); // Lo pintamos de gris
                 chkComodin.setEnabled(false); // No pueden alterar su estado lógico
                 
-                JOptionPane.showMessageDialog(parent, 
-                    "ℹ️ MODO SEGURO ACTIVO:\nPara los productos base, solo está autorizado actualizar el Precio.", 
-                    "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                showMessageDialog(parent,"ℹ️ MODO SEGURO ACTIVO:\nPara los productos base, solo está "
+                        + "autorizado actualizar el Precio.", "Aviso", INFORMATION_MESSAGE);
             }
 
-            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
-            panel.add(new javax.swing.JLabel("Nombre del Producto:"));
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Nombre del Producto:"));
             panel.add(txtNombre);
-            panel.add(new javax.swing.JLabel("Precio ($):"));
+            panel.add(new JLabel("Precio ($):"));
             panel.add(txtPrecio);
             panel.add(chkComodin);
 
-            int resultado = JOptionPane.showConfirmDialog(parent, panel, 
-                    "Modificar Producto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            int resultado = showConfirmDialog(parent, panel, "Modificar Producto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
 
             if (resultado == JOptionPane.OK_OPTION) {
                 String nombreNuevo = txtNombre.getText().trim();
                 String precioStr = txtPrecio.getText().trim();
                 
                 if (nombreNuevo.isEmpty() || precioStr.isEmpty()) {
-                    JOptionPane.showMessageDialog(parent, "Todos los campos son obligatorios.");
+                    showMessageDialog(parent, "Todos los campos son obligatorios.");
                     return;
                 }
                 
                 try {
                     double precioNuevo = Double.parseDouble(precioStr);
                     int esComodinNuevo = chkComodin.isSelected() ? 1 : 0;
-                    
-                    // Mandamos los cables directos a la base de datos portátil
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                        com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                    
                     if (dao.modificarProducto(idProducto, nombreNuevo, precioNuevo, esComodinNuevo)) {
-                        JOptionPane.showMessageDialog(parent, "✅ Producto modificado correctamente.");
+                        showMessageDialog(parent, "✅ Producto modificado correctamente.");
                         recargarTablaProductos(tablaProd); // Refrescamos la sala al instante
                     } else {
-                        JOptionPane.showMessageDialog(parent, "❌ Error al actualizar en la base de datos.");
+                        showMessageDialog(parent, "❌ Error al actualizar en la base de datos.");
                     }
                 } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(parent, "El precio debe ser un número válido.");
+                    showMessageDialog(parent, "El precio debe ser un número válido.");
                 }
             }
         } else if (pestaniaActiva == 1) {
             int fila = tablaGastos.getSelectedRow();
             if (fila == -1) {
-                javax.swing.JOptionPane.showMessageDialog(parent, "Por favor, seleccione un Gasto del catálogo para modificarlo.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                showMessageDialog(parent, "Por favor, seleccione un Gasto del catálogo para modificarlo.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
                 return;
             }
             
@@ -273,31 +268,26 @@ public class C_Inicio {
             String nombreActual = tablaGastos.getValueAt(fila, 1).toString();
             String requiereActual = tablaGastos.getValueAt(fila, 2).toString(); // "Sí" o "No"
             
-            javax.swing.JTextField txtNombre = new javax.swing.JTextField(nombreActual);
-            javax.swing.JCheckBox chkRequiere = new javax.swing.JCheckBox("Requiere Descripción detallada");
+            JTextField txtNombre = new JTextField(nombreActual);
+            JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
             chkRequiere.setSelected(requiereActual.equalsIgnoreCase("Sí"));
 
-            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
+            JPanel panel = new JPanel(new GridLayout(0, 1));
             panel.add(new javax.swing.JLabel("Nombre del Gasto:"));
             panel.add(txtNombre);
             panel.add(chkRequiere);
 
-            int resultado = javax.swing.JOptionPane.showConfirmDialog(parent, panel, 
-                    "Modificar Tipo de Gasto", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+            int resultado = showConfirmDialog(parent, panel, "Modificar Tipo de Gasto",OK_CANCEL_OPTION, PLAIN_MESSAGE);
 
-            if (resultado == javax.swing.JOptionPane.OK_OPTION) {
+            if (resultado == OK_OPTION) {
                 String nombreNuevo = txtNombre.getText().trim();
                 
                 if (nombreNuevo.isEmpty()) {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "El nombre no puede estar vacío.");
+                    showMessageDialog(parent, "El nombre no puede estar vacío.");
                     return;
                 }
                 
                 int requiereNuevo = chkRequiere.isSelected() ? 1 : 0;
-                
-                com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
-                    com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();
-                
                 if (dao.modificarCatGasto(idTipo, nombreNuevo, requiereNuevo)) {
                     javax.swing.JOptionPane.showMessageDialog(parent, "✅ Gasto modificado.");
                     recargarTablaCatGastos(tablaGastos);
