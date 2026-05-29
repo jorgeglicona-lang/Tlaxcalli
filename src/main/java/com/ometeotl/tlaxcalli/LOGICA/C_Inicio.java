@@ -7,39 +7,6 @@ import javax.swing.JTable;
 
 public class C_Inicio {
     
-    // MÉTODO NATIVO PARA AJUSTAR IMAGEN A JLABEL
-    public void pintarImagen(javax.swing.JLabel lbl, String ruta) {
-        try {
-            // 1. Cargar la imagen desde los recursos del proyecto (funciona dentro del JAR)
-            java.net.URL url = getClass().getResource(ruta);
-            
-            if (url != null) {
-                javax.swing.ImageIcon imagen = new javax.swing.ImageIcon(url);
-                
-                // 2. Obtener dimensiones. Si el layout aún no carga, usamos el tamaño preferido
-                int w = lbl.getWidth();
-                int h = lbl.getHeight();
-                if (w == 0 || h == 0) {
-                    w = lbl.getPreferredSize().width;
-                    h = lbl.getPreferredSize().height;
-                }
-                
-                // 3. Escalar la imagen (SCALE_SMOOTH da mejor calidad que la librería externa)
-                javax.swing.Icon icono = new javax.swing.ImageIcon(
-                    imagen.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH)
-                );
-                
-                // 4. Asignar al label
-                lbl.setIcon(icono);
-                lbl.repaint();
-            } else {
-                System.err.println("No se encontró la imagen en: " + ruta);
-            }
-        } catch (Exception e) {
-            System.err.println("Error cargando imagen: " + e.getMessage());
-        }
-    }
-    
     public void recargarTablaProductos(JTable tablaProd) {
         com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO dao = 
             com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory.getInicioDAO();

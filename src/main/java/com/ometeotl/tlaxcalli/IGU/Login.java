@@ -3,25 +3,21 @@ package com.ometeotl.tlaxcalli.IGU;
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_Login;
 import java.awt.Color;
-import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
+import java.awt.event.KeyEvent;
 
 public class Login extends javax.swing.JFrame {
 
-    private final C_Inicio ima = new C_Inicio();
     private final C_Login l = new C_Login();
-    String valorPass;
     
     public Login() {
         initComponents();
-        ima.pintarImagen(Logolb, "/imagen/logazul.png");
-        ima.pintarImagen(Information, "/imagen/informacion.png");
         
+        HerramientasVisuales.pintarImagen(Logolb, "/imagen/logazul.png");
+        HerramientasVisuales.pintarImagen(Information, "/imagen/informacion.png");
         Information.setToolTipText("<html>Primer ingreso del sistema:"
                 + "<br>Usuario: <b>Admin</b><br>Contraseña: <b>Admin123</b>"
                 + "<br><br> Recuerde cambiar la contraseña</html>");
         
-        exbg.setBackground(Color.white);
-        jLabel9.setForeground(new Color(204,204,204));
         HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
         HerramientasVisuales.configurarBotonCerrar(this, exbg, jLabel9, true);
         HerramientasVisuales.configurarPlaceholderTexto(usertxt, "Ingrese su usuario");
@@ -199,16 +195,8 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel7MouseEntered
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        button.setBackground(new java.awt.Color(49,191,71));
-        valorPass = new String (passtst.getPassword());
-        
-        if(valorPass.equals("**********") || usertxt.getText().equals("Ingrese su usuario")) {
-            return; // Cortamos la acción si los campos son los falsos
-        }
-            
-        if (l.ValUsuario(usertxt.getText(), valorPass)) {
-            this.dispose(); // Cierra el login y abre el sistema
-        }
+        button.setBackground(new Color(49,191,71));
+        l.ValUsuario(this, usertxt, passtst);
     }//GEN-LAST:event_jLabel7MouseClicked
 
     private void jLabel7MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseExited
@@ -217,16 +205,8 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel7MouseExited
 
     private void pasststKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pasststKeyPressed
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-            valorPass = new String (passtst.getPassword());
-            // Validamos que no intenten entrar con el texto de relleno
-            if(valorPass.equals("**********") || usertxt.getText().equals("Ingrese su usuario")) {
-                return; // Cortamos la acción si los campos son los falsos
-            }
-            
-            if (l.ValUsuario(usertxt.getText(), valorPass)) {
-                this.dispose(); // Cierra el login y abre el sistema
-            }
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            l.ValUsuario(this, usertxt, passtst);
         }
     }//GEN-LAST:event_pasststKeyPressed
 

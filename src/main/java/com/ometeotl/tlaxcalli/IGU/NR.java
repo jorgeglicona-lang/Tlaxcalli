@@ -2,28 +2,26 @@ package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_NR;
-import java.awt.Color;
-import com.ometeotl.tlaxcalli.LOGICA.C_Inicio; // Para usar pintarImagen()
+import com.ometeotl.tlaxcalli.LOGICA.GastoItem;
+import com.ometeotl.tlaxcalli.LOGICA.ProductoItem;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.table.DefaultTableModel;
 
 public class NR extends javax.swing.JFrame {
 
-    // Instanciamos el cerebro
-    private C_NR controlador = new C_NR();
+    private final C_NR controlador = new C_NR();
     
-    int xMause, yMause;
-
     public NR() {
         initComponents();
-        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
+        
+        HerramientasVisuales.pintarImagen(Logolb, "/imagen/transparencia.png");
+        
         // Ocultar ID en la tabla
         tabla_detalles.getColumnModel().getColumn(0).setMinWidth(0);
         tabla_detalles.getColumnModel().getColumn(0).setMaxWidth(0);
         tabla_detalles.getColumnModel().getColumn(0).setWidth(0);
         
-        // Pintar logo usando el utilitario que ya teníamos en C_Inicio
-        new C_Inicio().pintarImagen(Logolb, "/imagen/transparencia.png");
+        
         
         // Llenar combos delegando la tarea al controlador
         controlador.inicializarCombos(BoxRepartidor, cb_producto, cb_gastos);
@@ -83,6 +81,7 @@ public class NR extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         jBext = new javax.swing.JPanel();
         ext = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nuevo Registro");
@@ -324,33 +323,12 @@ public class NR extends javax.swing.JFrame {
         jPanel1.add(t_detalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 340, 100, -1));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPanel4MouseDragged(evt);
-            }
-        });
-        jPanel4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jPanel4MousePressed(evt);
-            }
-        });
 
         jBext.setBackground(new java.awt.Color(255, 255, 255));
 
         ext.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
         ext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ext.setText("X");
-        ext.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                extMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                extMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                extMouseExited(evt);
-            }
-        });
 
         javax.swing.GroupLayout jBextLayout = new javax.swing.GroupLayout(jBext);
         jBext.setLayout(jBextLayout);
@@ -382,6 +360,12 @@ public class NR extends javax.swing.JFrame {
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 740, 40));
 
+        jLabel14.setFont(new java.awt.Font("Copperplate Gothic Bold", 0, 24)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel14.setText("Nuevo Registro");
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -406,7 +390,7 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_b_guardarVActionPerformed
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void BoxRepartidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BoxRepartidorActionPerformed
@@ -418,14 +402,12 @@ public class NR extends javax.swing.JFrame {
 
     private void b_molinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_molinoActionPerformed
         Molino mol=new Molino();
-        mol.setVisible(true);
-        mol.setLocationRelativeTo(null);
+        HerramientasVisuales.GenV(mol);
     }//GEN-LAST:event_b_molinoActionPerformed
 
     private void cb_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_productoActionPerformed
         if (cb_producto.getSelectedItem() == null) return;
-        com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = 
-                (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
+        ProductoItem item = (ProductoItem) cb_producto.getSelectedItem();
         t_cantidad.setText("");
         t_precio.setText("");
         t_detalle.setText("");
@@ -459,20 +441,20 @@ public class NR extends javax.swing.JFrame {
 
     private void b_agregarProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarProdActionPerformed
         try {
-            com.ometeotl.tlaxcalli.LOGICA.ProductoItem item = (com.ometeotl.tlaxcalli.LOGICA.ProductoItem) cb_producto.getSelectedItem();
+            ProductoItem item = (ProductoItem) cb_producto.getSelectedItem();
             int cantidad = Integer.parseInt(t_cantidad.getText());
             double precioUnitario = item.isComodin() ? Double.parseDouble(t_precio.getText()) : item.getPrecio();
             String observacion = item.isComodin() ? t_detalle.getText() : item.toString();
             double subtotal = cantidad * precioUnitario;
 
-            javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
+            DefaultTableModel modelo = (DefaultTableModel) tabla_detalles.getModel();
             modelo.addRow(new Object[] { item.getId(), observacion, cantidad, precioUnitario, subtotal });
             
             t_cantidad.setText("");
             t_precio.setText("");
             t_detalle.setText("");
         } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Verifica la cantidad y precio.");
+             showMessageDialog(this, "Verifica la cantidad y precio.");
         }
         
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
@@ -481,7 +463,7 @@ public class NR extends javax.swing.JFrame {
     private void cb_gastosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_gastosActionPerformed
         if (cb_gastos.getSelectedItem() == null) return;
         
-        com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
+        GastoItem item = (GastoItem) cb_gastos.getSelectedItem();
         
         t_montoGasto.setText("");
         t_detalleGasto.setText("");
@@ -508,22 +490,21 @@ public class NR extends javax.swing.JFrame {
 
     private void b_agregarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarGastoActionPerformed
         try {
-            com.ometeotl.tlaxcalli.LOGICA.GastoItem item = (com.ometeotl.tlaxcalli.LOGICA.GastoItem) cb_gastos.getSelectedItem();
-            
+            GastoItem item = (GastoItem) cb_gastos.getSelectedItem();
             double monto = Double.parseDouble(t_montoGasto.getText());
             String descripcion = item.isRequiereDescripcion() ? t_detalleGasto.getText() : item.toString();
-
+            
             if (item.isRequiereDescripcion() && descripcion.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Por favor especifica el detalle del gasto."); return;
+                showMessageDialog(this, "Por favor especifica el detalle del gasto."); return;
             }
 
-            javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
+            DefaultTableModel modelo = (DefaultTableModel) tabla_gastos.getModel();
             modelo.addRow(new Object[] { descripcion, monto });
             
             t_montoGasto.setText(""); 
             t_detalleGasto.setText("");
         } catch (NumberFormatException e) { 
-            javax.swing.JOptionPane.showMessageDialog(this, "El monto debe ser numérico."); 
+            showMessageDialog(this, "El monto debe ser numérico."); 
         }
         
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
@@ -576,8 +557,9 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_t_masaKeyReleased
 
     private void eliminarProd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarProd
-        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_detalles.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) tabla_detalles.getModel();
         int fila = tabla_detalles.getSelectedRow();
+        
         if (fila >= 0) {
             modelo.removeRow(fila);
             controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar); 
@@ -586,8 +568,9 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_eliminarProd
 
     private void b_EliminarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_EliminarGastoActionPerformed
-        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tabla_gastos.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) tabla_gastos.getModel();
         int fila = tabla_gastos.getSelectedRow();
+        
         if (fila >= 0) {
             modelo.removeRow(fila);
             controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar); 
@@ -602,32 +585,6 @@ public class NR extends javax.swing.JFrame {
     private void tabla_gastosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabla_gastosMouseClicked
         if (tabla_gastos.getSelectedRow() != -1) b_EliminarGasto.setEnabled(true);
     }//GEN-LAST:event_tabla_gastosMouseClicked
-
-    private void extMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_extMouseClicked
-
-    private void extMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseEntered
-        jBext.setBackground(Color.RED);
-        ext.setForeground(Color.white);
-    }//GEN-LAST:event_extMouseEntered
-
-    private void extMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_extMouseExited
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
-    }//GEN-LAST:event_extMouseExited
-
-    private void jPanel4MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MouseDragged
-        int x = evt.getXOnScreen();
-        int y = evt.getYOnScreen();
-
-        this.setLocation(x-xMause, y-yMause);
-    }//GEN-LAST:event_jPanel4MouseDragged
-
-    private void jPanel4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel4MousePressed
-        xMause = evt.getX();
-        yMause = evt.getY();
-    }//GEN-LAST:event_jPanel4MousePressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -652,6 +609,7 @@ public class NR extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

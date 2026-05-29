@@ -3,17 +3,27 @@ package com.ometeotl.tlaxcalli.LOGICA;
 import com.ometeotl.tlaxcalli.IGU.Inicio;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.ILoginDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
+import javax.swing.JFrame;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 public class C_Login {
     
-    public boolean ValUsuario(String User, String Passw) {
+    public void ValUsuario(JFrame parent, JTextField User, JPasswordField Passw) {
         // En lugar de escribir el Query aquí, llamamos al contrato a través de la fábrica
-        String Usuario=User;
-        String password=Passw;
-        ILoginDAO loginDAO = DAOFactory.getLoginDAO();
+        String valorPass = new String (Passw.getPassword());
+        String Usuario=User.getText();
+        String password=valorPass;
         
-        // Le pedimos al DAO seleccionado que valide las credenciales
-        boolean accesoCorrecto = loginDAO.validarAcceso(Usuario, password);
+        
+        if(password.equals("**********") || Usuario.equals("Ingrese su usuario")) {
+            showMessageDialog(null, "❌ Credenciales incorrectas o usuario Inactivo.");
+            return;
+        }
+        
+        ILoginDAO Val = DAOFactory.getLoginDAO();
+        boolean accesoCorrecto = Val.validarAcceso(Usuario, password);
         
         if (accesoCorrecto) {
             String puestoEncontrado = C_Sesion_login.puesto;
@@ -26,14 +36,13 @@ public class C_Login {
                 ini.setVisible(true);
                 ini.setLocationRelativeTo(null);
                 
-                return true; 
+                parent.dispose();
             } else {
-                javax.swing.JOptionPane.showMessageDialog(null, "⛔ Acceso Denegado.\nTu puesto (" + puestoEncontrado + ") no tiene permisos de Administrador.");
-                return false;
+                showMessageDialog(null, "⛔ Acceso Denegado.\nTu puesto (" 
+                                  + puestoEncontrado + ") no tiene permisos de Administrador.");
             }
         } else {
-            javax.swing.JOptionPane.showMessageDialog(null, "❌ Credenciales incorrectas o usuario Inactivo.");
-            return false;
+            showMessageDialog(null, "❌ Credenciales incorrectas o usuario Inactivo.");
         }
     }
 }

@@ -3,18 +3,17 @@ package com.ometeotl.tlaxcalli.IGU;
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_Reportes;
 import com.ometeotl.tlaxcalli.LOGICA.GeneradorReportes;
-import java.awt.Color;
 import java.awt.Font;
 
 public class Reportes extends javax.swing.JFrame {
     
-    private C_Reportes controlador = new C_Reportes();
+    private final C_Reportes controlador = new C_Reportes();
     
     public Reportes() {
         initComponents();
+        
         controlador.cargarEmpleados(CB_Empleados);
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
+        HerramientasVisuales.pintarImagen(Logolb, "/imagen/transparencia.png");
         // Poner la fecha de hoy por defecto para que no aparezcan vacíos
         datePicker1.setDateToToday();
         datePicker4.setDateToToday();
@@ -60,6 +59,8 @@ public class Reportes extends javax.swing.JFrame {
         B_SalirInicio = new javax.swing.JButton();
         datePicker4 = new com.github.lgooddatepicker.components.DatePicker();
         datePicker1 = new com.github.lgooddatepicker.components.DatePicker();
+        Name = new javax.swing.JLabel();
+        Logolb = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jBext = new javax.swing.JPanel();
         ext = new javax.swing.JLabel();
@@ -165,6 +166,11 @@ public class Reportes extends javax.swing.JFrame {
         jPanel1.add(datePicker4, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 150, -1, -1));
         jPanel1.add(datePicker1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 110, -1, -1));
 
+        Name.setFont(new java.awt.Font("Roboto Black", 0, 26)); // NOI18N
+        Name.setText("Tlaxcalli");
+        jPanel1.add(Name, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 20, -1, -1));
+        jPanel1.add(Logolb, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 40, 40));
+
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         jBext.setBackground(new java.awt.Color(255, 255, 255));
@@ -234,6 +240,8 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JButton B_SalirInicio;
     private javax.swing.JComboBox<String> CB_Empleados;
     private javax.swing.JLabel IngresosN;
+    private javax.swing.JLabel Logolb;
+    private javax.swing.JLabel Name;
     private javax.swing.JTable T_Gastos;
     private javax.swing.JTable T_Ventas;
     private javax.swing.JLabel TotalG;

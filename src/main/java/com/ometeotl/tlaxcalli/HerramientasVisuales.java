@@ -1,11 +1,18 @@
 package com.ometeotl.tlaxcalli;
 
 import java.awt.Color;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 public class HerramientasVisuales {
 
@@ -36,6 +43,8 @@ public class HerramientasVisuales {
 
     // 2. EL BOTÓN "X" INTELIGENTE
     public static void configurarBotonCerrar(JFrame ventana, JPanel jBext, JLabel ext, boolean esPrincipal) {
+        jBext.setBackground(Color.WHITE);
+        ext.setForeground(new Color(204, 204, 204));
         
         jBext.addMouseListener(new MouseAdapter() {
             @Override
@@ -45,7 +54,7 @@ public class HerramientasVisuales {
             }
 
             @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            public void mouseExited(MouseEvent evt) {
                 jBext.setBackground(Color.WHITE);
                 ext.setForeground(new Color(204, 204, 204));
             }
@@ -67,60 +76,96 @@ public class HerramientasVisuales {
     }
     
     // 1. EL VIGILANTE DE TEXTO FALSO (PLACEHOLDER)
-    public static void configurarPlaceholderTexto(javax.swing.JTextField campo, String textoFalso) {
-        campo.addFocusListener(new java.awt.event.FocusAdapter() {
+    public static void configurarPlaceholderTexto(JTextField campo, String textoFalso) {
+        campo.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent evt) {
+            public void focusGained(FocusEvent evt) {
                 // Cuando el cursor entra, si tiene el texto falso, lo borra
                 if (campo.getText().equals(textoFalso)) {
                     campo.setText("");
-                    campo.setForeground(java.awt.Color.BLACK);
+                    campo.setForeground(Color.BLACK);
                 }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent evt) {
+            public void focusLost(FocusEvent evt) {
                 // Cuando el cursor sale, si lo dejaron vacío, regresa el texto falso
                 if (campo.getText().isEmpty()) {
                     campo.setText(textoFalso);
-                    campo.setForeground(java.awt.Color.GRAY);
+                    campo.setForeground(Color.GRAY);
                 }
             }
         });
     }
 
     // 2. EL VIGILANTE DE CONTRASEÑAS FALSAS
-    public static void configurarPlaceholderClave(javax.swing.JPasswordField campoClave, String claveFalsa) {
-        campoClave.addFocusListener(new java.awt.event.FocusAdapter() {
+    public static void configurarPlaceholderClave(JPasswordField campoClave, String claveFalsa) {
+        campoClave.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(java.awt.event.FocusEvent evt) {
+            public void focusGained(FocusEvent evt) {
                 String passActual = new String(campoClave.getPassword());
                 if (passActual.equals(claveFalsa)) {
                     campoClave.setText("");
-                    campoClave.setForeground(java.awt.Color.BLACK);
+                    campoClave.setForeground(Color.BLACK);
                 }
             }
 
             @Override
-            public void focusLost(java.awt.event.FocusEvent evt) {
+            public void focusLost(FocusEvent evt) {
                 String passActual = new String(campoClave.getPassword());
                 if (passActual.isEmpty()) {
                     campoClave.setText(claveFalsa);
-                    campoClave.setForeground(java.awt.Color.GRAY);
+                    campoClave.setForeground(Color.GRAY);
                 }
             }
         });
     }
 
     // 3. EL SALTO CON ENTER (Para brincar de un campo a otro)
-    public static void configurarSaltoEnter(javax.swing.JTextField campoOrigen, javax.swing.JComponent campoDestino) {
-        campoOrigen.addKeyListener(new java.awt.event.KeyAdapter() {
+    public static void configurarSaltoEnter(JTextField campoOrigen, JComponent campoDestino) {
+        campoOrigen.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                     campoDestino.requestFocus();
                 }
             }
         });
+    }
+    
+    // MÉTODO NATIVO PARA AJUSTAR IMAGEN A JLABEL
+    public static void pintarImagen(javax.swing.JLabel lbl, String ruta) {
+        try {
+            // 1. Cargamos el recurso usando explícitamente el nombre de la clase contenedora
+            java.net.URL url = HerramientasVisuales.class.getResource(ruta);
+            
+            if (url != null) {
+                javax.swing.ImageIcon imagen = new javax.swing.ImageIcon(url);
+                
+                // 2. Obtener dimensiones seguras
+                int w = lbl.getWidth();
+                int h = lbl.getHeight();
+                if (w == 0 || h == 0) {
+                    w = lbl.getPreferredSize().width;
+                    h = lbl.getPreferredSize().height;
+                }
+                
+                // 3. Escalar con alta calidad
+                javax.swing.Icon icono = new javax.swing.ImageIcon(
+                    imagen.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH)
+                );
+                
+                // 4. Asignar y refrescar
+                lbl.setIcon(icono);
+                lbl.repaint();
+            } else {
+                // Como no hay consola en el JAR de producción, un JOptionPane nos salvará de buscar a ciegas
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                    "⚠️ No se encontró el archivo de imagen en la ruta:\n" + ruta, 
+                    "Error de Recursos", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (Exception e) {
+            System.err.println("Error cargando imagen: " + e.getMessage());
+        }
     }
 }

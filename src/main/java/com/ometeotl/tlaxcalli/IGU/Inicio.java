@@ -17,12 +17,9 @@ public class Inicio extends javax.swing.JFrame {
     public Inicio() {
         initComponents();
         
-        controlador.pintarImagen(Logolb, "/imagen/transparencia.png");
+        HerramientasVisuales.pintarImagen(Logolb, "/imagen/transparencia.png");
         nom.inicializarNombreNegocio(this, negocio);
         this.nomU.setText("¡Bienvenido "+C_Sesion_login.nombre+"!");
-        
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
         
         // 1. Le pedimos a la fábrica el "enchufe" de la sala
         I_InicioDAO inicioDAO = DAOFactory.getInicioDAO();

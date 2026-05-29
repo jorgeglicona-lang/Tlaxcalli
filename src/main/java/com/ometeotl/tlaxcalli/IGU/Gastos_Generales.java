@@ -2,12 +2,11 @@ package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
 import com.ometeotl.tlaxcalli.LOGICA.C_GastosG;
-import java.awt.Color;
 import javax.swing.JOptionPane;
 
 public class Gastos_Generales extends javax.swing.JFrame {
     
-    private C_GastosG controlador = new C_GastosG();
+    private final C_GastosG controlador = new C_GastosG();
     
     public Gastos_Generales() {
         initComponents();
@@ -15,9 +14,6 @@ public class Gastos_Generales extends javax.swing.JFrame {
         controlador.cargarSemanaActual(T_GAd, TotalGAd);
         datePicker1.setDateToToday();
         datePicker2.setDateToToday();
-        
-        jBext.setBackground(Color.white);
-        ext.setForeground(new Color(204,204,204));
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
         HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
@@ -55,9 +51,9 @@ public class Gastos_Generales extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel6.setText("Gastos Generales");
-        jLabel6.setFont(new java.awt.Font("Copperplate Gothic Light", 0, 24)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Copperplate Gothic Bold", 0, 24)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 240, 30));
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 30, 250, 30));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 

@@ -1,6 +1,7 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.LOGICA.C_Molino;
+import javax.swing.ImageIcon;
 
 public class Molino extends javax.swing.JFrame {
 
@@ -9,7 +10,7 @@ public class Molino extends javax.swing.JFrame {
     public Molino() {
         initComponents();
         controlador = new C_Molino();
-        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
+        setIconImage(new ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
         this.setLocationRelativeTo(null);
         
         // El controlador llena la pantalla si ya hay datos hoy
@@ -31,9 +32,10 @@ public class Molino extends javax.swing.JFrame {
         b_guardarR = new javax.swing.JButton();
         b_salir = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Molino");
-        setUndecorated(true);
+        setAlwaysOnTop(true);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -118,7 +120,7 @@ public class Molino extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_b_salirActionPerformed
 
     private void b_guardarRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_guardarRActionPerformed
