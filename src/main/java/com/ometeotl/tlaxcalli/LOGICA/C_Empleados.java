@@ -69,7 +69,7 @@ public class C_Empleados {
                     // Le preguntamos a la BD cuántos jefes quedan
                     int jefesDisponibles = dao.contarAdministradoresActivos();
                     
-                    if (jefesDisponibles <= 1) {
+                    if (jefesDisponibles <= 2) {
                         showMessageDialog(parent, 
                             "❌ Operación denegada: Este es el único usuario con acceso administrativo en el sistema.\n" +
                             "No puede eliminarlo o se quedará sin acceso a Tlaxcalli.", 
