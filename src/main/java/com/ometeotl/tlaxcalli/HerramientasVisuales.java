@@ -1,19 +1,25 @@
 package com.ometeotl.tlaxcalli;
 
 import java.awt.Color;
+import static java.awt.Color.BLACK;
+import static java.awt.Color.WHITE;
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
@@ -182,25 +188,60 @@ public class HerramientasVisuales {
         }
     }
     
-    // Este método centraliza la lógica de habilitación
+    // ⛓️ VINCULAR CONTROL MEJORADO
     public static void vincularControl(JCheckBox checkbox, Object... componentes) {
-        // Definimos qué hacer cuando el estado cambia
-        ActionListener sync = e -> {
+        ItemListener sync = e -> {
             boolean activo = checkbox.isSelected();
+            
             for (Object c : componentes) {
-                if (c instanceof JComponent comp) {
+                if (c instanceof JTable tabla) {
+                    tabla.setEnabled(activo);
+                    if (!activo) {
+                        ((DefaultTableModel) tabla.getModel()).setRowCount(0);
+                    }
+                }
+                else if (c instanceof Component comp) {
                     comp.setEnabled(activo);
-                } else if (c instanceof DefaultTableModel modelo) {
-                    // Opcional: si se desactiva, podríamos querer limpiar la tabla
-                    if (!activo) modelo.setRowCount(0);
+                    // (Opcional) Si quiere que los campos de texto también se limpien solos
+                    if (!activo && comp instanceof JTextField txt) {
+                        txt.setText("");
+                    }
+                    // (Opcional) Si quiere que los combos regresen a "Seleccione..."
+                    if (!activo && comp instanceof JComboBox<?> combo) {
+                        if (combo.getItemCount() > 0) combo.setSelectedIndex(0);
+                    }
                 }
             }
         };
-
-        // Lo asignamos al checkbox
-        checkbox.addActionListener(sync);
-
-        // Lo ejecutamos una vez al inicio para asegurar que el estado inicial sea correcto
-        sync.actionPerformed(null);
+        
+        checkbox.addItemListener(sync);
+        sync.itemStateChanged(null); // Ejecuta el estado inicial
+    }
+    
+    
+    public static void LimpiarCampos(Object... componentes){
+        for (Object c : componentes) {
+            if (c instanceof JTextField txt) {
+                txt.setText("");
+                txt.setBackground(WHITE);
+                txt.setForeground(BLACK);
+                txt.setEnabled(false);
+                txt.setDisabledTextColor(BLACK);
+            } 
+            else if (c instanceof JTable modelo) {
+                ((DefaultTableModel) modelo.getModel()).setRowCount(0);
+                modelo.setEnabled(false);
+            } 
+            else if (c instanceof JCheckBox chk) {
+                chk.setSelected(false);
+                chk.setEnabled(false);
+            }
+            else if (c instanceof JComboBox<?> combo) {
+                if (combo.getItemCount() > 0) {
+                    combo.setSelectedIndex(0);
+                    combo.setEnabled(false);
+                }
+            }
+        }
     }
 }

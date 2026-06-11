@@ -9,17 +9,24 @@ import static com.ometeotl.tlaxcalli.HerramientasVisuales.vincularControl;
 import com.ometeotl.tlaxcalli.LOGICA.C_NR;
 import com.ometeotl.tlaxcalli.LOGICA.GastoItem;
 import com.ometeotl.tlaxcalli.LOGICA.ProductoItem;
+import java.awt.Color;
+import static java.awt.Color.BLACK;
+import static java.awt.Color.WHITE;
+import javax.swing.ButtonGroup;
 import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.table.DefaultTableModel;
 
 public class NR extends javax.swing.JFrame {
 
     private final C_NR controlador = new C_NR();
-    
+    private final ButtonGroup grupoMasa = new ButtonGroup();
     public NR() {
         initComponents();
         
         pintarImagen(Logolb, "/imagen/transparencia.png");
+        
+        grupoMasa.add(s_masaSi);
+        grupoMasa.add(s_masaNo);
         
         // Ocultar ID en la tabla
         ocultarColumna(tabla_detalles,0);
@@ -27,16 +34,38 @@ public class NR extends javax.swing.JFrame {
         // Llenar combos delegando la tarea al controlador
         controlador.inicializarCombos(BoxRepartidor, cb_producto, cb_gastos);
         controlador.cargarPreciosBase();
-        configurarSeccionMasa(); // Lógica puramente visual, se queda aquí
-       /* vincularControl(s_PAdicionales, 
-        cb_producto, t_detalle, t_cantidad, t_precio, b_agregarProd, tabla_detalles, b_EliminarProd);
-
+        configurarSeccionMasa();
+                
         // Vinculamos todo lo relacionado a Gastos
-        vincularControl(c_Gastos, 
-        cb_gastos, t_montoGasto, t_detalleGasto, b_agregarGasto, tabla_gastos, b_EliminarGasto);*/
+        vincularControl(s_PAdicionales, cb_producto, b_agregarProd, tabla_detalles, b_EliminarProd);
+        vincularControl(c_Gastos, cb_gastos, b_agregarGasto, tabla_gastos, b_EliminarGasto);
         configurarBarraArrastre(this, jPanel4);
         configurarBotonCerrar(this, jBext, ext, false);
+        
     }
+    
+    private void configurarSeccionMasa() {
+        s_masaNo.setSelected(true);
+        t_masa.setEnabled(false);
+        t_masa.setText("");
+        t_masa.setBackground(new Color(220, 220, 220)); 
+
+        s_masaSi.addItemListener(e -> {
+            t_masa.setEnabled(true);  
+            t_masa.setBackground(WHITE);
+            t_masa.setForeground(BLACK);
+            t_masa.requestFocus();
+            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
+        });
+
+        s_masaNo.addItemListener(e -> {
+            t_masa.setEnabled(false); 
+            t_masa.setText("");       
+            t_masa.setBackground(new Color(220, 220, 220)); 
+            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
+        });
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -283,19 +312,9 @@ public class NR extends javax.swing.JFrame {
         jPanel1.add(t_detalleGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 520, 120, -1));
 
         s_PAdicionales.setText("Productos Adicionales");
-        s_PAdicionales.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                s_PAdicionalesActionPerformed(evt);
-            }
-        });
         jPanel1.add(s_PAdicionales, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 300, -1, -1));
 
         c_Gastos.setText("Gastos");
-        c_Gastos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c_GastosActionPerformed(evt);
-            }
-        });
         jPanel1.add(c_Gastos, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 490, -1, -1));
 
         b_EliminarGasto.setText("Eliminar");
@@ -401,7 +420,7 @@ public class NR extends javax.swing.JFrame {
 
     private void BoxRepartidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BoxRepartidorActionPerformed
         c_entregar.setText("Total a Entregar: $0.00");
-        controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,
+        controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,s_masaNo,
                                                 s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
                                                 cb_gastos, cb_producto);
     }//GEN-LAST:event_BoxRepartidorActionPerformed
@@ -476,6 +495,7 @@ public class NR extends javax.swing.JFrame {
         
         if (item.getId() == 0) { 
             t_detalleGasto.setEnabled(false);
+            t_montoGasto.setEnabled(false); 
             b_agregarGasto.setEnabled(false);
             return;
         }
@@ -515,40 +535,6 @@ public class NR extends javax.swing.JFrame {
         
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_agregarGastoActionPerformed
-
-    private void s_PAdicionalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_s_PAdicionalesActionPerformed
-        boolean activo = s_PAdicionales.isSelected();
-        cb_producto.setEnabled(activo);
-        tabla_detalles.setEnabled(activo);
-        if (!activo) {
-            cb_producto.setSelectedIndex(0); 
-            t_detalle.setText("");
-            t_cantidad.setText("");
-            t_precio.setText("");
-            tabla_detalles.clearSelection(); 
-            b_EliminarProd.setEnabled(false);
-            t_detalle.setEnabled(false);
-            t_cantidad.setEnabled(false);  
-            t_precio.setEnabled(false);    
-            b_agregarProd.setEnabled(false); 
-        }
-    }//GEN-LAST:event_s_PAdicionalesActionPerformed
-
-    private void c_GastosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c_GastosActionPerformed
-        boolean activo = c_Gastos.isSelected();
-        cb_gastos.setEnabled(activo);
-        tabla_gastos.setEnabled(activo);
-        if(!activo){
-            cb_gastos.setSelectedIndex(0);
-            t_montoGasto.setText("");
-            t_detalleGasto.setText("");
-            tabla_gastos.clearSelection();
-            b_EliminarGasto.setEnabled(false);
-            t_montoGasto.setEnabled(false);
-            t_detalleGasto.setEnabled(false);
-            b_agregarGasto.setEnabled(false);
-        }
-    }//GEN-LAST:event_c_GastosActionPerformed
 
     private void t_repartoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_repartoKeyReleased
         controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
@@ -642,28 +628,4 @@ public class NR extends javax.swing.JFrame {
     private javax.swing.JTable tabla_detalles;
     private javax.swing.JTable tabla_gastos;
     // End of variables declaration//GEN-END:variables
-    
-    private void configurarSeccionMasa() {
-        javax.swing.ButtonGroup grupoMasa = new javax.swing.ButtonGroup();
-        grupoMasa.add(s_masaSi);
-        grupoMasa.add(s_masaNo);
-
-        s_masaNo.setSelected(true);   
-        t_masa.setEnabled(false);     
-        t_masa.setText("");           
-        t_masa.setBackground(new java.awt.Color(220, 220, 220)); 
-
-        s_masaSi.addActionListener(e -> {
-            t_masa.setEnabled(true);  
-            t_masa.setBackground(java.awt.Color.WHITE); 
-            t_masa.requestFocus();    
-        });
-
-        s_masaNo.addActionListener(e -> {
-            t_masa.setEnabled(false); 
-            t_masa.setText("");       
-            t_masa.setBackground(new java.awt.Color(220, 220, 220)); 
-            controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
-        });
-    }    
 }

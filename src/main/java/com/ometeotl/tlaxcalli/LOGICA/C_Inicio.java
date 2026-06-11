@@ -27,7 +27,7 @@ public class C_Inicio {
     private final I_InicioDAO dao = DAOFactory.getInicioDAO();
     private JTextField txtNombre = new JTextField();
     private JTextField txtPrecio = new JTextField();
-    private JCheckBox chkComodin = new JCheckBox();
+    private JCheckBox chkComodin = new JCheckBox("Es comodin");
     private JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
     
     public void recargarTablaProductos(JTable tablaProd) {

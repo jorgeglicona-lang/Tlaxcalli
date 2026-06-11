@@ -5,8 +5,15 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 import static java.awt.Color.BLACK;
-import static java.awt.Color.WHITE;
 import java.util.List;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.LimpiarCampos;
+import static java.awt.Color.RED;
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class C_NR {
     
@@ -14,6 +21,7 @@ public class C_NR {
     private double precioMostrador = 0.0;
     private double precioMasa = 0.0;
     private final IVentasDAO dao = DAOFactory.getVentasDAO();
+    private Color DatoEx;
     
     public void cargarPreciosBase() {
         precioReparto = dao.obtenerPrecioProducto(1);
@@ -26,7 +34,7 @@ public class C_NR {
         if (precioMasa == 0) precioMasa = 20.0;
     }
     
-    // 1. LLENADO DE COMBOBOXES
+    // 1. LLENADO DE COMBOBOX
     public void inicializarCombos(JComboBox<Object> boxRepartidor, JComboBox<Object> cbProductos,
             JComboBox<Object> cbGastos) {
         
@@ -62,7 +70,7 @@ public class C_NR {
         for(GastoItem g : gastos) cbGastos.addItem(g);
     }
 
-    // 2. MATEMÁTICAS EN TIEMPO REAL
+    // 2. CALCULAR EN TIEMPO AL INSTANTE
     public void calcularTotalAPagar(JTextField tReparto, JTextField tVenta, JTextField tMasa,
             JTable tProd, JTable tGastos, JLabel cEntregar) {
         double totalIngresos = 0.0;
@@ -91,14 +99,14 @@ public class C_NR {
 
         double totalFinal = totalIngresos - totalGastos;
         cEntregar.setText("Total a Entregar: $" + String.format("%.2f", totalFinal));
-        cEntregar.setForeground(totalFinal < 0 ? Color.RED : Color.BLACK);
+        cEntregar.setForeground(totalFinal < 0 ? RED : BLACK);
     }
 
-    // 3. LÓGICA DE REPARTIDOR VS MOSTRADOR
+    // 3. LÓGICA DE REPARTIDOR Y MOSTRADOR
     public void procesarSeleccionRepartidor(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto,
-                                            JTextField tVenta, JTextField tMasa, JRadioButton sMasa, JCheckBox Pro,
-                                            JCheckBox Gas, JTable tProd, JTable tGastos, JLabel cEntregar, 
-                                            JComboBox cb_gas, JComboBox cb_pro) { // 🚀 NUEVOS PARÁMETROS
+                                            JTextField tVenta, JTextField tMasa, JRadioButton sMasaS,
+                                            JRadioButton sMasaN, JCheckBox Pro, JCheckBox Gas, JTable tProd,
+                                            JTable tGastos, JLabel cEntregar, JComboBox cb_gas, JComboBox cb_pro) {
 
         Object item = boxRepartidor.getSelectedItem();
         DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
@@ -109,25 +117,27 @@ public class C_NR {
         String seleccionado = item.toString();
         
         if (seleccionado.equalsIgnoreCase("Seleccione...")) {
-            LimpiarCampos(tReparto,tVenta,sMasa,tMasa,modeloProd,modeloGastos);
-            tReparto.setEnabled(false);
-            tVenta.setEnabled(false);
-            tMasa.setEnabled(false);
+            LimpiarCampos(tReparto,tVenta,tProd,tGastos,Pro,Gas);
+            sMasaS.setEnabled(false);
+            sMasaN.setSelected(true);
             calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
             return;
         }
         
         if (!(item instanceof EmpleadoItem emp)) {
-            JOptionPane.showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
-            return; // ❌ Salida temprana limpísima
+            showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
+            return;
         }
         
         int idEmpleado = emp.getId();
-        LimpiarCampos(tReparto,tVenta,tMasa,modeloProd,modeloGastos);
-        tMasa.setEnabled(false);
-        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
-        
         double[] corteExistente = dao.obtenerCorteEmpleadoHoy(idEmpleado);
+        
+        if(idEmpleado>0){
+            Pro.setEnabled(true);
+            Gas.setEnabled(true);
+            sMasaS.setEnabled(true);
+            sMasaN.setSelected(true);
+        }
         
         if (corteExistente != null) {
             // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
@@ -137,10 +147,11 @@ public class C_NR {
             tReparto.setForeground(BLACK);
             tVenta.setForeground(BLACK);
             tMasa.setForeground(BLACK);
-            Color amarilloAlerta = new Color(255, 255, 200);
-            tReparto.setBackground(amarilloAlerta);
-            tVenta.setBackground(amarilloAlerta); 
-            tMasa.setBackground(amarilloAlerta);
+            DatoEx = new Color(190, 250, 180);
+            tReparto.setBackground(DatoEx);
+            tVenta.setBackground(DatoEx); 
+            tMasa.setBackground(DatoEx);
+            
             // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
             if (!seleccionado.equalsIgnoreCase("Mostrador")) {
                 tReparto.setEnabled(true);
@@ -160,7 +171,8 @@ public class C_NR {
             if (!textoMasa.equals("0.00") && !textoMasa.equals("0.0") && !textoMasa.isEmpty()) {
                 tMasa.setEnabled(true);   
                 tMasa.setEditable(true);
-                sMasa.setSelected(true);
+                sMasaS.setEnabled(true);
+                sMasaS.setSelected(true);
             } else {
                 tMasa.setEnabled(false);
                 tMasa.setDisabledTextColor(BLACK);
@@ -175,68 +187,72 @@ public class C_NR {
             for (Object[] fila : gastosHoy) {
                 modeloGastos.addRow(fila);
             }
-            if(modeloGastos.getRowCount()>0){
-                Gas.setSelected(true);
-                cb_gas.setEnabled(true);
-                tGastos.setEnabled(true);
-            }
-            if(modeloProd.getRowCount()>0){
-                Pro.setSelected(true);
-                cb_pro.setEnabled(true);
-                tProd.setEnabled(true);
-            }
             
-            // Forzamos el recalculo inmediato del dinero para que coincida con las tablas cargadas
+            if(modeloGastos.getRowCount()>0) Gas.setSelected(true);
+            if(modeloProd.getRowCount()>0) Pro.setSelected(true);
+            
             calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
-            JOptionPane.showMessageDialog(parent, 
-                "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos y gastos en las tablas.", 
-                "Información", JOptionPane.INFORMATION_MESSAGE);
+            
+            showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
+                            + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
+                            + "y gastos en las tablas.","Atencion", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
+        LimpiarCampos(tReparto,tVenta,tMasa,tProd,tGastos);
+        Pro.setSelected(false);
+        Gas.setSelected(false);
+        sMasaN.setSelected(true);
         // 🟢 ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
         if (seleccionado.equalsIgnoreCase("Mostrador")) {
             IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
             double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
             
             if (produccionTotal <= 0) {
-                JOptionPane.showMessageDialog(parent, "⚠️ ACCIÓN BLOQUEADA:\nNo se puede calcular el Mostrador porque el registro de Molino está vacío.\nPor favor, registre primero la producción del día.");
+                JOptionPane.showMessageDialog(parent, "⚠️ ACCIÓN BLOQUEADA:\nNo se puede calcular el Mostrador "
+                        + "porque el registro de Molino está vacío.\nPor favor, registre primero la producción "
+                        + "del día.");
                 boxRepartidor.setSelectedIndex(0); 
-                return; 
+                return;
             }
-
-            tReparto.setEditable(false); tReparto.setBackground(new Color(220, 220, 220));
-            tVenta.setEditable(false);   tVenta.setBackground(new Color(220, 220, 220)); 
-            tMasa.setEnabled(true);     tMasa.setEditable(true);
+            
+            DatoEx = new Color(190, 250, 180);
+            tReparto.setBackground(DatoEx);
+            tVenta.setBackground(DatoEx);
             
             try {
                 double vendidoReparto = dao.obtenerTotalRepartoHoy();
                 double sobranteMostrador = produccionTotal - vendidoReparto;
+                
                 if (sobranteMostrador < 0) {
-                     tVenta.setForeground(Color.RED);
-                     JOptionPane.showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
+                     tVenta.setForeground(RED);
+                     showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" 
+                             + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
                 }
+                tReparto.setText("0.0");
                 tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
-            } catch (Exception e) { JOptionPane.showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage()); }
+            } catch (Exception e){
+                showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage());
+            }
+            
         } else {
-            tReparto.setEnabled(true); tReparto.setEditable(true);
-            tVenta.setEnabled(true);   tVenta.setEditable(true);
-            tMasa.setEnabled(true);   tMasa.setEditable(true);
+            tReparto.setEnabled(true);
+            tReparto.setEditable(true);
+            tVenta.setEnabled(true);
+            tVenta.setEditable(true);
         }
-        
-        // Forzamos el recalculo inmediato del dinero para que coincida con las tablas cargadas
         calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
     }
 
     // 4. GUARDADO FINAL
-    public void guardarCorte(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto, JTextField tVenta, 
-                             JTextField tMasa, JTable tProd, JTable tGastos, JRadioButton sMasaNo, 
-                             JCheckBox sPAdicionales, JCheckBox cGastos) { // 🚀 NUEVO PARÁMETRO: cGastos
+    public void guardarCorte(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto, JTextField tVenta,
+                             JTextField tMasa, JTable tProd, JTable tGastos, JRadioButton sMasa,
+                             JCheckBox sPAdicionales, JCheckBox cGastos) {
         
         Object itemSeleccionado = boxRepartidor.getSelectedItem();
         
         if (itemSeleccionado == null) {
-            JOptionPane.showMessageDialog(parent, "⚠️ No hay ninguna selección válida en el mostrador.");
+            showMessageDialog(parent, "⚠️ No hay ninguna selección válida en el mostrador.");
             return;
         }
 
@@ -246,23 +262,21 @@ public class C_NR {
         }
         
         if (idEmpleado == 0) {
-            JOptionPane.showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
+            showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
             return;
         }
 
         double kReparto = 0, kVenta = 0, kMasa = 0;
+        
         try {
             if (!tReparto.getText().isEmpty()) kReparto = Double.parseDouble(tReparto.getText());
             if (!tVenta.getText().isEmpty()) kVenta = Double.parseDouble(tVenta.getText());
             if (!tMasa.getText().isEmpty()) kMasa = Double.parseDouble(tMasa.getText());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(parent, "❌ Verifica que los kilos sean números válidos.");
+            showMessageDialog(parent, "❌ Verifica que los kilos sean números válidos.");
             return;
         }
 
-        // ==========================================
-        // 🛡️ LÓGICA DE ADVERTENCIAS INTELIGENTES
-        // ==========================================
         DefaultTableModel modeloProductos = (DefaultTableModel) tProd.getModel();
         DefaultTableModel modeloGastos = (DefaultTableModel) tGastos.getModel();
 
@@ -272,75 +286,47 @@ public class C_NR {
         String mensajeConfirmacion = "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?";
 
         if (ignoraProductos) {
-            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay productos en la tabla, pero la casilla 'Productos Adicionales' está desactivada. NO SE GUARDARÁN.";
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay productos en la tabla, pero la casilla 'Productos Adicionales'"
+                    + "está desactivada. NO SE GUARDARÁN.";
         }
         if (ignoraGastos) {
-            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay gastos en la tabla, pero la casilla 'Gastos' está desactivada. NO SE GUARDARÁN.";
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay gastos en la tabla, pero la casilla 'Gastos' está desactivada."
+                    + "NO SE GUARDARÁN.";
         }
 
         // Mostramos el cuadro de diálogo (usamos WARNING_MESSAGE si hay avisos, QUESTION_MESSAGE si todo está normal)
-        int tipoMensaje = (ignoraProductos || ignoraGastos) ? JOptionPane.WARNING_MESSAGE : JOptionPane.QUESTION_MESSAGE;
-        int confirm = JOptionPane.showConfirmDialog(parent, mensajeConfirmacion, "Confirmar Guardado", JOptionPane.YES_NO_OPTION, tipoMensaje);
+        int tipoMensaje = (ignoraProductos || ignoraGastos) ? WARNING_MESSAGE : QUESTION_MESSAGE;
+        int confirm = showConfirmDialog(parent, mensajeConfirmacion, "Confirmar Guardado", YES_NO_OPTION,
+                tipoMensaje);
         
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (confirm != YES_OPTION) return;
 
-        // ==========================================
-        // 🚀 FILTRO DE GUARDADO
-        // Si el usuario aceptó ignorarlos, mandamos modelos vacíos al DAO para que no guarde basura
-        // ==========================================
         DefaultTableModel prodParaGuardar = ignoraProductos ? new DefaultTableModel() : modeloProductos;
         DefaultTableModel gastosParaGuardar = ignoraGastos ? new DefaultTableModel() : modeloGastos;
 
         boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
         
         if (exito) {
-            JOptionPane.showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
+            showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
             
             // Limpieza general
             boxRepartidor.setSelectedIndex(0);
-            tReparto.setText("");
-            tVenta.setText("");
-            tMasa.setText("");
             modeloProductos.setRowCount(0);
-            modeloGastos.setRowCount(0);
-            sMasaNo.setSelected(true);
+            sMasa.setSelected(true);
+            LimpiarCampos(tReparto,tVenta,tMasa);
             
-            // Forzamos el apagado de las casillas y sus eventos visuales
             if (sPAdicionales.isSelected()) {
                 sPAdicionales.setSelected(false);
                 sPAdicionales.getActionListeners()[0].actionPerformed(null);
             }
+            
             if (cGastos.isSelected()) {
                 cGastos.setSelected(false);
                 cGastos.getActionListeners()[0].actionPerformed(null);
             }
             
         } else {
-            JOptionPane.showMessageDialog(parent, "❌ Error al guardar en la base de datos.");
-        }
-    }
-    
-    private void LimpiarCampos(Object... componentes){
-        for (Object c : componentes) {
-            if (c instanceof JTextField txt) {
-                txt.setText("");
-                txt.setBackground(WHITE);
-                txt.setForeground(BLACK);
-            } 
-            else if (c instanceof DefaultTableModel modelo) {
-                modelo.setRowCount(0);
-            } 
-            else if (c instanceof JCheckBox chk) {
-                chk.setSelected(false);
-            } 
-            else if (c instanceof JRadioButton radio) {
-                radio.setSelected(false); 
-            }
-            else if (c instanceof JComboBox<?> combo) {
-                if (combo.getItemCount() > 0) {
-                    combo.setSelectedIndex(0);
-                }
-            }
+            showMessageDialog(parent, "❌ Error al guardar en la base de datos.");
         }
     }
 }
