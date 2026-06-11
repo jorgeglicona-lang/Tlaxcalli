@@ -1,9 +1,9 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
 public class GastoItem {
-    private int id;
-    private String nombre;
-    private boolean requiereDescripcion;
+    private final int id;
+    private final String nombre;
+    private final boolean requiereDescripcion;
 
     public GastoItem(int id, String nombre, boolean requiereDescripcion) {
         this.id = id;

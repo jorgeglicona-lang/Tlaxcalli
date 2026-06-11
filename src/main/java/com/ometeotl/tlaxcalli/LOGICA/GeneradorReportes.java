@@ -20,13 +20,13 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
+import java.io.File;
 import javax.swing.JComboBox;
-
 import javax.swing.table.DefaultTableModel;
 public class GeneradorReportes {
     
-    private IReportesDAO reportesDao = DAOFactory.getReportesDAO();
-    private IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
+    private final IReportesDAO reportesDao = DAOFactory.getReportesDAO();
+    private final IGastosGeneralesDAO gastosGeneralesDao = DAOFactory.getGastosGeneralesDAO();
 
     public void prepararPDF(DatePicker FI, DatePicker FF, JComboBox EF) {
         // 1. Creamos modelos temporales para extraer la info de los DAOs
@@ -35,8 +35,6 @@ public class GeneradorReportes {
         String empleadoFiltro = EF.getSelectedItem().toString();
         String fechaInicio = FI.getDate().toString();
         String fechaFin = FF.getDate().toString();
-
-        // 🛠️ ¡REPARADO! Usamos el DAO unificado de Gastos Generales mediante la fábrica
         DefaultTableModel modeloGastosAdm = gastosGeneralesDao.obtenerGastosPorRango(fechaInicio, fechaFin);
         
         modeloVentas.addColumn("Empleado");
@@ -51,24 +49,31 @@ public class GeneradorReportes {
         double totalV = reportesDao.llenarVentas(empleadoFiltro, fechaInicio, fechaFin, modeloVentas);
         double totalGOp = reportesDao.llenarGastos(empleadoFiltro, fechaInicio, fechaFin, modeloGastosOp);
         
-        // 3. Calculamos totales generales de la tabla administrativa (La columna 2 es el Monto)
+        // 3. Calculamos totales generales de la tabla administrativa
         double totalGAdm = 0;
-        for (int i = 0; i < modeloGastosAdm.getRowCount(); i++) {
-            totalGAdm += Double.parseDouble(modeloGastosAdm.getValueAt(i, 2).toString());
-        }
 
+        for (int i = 0; i < modeloGastosAdm.getRowCount(); i++) {
+            Object valorCelda = modeloGastosAdm.getValueAt(i, 2);
+            if (valorCelda != null && !valorCelda.toString().trim().isEmpty()) {
+                try {
+                    totalGAdm += Double.parseDouble(valorCelda.toString().trim());
+                } catch (NumberFormatException e) {
+                    System.err.println("⚠️ Advertencia: Valor no numérico ignorado en la fila " + i);
+                }
+            }
+        }
         // 4. Llamamos al generador de PDF enviando toda la información recolectada
         GeneradorReportes pdf = new GeneradorReportes();
-        pdf.crearDocumento(fechaInicio, fechaFin, empleadoFiltro, modeloVentas, modeloGastosOp, modeloGastosAdm, totalV, totalGOp, totalGAdm);
+        pdf.crearDocumento(fechaInicio, fechaFin, empleadoFiltro, modeloVentas, modeloGastosOp, modeloGastosAdm,
+                           totalV, totalGOp, totalGAdm);
     }
     
     public void crearDocumento(String fInicio, String fFin, String empleado, 
                                DefaultTableModel vtas, DefaultTableModel gOp, DefaultTableModel gAdm, 
                                double tV, double tGOp, double tGAdm) {
-    
         // 1. Configuración de carpetas y nombre (Automatización intacta)
         String userHome = System.getProperty("user.home");
-        java.io.File carpetaReportes = new java.io.File(userHome + java.io.File.separator + "Documents" + java.io.File.separator + "Tlaxcalli_Reportes");
+        File carpetaReportes = new File(userHome + File.separator + "Documents" + File.separator + "Tlaxcalli_Reportes");
         
         if (!carpetaReportes.exists()) {
             carpetaReportes.mkdirs(); 

@@ -1,8 +1,8 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
 public class EmpleadoItem {
-    private int id;
-    private String nombre;
+    private final int id;
+    private final String nombre;
 
     public EmpleadoItem(int id, String nombre) {
         this.id = id;
