@@ -1,5 +1,6 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.GenV;
 import com.ometeotl.tlaxcalli.IGU.Inicio;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.ILoginDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
@@ -25,24 +26,22 @@ public class C_Login {
         ILoginDAO Val = DAOFactory.getLoginDAO();
         boolean accesoCorrecto = Val.validarAcceso(Usuario, password);
         
-        if (accesoCorrecto) {
-            String puestoEncontrado = C_Sesion_login.puesto;
-            
-            if (puestoEncontrado.equalsIgnoreCase("Gerente") || 
-                puestoEncontrado.equalsIgnoreCase("Administrador")) {
-                
-                // Abrir pantalla de inicio
-                Inicio ini = new Inicio();
-                ini.setVisible(true);
-                ini.setLocationRelativeTo(null);
-                
-                parent.dispose();
-            } else {
-                showMessageDialog(null, "⛔ Acceso Denegado.\nTu puesto (" 
-                                  + puestoEncontrado + ") no tiene permisos de Administrador.");
-            }
-        } else {
+        if (!accesoCorrecto) {
             showMessageDialog(null, "❌ Credenciales incorrectas o usuario Inactivo.");
+            return;
         }
+        
+        String puestoEncontrado = C_Sesion_login.puesto;
+            
+        if (!puestoEncontrado.equalsIgnoreCase("Gerente") && 
+                !puestoEncontrado.equalsIgnoreCase("Administrador")) {
+            showMessageDialog(null, "⛔ Acceso Denegado.\nTu puesto (" 
+                                + puestoEncontrado + ") no tiene permisos de Administrador.");
+            return;
+        }
+        
+        Inicio ini = new Inicio();
+        GenV(ini);
+        parent.dispose();
     }
 }

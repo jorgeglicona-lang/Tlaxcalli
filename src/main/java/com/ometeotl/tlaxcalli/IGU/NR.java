@@ -1,6 +1,11 @@
 package com.ometeotl.tlaxcalli.IGU;
 
-import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.GenV;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBarraArrastre;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBotonCerrar;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.ocultarColumna;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.pintarImagen;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.vincularControl;
 import com.ometeotl.tlaxcalli.LOGICA.C_NR;
 import com.ometeotl.tlaxcalli.LOGICA.GastoItem;
 import com.ometeotl.tlaxcalli.LOGICA.ProductoItem;
@@ -14,22 +19,23 @@ public class NR extends javax.swing.JFrame {
     public NR() {
         initComponents();
         
-        HerramientasVisuales.pintarImagen(Logolb, "/imagen/transparencia.png");
+        pintarImagen(Logolb, "/imagen/transparencia.png");
         
         // Ocultar ID en la tabla
-        tabla_detalles.getColumnModel().getColumn(0).setMinWidth(0);
-        tabla_detalles.getColumnModel().getColumn(0).setMaxWidth(0);
-        tabla_detalles.getColumnModel().getColumn(0).setWidth(0);
-        
-        
+        ocultarColumna(tabla_detalles,0);
         
         // Llenar combos delegando la tarea al controlador
         controlador.inicializarCombos(BoxRepartidor, cb_producto, cb_gastos);
         controlador.cargarPreciosBase();
         configurarSeccionMasa(); // Lógica puramente visual, se queda aquí
-        
-        HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
-        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
+       /* vincularControl(s_PAdicionales, 
+        cb_producto, t_detalle, t_cantidad, t_precio, b_agregarProd, tabla_detalles, b_EliminarProd);
+
+        // Vinculamos todo lo relacionado a Gastos
+        vincularControl(c_Gastos, 
+        cb_gastos, t_montoGasto, t_detalleGasto, b_agregarGasto, tabla_gastos, b_EliminarGasto);*/
+        configurarBarraArrastre(this, jPanel4);
+        configurarBotonCerrar(this, jBext, ext, false);
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -402,7 +408,7 @@ public class NR extends javax.swing.JFrame {
 
     private void b_molinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_molinoActionPerformed
         Molino mol=new Molino();
-        HerramientasVisuales.GenV(mol);
+        GenV(mol);
     }//GEN-LAST:event_b_molinoActionPerformed
 
     private void cb_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_productoActionPerformed

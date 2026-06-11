@@ -4,6 +4,8 @@ import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
+import static java.awt.Color.BLACK;
+import static java.awt.Color.WHITE;
 import java.util.List;
 
 public class C_NR {
@@ -11,9 +13,9 @@ public class C_NR {
     private double precioReparto = 0.0;
     private double precioMostrador = 0.0;
     private double precioMasa = 0.0;
+    private final IVentasDAO dao = DAOFactory.getVentasDAO();
     
     public void cargarPreciosBase() {
-        IVentasDAO dao = DAOFactory.getVentasDAO();
         precioReparto = dao.obtenerPrecioProducto(1);
         precioMostrador = dao.obtenerPrecioProducto(2);
         precioMasa = dao.obtenerPrecioProducto(3);
@@ -23,8 +25,11 @@ public class C_NR {
         if (precioMostrador == 0) precioMostrador = 22.0;
         if (precioMasa == 0) precioMasa = 20.0;
     }
-    // 1. LLENADO DE COMBOBOXES (Sin tocar la vista)
-    public void inicializarCombos(JComboBox<Object> boxRepartidor, JComboBox<Object> cbProductos, JComboBox<Object> cbGastos) {
+    
+    // 1. LLENADO DE COMBOBOXES
+    public void inicializarCombos(JComboBox<Object> boxRepartidor, JComboBox<Object> cbProductos,
+            JComboBox<Object> cbGastos) {
+        
         // --- Empleados ---
         // Asumiendo que su EmpleadosDAO original o SQLiteDAO ya está en la fábrica
         IEmpleadosDAO empDao = DAOFactory.getEmpleadosDAO();
@@ -33,6 +38,7 @@ public class C_NR {
         DefaultTableModel modeloEmp = empDao.consultarVendedores(); 
         
         boxRepartidor.addItem(new EmpleadoItem(0, "Seleccione..."));
+        
         for (int i = 0; i < modeloEmp.getRowCount(); i++) {
             int id = Integer.parseInt(modeloEmp.getValueAt(i, 0).toString());
             String nombre = modeloEmp.getValueAt(i, 1).toString();
@@ -41,18 +47,24 @@ public class C_NR {
 
         // --- Productos ---
         IVentasDAO ventasDao = DAOFactory.getVentasDAO();
+        
         List<ProductoItem> prods = ventasDao.obtenerProductosParaVenta();
+        
         cbProductos.addItem(new ProductoItem(0, "Seleccionar...", 0, false));
+        
         for(ProductoItem p : prods) cbProductos.addItem(p);
 
         // --- Gastos ---
         List<GastoItem> gastos = ventasDao.obtenerGastosParaVenta();
+        
         cbGastos.addItem(new GastoItem(0, "Seleccionar...", false));
+        
         for(GastoItem g : gastos) cbGastos.addItem(g);
     }
 
     // 2. MATEMÁTICAS EN TIEMPO REAL
-    public void calcularTotalAPagar(JTextField tReparto, JTextField tVenta, JTextField tMasa, JTable tProd, JTable tGastos, JLabel cEntregar) {
+    public void calcularTotalAPagar(JTextField tReparto, JTextField tVenta, JTextField tMasa,
+            JTable tProd, JTable tGastos, JLabel cEntregar) {
         double totalIngresos = 0.0;
         double totalGastos = 0.0;
         
@@ -62,16 +74,19 @@ public class C_NR {
             if (!tMasa.getText().isEmpty()) totalIngresos += Double.parseDouble(tMasa.getText()) * precioMasa;
             
             DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
+            
             for (int i = 0; i < modeloProd.getRowCount(); i++) {
                 Object valor = modeloProd.getValueAt(i, 4); 
                 if (valor != null) totalIngresos += Double.parseDouble(valor.toString());
             }
 
             DefaultTableModel modeloGastos = (DefaultTableModel) tGastos.getModel();
+            
             for (int i = 0; i < modeloGastos.getRowCount(); i++) {
                 Object valor = modeloGastos.getValueAt(i, 1);
                 if (valor != null) totalGastos += Double.parseDouble(valor.toString());
             }
+            
         } catch (NumberFormatException e) { /* Ignorar errores mientras teclean */ }
 
         double totalFinal = totalIngresos - totalGastos;
@@ -80,46 +95,48 @@ public class C_NR {
     }
 
     // 3. LÓGICA DE REPARTIDOR VS MOSTRADOR
-    public void procesarSeleccionRepartidor(JFrame parent, JComboBox<Object> boxRepartidor, 
-                                            JTextField tReparto, JTextField tVenta, JTextField tMasa, 
-                                            JRadioButton sMasa, JCheckBox Pro, JCheckBox Gas,
-                                            JTable tProd, JTable tGastos, JLabel cEntregar, 
+    public void procesarSeleccionRepartidor(JFrame parent, JComboBox<Object> boxRepartidor, JTextField tReparto,
+                                            JTextField tVenta, JTextField tMasa, JRadioButton sMasa, JCheckBox Pro,
+                                            JCheckBox Gas, JTable tProd, JTable tGastos, JLabel cEntregar, 
                                             JComboBox cb_gas, JComboBox cb_pro) { // 🚀 NUEVOS PARÁMETROS
 
-        if (boxRepartidor.getSelectedItem() == null) return;
-        
         Object item = boxRepartidor.getSelectedItem();
-        int idEmpleado = 0;
-        if (item instanceof EmpleadoItem) {
-            idEmpleado = ((EmpleadoItem) item).getId();
-        }
-        
-        String seleccionado = item.toString();
         DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
         DefaultTableModel modeloGastos = (DefaultTableModel) tGastos.getModel();
+
+        if (item == null) return;
         
-        // Limpieza inicial estándar
-        tReparto.setText(""); tVenta.setText(""); tMasa.setText("");
-        tReparto.setBackground(Color.WHITE); tVenta.setBackground(Color.WHITE); tMasa.setBackground(Color.WHITE);
-        tVenta.setForeground(Color.BLACK);
-        modeloProd.setRowCount(0);
-        modeloGastos.setRowCount(0);
+        String seleccionado = item.toString();
         
         if (seleccionado.equalsIgnoreCase("Seleccione...")) {
-            tReparto.setEnabled(false); tVenta.setEnabled(false); tMasa.setEnabled(false);
+            LimpiarCampos(tReparto,tVenta,sMasa,tMasa,modeloProd,modeloGastos);
+            tReparto.setEnabled(false);
+            tVenta.setEnabled(false);
+            tMasa.setEnabled(false);
             calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
             return;
         }
         
-        IVentasDAO ventasDao = DAOFactory.getVentasDAO();
-        double[] corteExistente = ventasDao.obtenerCorteEmpleadoHoy(idEmpleado);
+        if (!(item instanceof EmpleadoItem emp)) {
+            JOptionPane.showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
+            return; // ❌ Salida temprana limpísima
+        }
+        
+        int idEmpleado = emp.getId();
+        LimpiarCampos(tReparto,tVenta,tMasa,modeloProd,modeloGastos);
+        tMasa.setEnabled(false);
+        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
+        
+        double[] corteExistente = dao.obtenerCorteEmpleadoHoy(idEmpleado);
         
         if (corteExistente != null) {
-            // 🛑 ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
+            // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
             tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
             tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
             tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
-            
+            tReparto.setForeground(BLACK);
+            tVenta.setForeground(BLACK);
+            tMasa.setForeground(BLACK);
             Color amarilloAlerta = new Color(255, 255, 200);
             tReparto.setBackground(amarilloAlerta);
             tVenta.setBackground(amarilloAlerta); 
@@ -130,11 +147,11 @@ public class C_NR {
                 tReparto.setEditable(true);
                 tVenta.setEnabled(true);   
                 tVenta.setEditable(true);
-                tReparto.setDisabledTextColor(Color.BLACK);
             } else {
                 tReparto.setEnabled(false);
                 tVenta.setEnabled(false);
-                tReparto.setDisabledTextColor(Color.BLACK);
+                tVenta.setDisabledTextColor(BLACK);
+                tReparto.setDisabledTextColor(BLACK);
             }
             
             // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
@@ -146,14 +163,15 @@ public class C_NR {
                 sMasa.setSelected(true);
             } else {
                 tMasa.setEnabled(false);
+                tMasa.setDisabledTextColor(BLACK);
             }
-            // 🚀 🛠️ ¡REPARADO! Llenamos las tablas visuales de productos adicionales y gastos
-            List<Object[]> productosHoy = ventasDao.obtenerProductosCorteHoy(idEmpleado);
+            //️ ¡REPARADO! Llenamos las tablas visuales de productos adicionales y gastos
+            List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
             for (Object[] fila : productosHoy) {
                 modeloProd.addRow(fila);
             }
             
-            List<Object[]> gastosHoy = ventasDao.obtenerGastosCorteHoy(idEmpleado);
+            List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
             for (Object[] fila : gastosHoy) {
                 modeloGastos.addRow(fila);
             }
@@ -176,7 +194,6 @@ public class C_NR {
             return;
         }
         
-
         // 🟢 ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
         if (seleccionado.equalsIgnoreCase("Mostrador")) {
             IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
@@ -193,7 +210,7 @@ public class C_NR {
             tMasa.setEnabled(true);     tMasa.setEditable(true);
             
             try {
-                double vendidoReparto = ventasDao.obtenerTotalRepartoHoy();
+                double vendidoReparto = dao.obtenerTotalRepartoHoy();
                 double sobranteMostrador = produccionTotal - vendidoReparto;
                 if (sobranteMostrador < 0) {
                      tVenta.setForeground(Color.RED);
@@ -217,13 +234,19 @@ public class C_NR {
                              JCheckBox sPAdicionales, JCheckBox cGastos) { // 🚀 NUEVO PARÁMETRO: cGastos
         
         Object itemSeleccionado = boxRepartidor.getSelectedItem();
+        
+        if (itemSeleccionado == null) {
+            JOptionPane.showMessageDialog(parent, "⚠️ No hay ninguna selección válida en el mostrador.");
+            return;
+        }
+
         int idEmpleado = 0;
-        if (itemSeleccionado instanceof EmpleadoItem) {
-            idEmpleado = ((EmpleadoItem) itemSeleccionado).getId();
+        if (itemSeleccionado instanceof EmpleadoItem emp) {
+            idEmpleado = emp.getId();
         }
         
         if (idEmpleado == 0) {
-            JOptionPane.showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador.");
+            JOptionPane.showMessageDialog(parent, "⚠️ Por favor selecciona un Repartidor o Mostrador válido.");
             return;
         }
 
@@ -268,7 +291,6 @@ public class C_NR {
         DefaultTableModel prodParaGuardar = ignoraProductos ? new DefaultTableModel() : modeloProductos;
         DefaultTableModel gastosParaGuardar = ignoraGastos ? new DefaultTableModel() : modeloGastos;
 
-        IVentasDAO dao = DAOFactory.getVentasDAO();
         boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
         
         if (exito) {
@@ -295,6 +317,30 @@ public class C_NR {
             
         } else {
             JOptionPane.showMessageDialog(parent, "❌ Error al guardar en la base de datos.");
+        }
+    }
+    
+    private void LimpiarCampos(Object... componentes){
+        for (Object c : componentes) {
+            if (c instanceof JTextField txt) {
+                txt.setText("");
+                txt.setBackground(WHITE);
+                txt.setForeground(BLACK);
+            } 
+            else if (c instanceof DefaultTableModel modelo) {
+                modelo.setRowCount(0);
+            } 
+            else if (c instanceof JCheckBox chk) {
+                chk.setSelected(false);
+            } 
+            else if (c instanceof JRadioButton radio) {
+                radio.setSelected(false); 
+            }
+            else if (c instanceof JComboBox<?> combo) {
+                if (combo.getItemCount() > 0) {
+                    combo.setSelectedIndex(0);
+                }
+            }
         }
     }
 }

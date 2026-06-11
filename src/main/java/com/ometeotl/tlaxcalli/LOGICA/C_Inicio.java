@@ -25,6 +25,10 @@ import javax.swing.JTextField;
 
 public class C_Inicio {
     private final I_InicioDAO dao = DAOFactory.getInicioDAO();
+    private JTextField txtNombre = new JTextField();
+    private JTextField txtPrecio = new JTextField();
+    private JCheckBox chkComodin = new JCheckBox();
+    private JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
     
     public void recargarTablaProductos(JTable tablaProd) {
         tablaProd.setModel(dao.obtenerProductosTabla());
@@ -34,18 +38,8 @@ public class C_Inicio {
         tablaGastos.setModel(dao.obtenerCatGastosTabla());
     }
     
-    // El policía de tránsito para el botón AGREGAR
-    public void agregarInteligente(JFrame parent, JTabbedPane pestanias, JTable tablaProd, JTable tablaGastos) {
-        
-        int pestaniaActiva = pestanias.getSelectedIndex();
-        
-        if (pestaniaActiva == 0) {
-            // --- FORMULARIO DE PRODUCTOS ---
-            JTextField txtNombre = new JTextField();
-            JTextField txtPrecio = new JTextField();
-            JCheckBox chkComodin = new JCheckBox("Es producto Comodín");
-            
-            chkComodin.addActionListener(e -> {
+    private int PormularioP(JFrame parent){
+        chkComodin.addActionListener(e -> {
                 if (chkComodin.isSelected()) {
                     txtPrecio.setText("0.0"); // Le ponemos cero por defecto
                     txtPrecio.setEnabled(false); // Bloqueamos la escritura
@@ -64,55 +58,64 @@ public class C_Inicio {
             panel.add(txtPrecio);
             panel.add(chkComodin);
 
-            int resultado = showConfirmDialog(parent, panel, 
+            return showConfirmDialog(parent, panel, 
                     "Nuevo Producto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
+    }
+    
+    private int PormularioG(JFrame parent){
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Nombre del Gasto (Ej. Gasolina, Luz):"));
+        panel.add(txtNombre);
+        panel.add(chkRequiere);
 
-            if (resultado == OK_OPTION) {
-                String nombre = txtNombre.getText().trim();
-                String precioStr = txtPrecio.getText().trim();
-                int esComodin = chkComodin.isSelected() ? 1 : 0;
+        return showConfirmDialog(parent, panel, 
+            "Nuevo Tipo de Gasto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
+    }
+    // El policía de tránsito para el botón AGREGAR
+    public void agregarInteligente(JFrame parent, JTabbedPane pestanias, JTable tablaProd, JTable tablaGastos) {
+        int pestaniaActiva = pestanias.getSelectedIndex();
+        
+        if (pestaniaActiva == 0) {
+            int result=PormularioP(parent);
+            if (result != OK_OPTION) {
+                return;
+            }
+            String nombre = txtNombre.getText().trim();
+            String precioStr = txtPrecio.getText().trim();
+            int esComodin = chkComodin.isSelected() ? 1 : 0;
 
-                if (nombre.isEmpty() || precioStr.isEmpty()) {
-                    showMessageDialog(parent, "Todos los campos son obligatorios.");
-                    return; 
+            if (nombre.isEmpty() || precioStr.isEmpty()) {
+                showMessageDialog(parent, "Todos los campos son obligatorios.");
+                return; 
+            }
+
+            try {
+                // 2. PARSEO LIMPIO: Convertimos el texto directo a número
+                double precio = Double.parseDouble(precioStr);
+
+                // 3. GUARDADO
+                if (dao.registrarProducto(nombre, precio, esComodin)) {
+                    showMessageDialog(parent, "✅ Producto guardado.");
+                    recargarTablaProductos(tablaProd);
+                } else {
+                    showMessageDialog(parent, "❌ Error al guardar en base de datos.");
                 }
 
-                try {
-                    // 2. PARSEO LIMPIO: Convertimos el texto directo a número
-                    double precio = Double.parseDouble(precioStr);
-
-                    // 3. GUARDADO
-                    if (dao.registrarProducto(nombre, precio, esComodin)) {
-                        showMessageDialog(parent, "✅ Producto guardado.");
-                        recargarTablaProductos(tablaProd);
-                    } else {
-                        showMessageDialog(parent, "❌ Error al guardar en base de datos.");
-                    }
-
-                } catch (NumberFormatException e) {
-                    showMessageDialog(parent, "El precio debe ser un número válido (ej. 20.50).");
-                }
+            } catch (NumberFormatException e) {
+                showMessageDialog(parent, "El precio debe ser un número válido (ej. 20.50).");
             }
         } else if (pestaniaActiva == 1) {
-            JTextField txtNombre = new JTextField();
-            JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
-
-            JPanel panel = new JPanel(new GridLayout(0, 1));
-            panel.add(new JLabel("Nombre del Gasto (Ej. Gasolina, Luz):"));
-            panel.add(txtNombre);
-            panel.add(chkRequiere);
-
-            int resultado = showConfirmDialog(parent, panel, 
-                    "Nuevo Tipo de Gasto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
-
-            if (resultado == OK_OPTION) {
-                String nombre = txtNombre.getText().trim();
+            int result=PormularioG(parent);
+            if (result != OK_OPTION) {
+                return;
+            }
+            String nombre = txtNombre.getText().trim();
                 
-                if (nombre.isEmpty()) {
-                    showMessageDialog(parent, "El nombre del gasto es obligatorio.");
-                    return;
-                }
-                
+            if (nombre.isEmpty()) {
+                showMessageDialog(parent, "El nombre del gasto es obligatorio.");
+                return;
+            }
+            try{    
                 int requiereDesc = chkRequiere.isSelected() ? 1 : 0;
                 if (dao.registrarCatGasto(nombre, requiereDesc)) {
                     showMessageDialog(parent, "✅ Gasto registrado.");
@@ -120,6 +123,8 @@ public class C_Inicio {
                 } else {
                     showMessageDialog(parent, "❌ Error al guardar.");
                 }
+            }catch(NumberFormatException e) {
+                showMessageDialog(parent, "Error al guardar gasto, revice el nombre y la descripcion");
             }
         }
     }
@@ -192,27 +197,16 @@ public class C_Inicio {
                         "Aviso",WARNING_MESSAGE);
                 return;
             }
+            
             int idProducto = Integer.parseInt(tablaProd.getValueAt(fila, 0).toString());
             String nombreActual = tablaProd.getValueAt(fila, 1).toString();
             double precioActual = Double.parseDouble(tablaProd.getValueAt(fila, 2).toString());
             String comodinActual = tablaProd.getValueAt(fila, 3).toString(); // Recibe "Sí" o "No"
             
             // Pasamos los datos extraídos como valores iniciales a los campos del formulario
-            JTextField txtNombre = new JTextField(nombreActual);
-            JTextField txtPrecio = new JTextField(String.valueOf(precioActual));
-            JCheckBox chkComodin = new JCheckBox("Es producto Comodín");
-            
-            chkComodin.addActionListener(e -> {
-                if (chkComodin.isSelected()) {
-                    txtPrecio.setText("0.0"); // Le ponemos cero por defecto
-                    txtPrecio.setEnabled(false); // Bloqueamos la escritura
-                    txtPrecio.setBackground(new Color(220, 220, 220)); // Lo pintamos de gris
-                } else {
-                    txtPrecio.setText(""); // Lo vaciamos
-                    txtPrecio.setEnabled(true); // Desbloqueamos
-                    txtPrecio.setBackground(Color.WHITE); // Regresa a blanco
-                }
-            });
+            txtNombre = new JTextField(nombreActual);
+            txtPrecio = new JTextField(String.valueOf(precioActual));
+            chkComodin = new JCheckBox("Es producto Comodín");
             
             // Si la celda extraída decía "Sí", encendemos la palomita automáticamente
             chkComodin.setSelected(comodinActual.equalsIgnoreCase("Sí"));
@@ -225,38 +219,33 @@ public class C_Inicio {
                 showMessageDialog(parent,"ℹ️ MODO SEGURO ACTIVO:\nPara los productos base, solo está "
                         + "autorizado actualizar el Precio.", "Aviso", INFORMATION_MESSAGE);
             }
-
-            JPanel panel = new JPanel(new GridLayout(0, 1));
-            panel.add(new JLabel("Nombre del Producto:"));
-            panel.add(txtNombre);
-            panel.add(new JLabel("Precio ($):"));
-            panel.add(txtPrecio);
-            panel.add(chkComodin);
-
-            int resultado = showConfirmDialog(parent, panel, "Modificar Producto", OK_CANCEL_OPTION, PLAIN_MESSAGE);
-
-            if (resultado == JOptionPane.OK_OPTION) {
-                String nombreNuevo = txtNombre.getText().trim();
-                String precioStr = txtPrecio.getText().trim();
-                
-                if (nombreNuevo.isEmpty() || precioStr.isEmpty()) {
-                    showMessageDialog(parent, "Todos los campos son obligatorios.");
-                    return;
-                }
-                
-                try {
-                    double precioNuevo = Double.parseDouble(precioStr);
-                    int esComodinNuevo = chkComodin.isSelected() ? 1 : 0;
-                    if (dao.modificarProducto(idProducto, nombreNuevo, precioNuevo, esComodinNuevo)) {
-                        showMessageDialog(parent, "✅ Producto modificado correctamente.");
-                        recargarTablaProductos(tablaProd); // Refrescamos la sala al instante
-                    } else {
-                        showMessageDialog(parent, "❌ Error al actualizar en la base de datos.");
-                    }
-                } catch (NumberFormatException e) {
-                    showMessageDialog(parent, "El precio debe ser un número válido.");
-                }
+            
+            int resultado=PormularioP(parent);
+            
+            if (resultado != JOptionPane.OK_OPTION) {
+                return;
             }
+            String nombreNuevo = txtNombre.getText().trim();
+            String precioStr = txtPrecio.getText().trim();
+                
+            if (nombreNuevo.isEmpty() || precioStr.isEmpty()) {
+                showMessageDialog(parent, "Todos los campos son obligatorios.");
+                return;
+            }
+                
+            try {
+                double precioNuevo = Double.parseDouble(precioStr);
+                int esComodinNuevo = chkComodin.isSelected() ? 1 : 0;
+                if (dao.modificarProducto(idProducto, nombreNuevo, precioNuevo, esComodinNuevo)) {
+                    showMessageDialog(parent, "✅ Producto modificado correctamente.");
+                    recargarTablaProductos(tablaProd); // Refrescamos la sala al instante
+                } else {
+                    showMessageDialog(parent, "❌ Error al actualizar en la base de datos.");
+                }
+            } catch (NumberFormatException e) {
+                showMessageDialog(parent, "El precio debe ser un número válido.");
+            }
+            
         } else if (pestaniaActiva == 1) {
             int fila = tablaGastos.getSelectedRow();
             if (fila == -1) {
@@ -268,33 +257,33 @@ public class C_Inicio {
             String nombreActual = tablaGastos.getValueAt(fila, 1).toString();
             String requiereActual = tablaGastos.getValueAt(fila, 2).toString(); // "Sí" o "No"
             
-            JTextField txtNombre = new JTextField(nombreActual);
-            JCheckBox chkRequiere = new JCheckBox("Requiere Descripción detallada");
+            txtNombre = new JTextField(nombreActual);
+            chkRequiere = new JCheckBox("Requiere Descripción detallada");
             chkRequiere.setSelected(requiereActual.equalsIgnoreCase("Sí"));
 
-            JPanel panel = new JPanel(new GridLayout(0, 1));
-            panel.add(new javax.swing.JLabel("Nombre del Gasto:"));
-            panel.add(txtNombre);
-            panel.add(chkRequiere);
+            int resultado = PormularioG(parent);
 
-            int resultado = showConfirmDialog(parent, panel, "Modificar Tipo de Gasto",OK_CANCEL_OPTION, PLAIN_MESSAGE);
-
-            if (resultado == OK_OPTION) {
-                String nombreNuevo = txtNombre.getText().trim();
+            if (resultado != OK_OPTION) {
+                return;
+            }
+            String nombreNuevo = txtNombre.getText().trim();
                 
                 if (nombreNuevo.isEmpty()) {
                     showMessageDialog(parent, "El nombre no puede estar vacío.");
                     return;
                 }
-                
+            try{    
                 int requiereNuevo = chkRequiere.isSelected() ? 1 : 0;
                 if (dao.modificarCatGasto(idTipo, nombreNuevo, requiereNuevo)) {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "✅ Gasto modificado.");
+                    showMessageDialog(parent, "✅ Gasto modificado.");
                     recargarTablaCatGastos(tablaGastos);
                 } else {
-                    javax.swing.JOptionPane.showMessageDialog(parent, "❌ Error al modificar.");
+                    showMessageDialog(parent, "❌ Error al modificar.");
                 }
+            }catch(NumberFormatException e){
+                showMessageDialog(parent, "❌ Error al modificar. Verifique la descripcion.");
             }
         }
     }
+    
 }

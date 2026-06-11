@@ -1,12 +1,14 @@
 package com.ometeotl.tlaxcalli;
 
 import java.awt.Color;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 public class HerramientasVisuales {
 
@@ -177,5 +180,27 @@ public class HerramientasVisuales {
             tabla.getColumnModel().getColumn(numCol).setWidth(0);
             tabla.getColumnModel().getColumn(numCol).setPreferredWidth(0);
         }
+    }
+    
+    // Este método centraliza la lógica de habilitación
+    public static void vincularControl(JCheckBox checkbox, Object... componentes) {
+        // Definimos qué hacer cuando el estado cambia
+        ActionListener sync = e -> {
+            boolean activo = checkbox.isSelected();
+            for (Object c : componentes) {
+                if (c instanceof JComponent comp) {
+                    comp.setEnabled(activo);
+                } else if (c instanceof DefaultTableModel modelo) {
+                    // Opcional: si se desactiva, podríamos querer limpiar la tabla
+                    if (!activo) modelo.setRowCount(0);
+                }
+            }
+        };
+
+        // Lo asignamos al checkbox
+        checkbox.addActionListener(sync);
+
+        // Lo ejecutamos una vez al inicio para asegurar que el estado inicial sea correcto
+        sync.actionPerformed(null);
     }
 }
