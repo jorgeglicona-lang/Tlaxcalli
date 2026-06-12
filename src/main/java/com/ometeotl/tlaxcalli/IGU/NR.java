@@ -37,8 +37,8 @@ public class NR extends javax.swing.JFrame {
         configurarSeccionMasa();
                 
         // Vinculamos todo lo relacionado a Gastos
-        vincularControl(s_PAdicionales, cb_producto, b_agregarProd, tabla_detalles, b_EliminarProd);
-        vincularControl(c_Gastos, cb_gastos, b_agregarGasto, tabla_gastos, b_EliminarGasto);
+        vincularControl(s_PAdicionales, cb_producto, tabla_detalles, b_EliminarProd);
+        vincularControl(c_Gastos, cb_gastos, tabla_gastos, b_EliminarGasto);
         configurarBarraArrastre(this, jPanel4);
         configurarBotonCerrar(this, jBext, ext, false);
         

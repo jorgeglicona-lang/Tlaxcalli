@@ -14,7 +14,6 @@ public interface IVentasDAO {
     double[] obtenerCorteEmpleadoHoy(int idEmpleado);
     double obtenerPrecioProducto(int idProducto);
     
-    // 🚀 NUEVAS ARMAS: Para leer las tablas del registro previo
     List<Object[]> obtenerProductosCorteHoy(int idEmpleado);
     List<Object[]> obtenerGastosCorteHoy(int idEmpleado);
 }

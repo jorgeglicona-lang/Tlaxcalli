@@ -77,9 +77,9 @@ public class C_NR {
         double totalGastos = 0.0;
         
         try {
-            if (!tReparto.getText().isEmpty()) totalIngresos += Double.parseDouble(tReparto.getText()) * precioReparto;
-            if (!tVenta.getText().isEmpty()) totalIngresos += Double.parseDouble(tVenta.getText()) * precioMostrador;
-            if (!tMasa.getText().isEmpty()) totalIngresos += Double.parseDouble(tMasa.getText()) * precioMasa;
+            if (!tReparto.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tReparto.getText()) * precioReparto;
+            if (!tVenta.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tVenta.getText()) * precioMostrador;
+            if (!tMasa.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tMasa.getText()) * precioMasa;
             
             DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
             
@@ -141,16 +141,12 @@ public class C_NR {
         
         if (corteExistente != null) {
             // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
-            tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
-            tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
-            tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
             tReparto.setForeground(BLACK);
             tVenta.setForeground(BLACK);
             tMasa.setForeground(BLACK);
             DatoEx = new Color(190, 250, 180);
             tReparto.setBackground(DatoEx);
-            tVenta.setBackground(DatoEx); 
-            tMasa.setBackground(DatoEx);
+            tVenta.setBackground(DatoEx);
             
             // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
             if (!seleccionado.equalsIgnoreCase("Mostrador")) {
@@ -167,17 +163,22 @@ public class C_NR {
             
             // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
             // Si tiene más de 0 kilos, la habilitamos.
-            String textoMasa = tMasa.getText();
-            if (!textoMasa.equals("0.00") && !textoMasa.equals("0.0") && !textoMasa.isEmpty()) {
+            double kiloM=corteExistente[2];
+            if (kiloM>0) {
                 tMasa.setEnabled(true);   
                 tMasa.setEditable(true);
                 sMasaS.setEnabled(true);
                 sMasaS.setSelected(true);
+                tMasa.setBackground(DatoEx);
             } else {
                 tMasa.setEnabled(false);
                 tMasa.setDisabledTextColor(BLACK);
             }
-            //️ ¡REPARADO! Llenamos las tablas visuales de productos adicionales y gastos
+            tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
+            tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
+            tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
+            
+            //️ Llenamos las tablas visuales de productos adicionales y gastos
             List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
             for (Object[] fila : productosHoy) {
                 modeloProd.addRow(fila);
@@ -269,9 +270,9 @@ public class C_NR {
         double kReparto = 0, kVenta = 0, kMasa = 0;
         
         try {
-            if (!tReparto.getText().isEmpty()) kReparto = Double.parseDouble(tReparto.getText());
-            if (!tVenta.getText().isEmpty()) kVenta = Double.parseDouble(tVenta.getText());
-            if (!tMasa.getText().isEmpty()) kMasa = Double.parseDouble(tMasa.getText());
+            if (!tReparto.getText().trim().isEmpty()) kReparto = Double.parseDouble(tReparto.getText());
+            if (!tVenta.getText().trim().isEmpty()) kVenta = Double.parseDouble(tVenta.getText());
+            if (!tMasa.getText().trim().isEmpty()) kMasa = Double.parseDouble(tMasa.getText());
         } catch (NumberFormatException e) {
             showMessageDialog(parent, "❌ Verifica que los kilos sean números válidos.");
             return;

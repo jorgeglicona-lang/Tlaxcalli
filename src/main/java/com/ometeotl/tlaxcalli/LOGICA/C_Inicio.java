@@ -109,14 +109,15 @@ public class C_Inicio {
             if (result != OK_OPTION) {
                 return;
             }
+            
             String nombre = txtNombre.getText().trim();
-                
+            int requiereDesc = chkRequiere.isSelected() ? 1 : 0;
+            
             if (nombre.isEmpty()) {
                 showMessageDialog(parent, "El nombre del gasto es obligatorio.");
                 return;
             }
-            try{    
-                int requiereDesc = chkRequiere.isSelected() ? 1 : 0;
+            try{
                 if (dao.registrarCatGasto(nombre, requiereDesc)) {
                     showMessageDialog(parent, "✅ Gasto registrado.");
                     recargarTablaCatGastos(tablaGastos);
@@ -127,6 +128,8 @@ public class C_Inicio {
                 showMessageDialog(parent, "Error al guardar gasto, revice el nombre y la descripcion");
             }
         }
+        txtNombre.setText("");
+        txtPrecio.setText("");
     }
 
     // El policía de tránsito para el botón ELIMINAR
