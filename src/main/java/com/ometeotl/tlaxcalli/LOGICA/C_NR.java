@@ -7,6 +7,7 @@ import java.awt.Color;
 import static java.awt.Color.BLACK;
 import java.util.List;
 import static com.ometeotl.tlaxcalli.HerramientasVisuales.LimpiarCampos;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.ActivarCampos;
 import static java.awt.Color.RED;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
@@ -42,7 +43,7 @@ public class C_NR {
         // Asumiendo que su EmpleadosDAO original o SQLiteDAO ya está en la fábrica
         IEmpleadosDAO empDao = DAOFactory.getEmpleadosDAO();
         
-        // 🛠️ ¡REPARADO! Ahora llamamos al método exclusivo de vendedores
+        // ¡REPARADO! Ahora llamamos al método exclusivo de vendedores
         DefaultTableModel modeloEmp = empDao.consultarVendedores(); 
         
         boxRepartidor.addItem(new EmpleadoItem(0, "Seleccione..."));
@@ -133,46 +134,31 @@ public class C_NR {
         double[] corteExistente = dao.obtenerCorteEmpleadoHoy(idEmpleado);
         
         if(idEmpleado>0){
-            Pro.setEnabled(true);
-            Gas.setEnabled(true);
-            sMasaS.setEnabled(true);
+            ActivarCampos(Pro,Gas,sMasaS);
             sMasaN.setSelected(true);
         }
         
         if (corteExistente != null) {
             // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
-            tReparto.setForeground(BLACK);
-            tVenta.setForeground(BLACK);
-            tMasa.setForeground(BLACK);
             DatoEx = new Color(190, 250, 180);
             tReparto.setBackground(DatoEx);
             tVenta.setBackground(DatoEx);
             
             // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
             if (!seleccionado.equalsIgnoreCase("Mostrador")) {
-                tReparto.setEnabled(true);
-                tReparto.setEditable(true);
-                tVenta.setEnabled(true);   
-                tVenta.setEditable(true);
+                ActivarCampos(tVenta,tReparto);
             } else {
-                tReparto.setEnabled(false);
-                tVenta.setEnabled(false);
-                tVenta.setDisabledTextColor(BLACK);
-                tReparto.setDisabledTextColor(BLACK);
+                LimpiarCampos(tVenta,tReparto);
             }
             
             // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
             // Si tiene más de 0 kilos, la habilitamos.
             double kiloM=corteExistente[2];
             if (kiloM>0) {
-                tMasa.setEnabled(true);   
-                tMasa.setEditable(true);
-                sMasaS.setEnabled(true);
-                sMasaS.setSelected(true);
+                ActivarCampos(tMasa,sMasaS);
                 tMasa.setBackground(DatoEx);
             } else {
-                tMasa.setEnabled(false);
-                tMasa.setDisabledTextColor(BLACK);
+                LimpiarCampos(tMasa);
             }
             tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
             tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
@@ -180,11 +166,12 @@ public class C_NR {
             
             //️ Llenamos las tablas visuales de productos adicionales y gastos
             List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
+            List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
+            
             for (Object[] fila : productosHoy) {
                 modeloProd.addRow(fila);
             }
             
-            List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
             for (Object[] fila : gastosHoy) {
                 modeloGastos.addRow(fila);
             }
@@ -204,7 +191,8 @@ public class C_NR {
         Pro.setSelected(false);
         Gas.setSelected(false);
         sMasaN.setSelected(true);
-        // 🟢 ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
+        
+        // ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
         if (seleccionado.equalsIgnoreCase("Mostrador")) {
             IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
             double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
@@ -226,10 +214,13 @@ public class C_NR {
                 double sobranteMostrador = produccionTotal - vendidoReparto;
                 
                 if (sobranteMostrador < 0) {
-                     tVenta.setForeground(RED);
-                     showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" 
+                    tVenta.setForeground(RED);
+                    showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" 
                              + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
+                    boxRepartidor.setSelectedIndex(0);
+                    return;
                 }
+                
                 tReparto.setText("0.0");
                 tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
             } catch (Exception e){
@@ -237,10 +228,7 @@ public class C_NR {
             }
             
         } else {
-            tReparto.setEnabled(true);
-            tReparto.setEditable(true);
-            tVenta.setEnabled(true);
-            tVenta.setEditable(true);
+            ActivarCampos(tReparto,tVenta);
         }
         calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
     }
@@ -307,27 +295,25 @@ public class C_NR {
 
         boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
         
-        if (exito) {
-            showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
-            
-            // Limpieza general
-            boxRepartidor.setSelectedIndex(0);
-            modeloProductos.setRowCount(0);
-            sMasa.setSelected(true);
-            LimpiarCampos(tReparto,tVenta,tMasa);
-            
-            if (sPAdicionales.isSelected()) {
-                sPAdicionales.setSelected(false);
-                sPAdicionales.getActionListeners()[0].actionPerformed(null);
-            }
-            
-            if (cGastos.isSelected()) {
-                cGastos.setSelected(false);
-                cGastos.getActionListeners()[0].actionPerformed(null);
-            }
-            
-        } else {
+        if (!exito) {
             showMessageDialog(parent, "❌ Error al guardar en la base de datos.");
+            return;   
+        }
+        
+        showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
+        // Limpieza general
+        sMasa.setSelected(true);
+        LimpiarCampos(tReparto,tVenta,tMasa,boxRepartidor);
+        boxRepartidor.setEnabled(true);
+
+        if (sPAdicionales.isSelected()) {
+            sPAdicionales.setSelected(false);
+            sPAdicionales.getActionListeners()[0].actionPerformed(null);
+        }
+        
+        if (cGastos.isSelected()) {
+            cGastos.setSelected(false);
+            cGastos.getActionListeners()[0].actionPerformed(null);
         }
     }
 }

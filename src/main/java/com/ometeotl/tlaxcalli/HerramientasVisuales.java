@@ -223,9 +223,8 @@ public class HerramientasVisuales {
         for (Object c : componentes) {
             if (c instanceof JTextField txt) {
                 txt.setText("");
-                txt.setBackground(WHITE);
-                txt.setForeground(BLACK);
                 txt.setEnabled(false);
+                txt.setBackground(WHITE);
                 txt.setDisabledTextColor(BLACK);
             } 
             else if (c instanceof JTable modelo) {
@@ -241,6 +240,33 @@ public class HerramientasVisuales {
                     combo.setSelectedIndex(0);
                     combo.setEnabled(false);
                 }
+            }
+        }
+    }
+    
+    public static void ActivarCampos(Object... componentes){
+        for (Object c : componentes) {
+            if (c instanceof JTextField txt) {
+                txt.setEnabled(true);
+                txt.setEditable(true);
+                txt.setForeground(BLACK);
+            } 
+            else if (c instanceof JTable modelo) {
+                modelo.setEnabled(true);
+            }
+            else if (c instanceof JCheckBox chk) {
+                chk.setEnabled(true);
+                chk.setSelected(true);
+            }
+            else if (c instanceof JComboBox<?> combo) {
+                if (combo.getItemCount() > 0) {
+                    combo.setSelectedIndex(0);
+                    combo.setEnabled(true);
+                }
+            }
+            else if(c instanceof JRadioButton RD){
+                RD.setEnabled(true);
+                RD.setSelected(true);
             }
         }
     }
