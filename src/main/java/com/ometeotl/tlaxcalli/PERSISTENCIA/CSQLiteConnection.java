@@ -88,9 +88,9 @@ public class CSQLiteConnection {
 
     public void inicializarEstructuraSQLite(Connection con) {
         try (Statement stmt = con.createStatement()) {
-            int[] idTabla = new int[15];
+            int[] idTabla = new int[8];
             String[] Tabla = {"Cat_Gastos", "Empleados", "Gastos","Gastos_Administrativos","Logeo",
-                              "Produccion_Diaria","Productividad","Productos","Usuarios","Ventas_Diarias"};
+                              "Produccion_Diaria","Productos","Ventas_Diarias"};
 
             // 1. Cat_Gastos
             idTabla[0]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cat_Gastos ("
@@ -146,30 +146,15 @@ public class CSQLiteConnection {
                     + "Tortilla_Elaborada_Kg REAL NOT NULL,"
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
 
-            // 7. Productividad (Sin PK en el script original)
-            idTabla[6]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productividad ("
-                    + "Fecha TEXT NOT NULL,"
-                    + "Botes REAL NOT NULL,"
-                    + "Harina REAL NOT NULL,"
-                    + "Desperdicio REAL NOT NULL,"
-                    + "TotalTortilla REAL NOT NULL)");
-
             // 8. Productos
-            idTabla[7]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productos ("
+            idTabla[6]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productos ("
                     + "Id_producto INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Nom_producto TEXT,"
                     + "Precio REAL,"
                     + "Es_Comodin INTEGER DEFAULT 0)");
 
-            // 9. Usuarios
-            idTabla[8]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Usuarios ("
-                    + "Id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "Id_empleado INTEGER,"
-                    + "Contrasena TEXT NOT NULL,"
-                    + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
-
             // 10. Ventas_Diarias
-            idTabla[9]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Ventas_Diarias ("
+            idTabla[7]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Ventas_Diarias ("
                     + "Id_venta INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Id_empleado INTEGER NOT NULL,"
                     + "Id_producto INTEGER NOT NULL,"
@@ -180,7 +165,7 @@ public class CSQLiteConnection {
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado),"
                     + "FOREIGN KEY(Id_producto) REFERENCES Productos(Id_producto))");
             
-            for(int i=0;i<10;i++){
+            for(int i=0;i<8;i++){
                 if(idTabla[i]==0) System.out.println("¡Tabla de "+Tabla[i]+" creada de forma exitosa!");
             }
 
