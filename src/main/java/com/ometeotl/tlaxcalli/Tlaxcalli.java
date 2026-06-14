@@ -1,5 +1,6 @@
 package com.ometeotl.tlaxcalli;
 
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.GenV;
 import com.ometeotl.tlaxcalli.IGU.Login;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.CSQLiteConnection;
 import java.io.File;
@@ -65,12 +66,10 @@ public class Tlaxcalli {
     }
 
     public static void main(String[] args) {
-        // Al llamar a la clase separada, aseguramos la BD portátil sin alterar SQL Server
-        CSQLiteConnection conexionPortatil = new CSQLiteConnection();
-        conexionPortatil.establecerConexionPortatil();
-        Login log = new Login();
-        log.setVisible(true);
-        log.setLocationRelativeTo(null);
+        CSQLiteConnection cP = new CSQLiteConnection();
+        cP.CrearBDPortatil();
         
+        Login log = new Login();
+        GenV(log);
     }
 }

@@ -1,6 +1,5 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
-import java.io.File;
 import static java.io.File.separator;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -18,15 +17,27 @@ public class CSQLiteConnection {
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
+            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME;
+            con = DriverManager.getConnection(url);
+            try (Statement pragma = con.createStatement()) {
+                pragma.execute("PRAGMA foreign_keys = ON;");
+            }
+        } catch (SQLException e) {
+            showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
+                "Error de Sistema", ERROR_MESSAGE);
+        }
+        return con;
+    }
+    
+    public Connection CrearBDPortatil() {
+        Connection con = null;
+        try {
             // 1. Obligamos a Java a decirnos la ruta exacta donde estamos parados
             String rutaBase = System.getProperty("user.dir");
             String rutaCompletaDb = rutaBase + separator + DB_NAME;
             
             // 2. Usamos la ruta absoluta y exacta para evitar que Windows esconda el archivo
             String url = "jdbc:sqlite:" + rutaCompletaDb;
-            File archivoDb = new File(rutaCompletaDb);
-            
-            boolean esNueva = !archivoDb.exists();
             
             // 3. Obligamos a Java a cargar el traductor de SQLite en memoria
             try {
@@ -42,14 +53,14 @@ public class CSQLiteConnection {
                 pragma.execute("PRAGMA foreign_keys = ON;");
             }
             
-            if (esNueva) {
-                System.out.println("Creando nueva estructura...");
-                inicializarEstructuraSQLite(con);
-                
-                // Nos avisa exactamente dónde dejó el archivo
-                showMessageDialog(null, "✅ Base de datos inicializada correctamente en:\n" + rutaCompletaDb, 
-                    "Ometeotl Portátil",INFORMATION_MESSAGE);
-            }
+            
+            System.out.println("Creando nueva estructura...");
+            inicializarEstructuraSQLite(con);
+
+            // Nos avisa exactamente dónde dejó el archivo
+            showMessageDialog(null, "✅ Base de datos inicializada correctamente en:\n" + rutaCompletaDb, 
+                "Ometeotl Portátil",INFORMATION_MESSAGE);
+
             
         } catch (SQLException e) {
             // Si algo falla, lo vemos en pantalla sí o sí
