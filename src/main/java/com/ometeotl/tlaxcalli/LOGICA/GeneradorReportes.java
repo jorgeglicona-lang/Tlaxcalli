@@ -3,7 +3,6 @@ package com.ometeotl.tlaxcalli.LOGICA;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -12,17 +11,30 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.VerticalAlignment;
+import static com.itextpdf.io.font.constants.StandardFonts.HELVETICA;
+import static com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD;
+import static com.itextpdf.kernel.colors.ColorConstants.BLUE;
+import static com.itextpdf.kernel.colors.ColorConstants.DARK_GRAY;
+import static com.itextpdf.kernel.colors.ColorConstants.WHITE;
+import static com.itextpdf.kernel.geom.PageSize.A4;
+import static com.itextpdf.layout.borders.Border.NO_BORDER;
+import static com.itextpdf.layout.properties.TextAlignment.CENTER;
+import static com.itextpdf.layout.properties.TextAlignment.RIGHT;
 import com.itextpdf.layout.properties.UnitValue;
+import static com.itextpdf.layout.properties.VerticalAlignment.MIDDLE;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IGastosGeneralesDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IReportesDAO;
+import java.awt.Desktop;
 import java.io.File;
+import static java.io.File.separator;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JComboBox;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.table.DefaultTableModel;
+
 public class GeneradorReportes {
     
     private final IReportesDAO reportesDao = DAOFactory.getReportesDAO();
@@ -73,76 +85,71 @@ public class GeneradorReportes {
                                double tV, double tGOp, double tGAdm) {
         // 1. Configuración de carpetas y nombre (Automatización intacta)
         String userHome = System.getProperty("user.home");
-        File carpetaReportes = new File(userHome + File.separator + "Documents" + File.separator + "Tlaxcalli_Reportes");
+        File carpetaReportes = new File(userHome + separator + "Documents" + separator + "Tlaxcalli_Reportes");
         
         if (!carpetaReportes.exists()) {
             carpetaReportes.mkdirs(); 
         }
 
-        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
-        java.time.format.DateTimeFormatter formatoFechaHora = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
+        LocalDateTime ahora = LocalDateTime.now();
+        DateTimeFormatter formatoFechaHora = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
         String fechaHoraStr = ahora.format(formatoFechaHora);
         String empleadoLimpio = empleado.trim().replace(" ", "_");
         String nombreFinalArchivo = "Reporte_" + empleadoLimpio + "_" + fechaHoraStr + ".pdf";
         
-        java.io.File archivoPDF = new java.io.File(carpetaReportes, nombreFinalArchivo);
+        File archivoPDF = new File(carpetaReportes, nombreFinalArchivo);
         String rutaFinal = archivoPDF.getAbsolutePath();
         
         // 🛡️ MOTOR DE ITEXT 9.6.0
-        try {
-            PdfWriter writer = new PdfWriter(rutaFinal);
+        try (PdfWriter writer = new PdfWriter(rutaFinal);
             PdfDocument pdfDoc = new PdfDocument(writer);
-            Document documento = new Document(pdfDoc, PageSize.A4);
-
+            Document documento = new Document(pdfDoc,A4);){
+            
             // Carga de fuentes base
-            PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
-            PdfFont fontNormal = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont fontBold = PdfFontFactory.createFont(HELVETICA_BOLD);
+            PdfFont fontNormal = PdfFontFactory.createFont(HELVETICA);
 
-            // ==========================================
-            // 🖼️ ENCABEZADO CON LOGO
-            // ==========================================
+            // ENCABEZADO
             Table tablaEncabezado = new Table(UnitValue.createPercentArray(new float[]{1f, 4f}));
             tablaEncabezado.setWidth(UnitValue.createPercentValue(100));
 
             try {
-                java.net.URL urlLogo = getClass().getResource("/imagen/transparencia.png");
+                URL urlLogo = getClass().getResource("/imagen/transparencia.png");
                 if (urlLogo != null) {
                     Image logo = new Image(ImageDataFactory.create(urlLogo));
                     logo.scaleToFit(45, 45);
                     
                     Cell celdaLogo = new Cell().add(logo);
-                    celdaLogo.setBorder(com.itextpdf.layout.borders.Border.NO_BORDER);
-                    celdaLogo.setTextAlignment(TextAlignment.CENTER);
-                    celdaLogo.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    celdaLogo.setBorder(NO_BORDER);
+                    celdaLogo.setTextAlignment(CENTER);
+                    celdaLogo.setVerticalAlignment(MIDDLE);
                     tablaEncabezado.addCell(celdaLogo);
                 } else {
-                    tablaEncabezado.addCell(new Cell().setBorder(com.itextpdf.layout.borders.Border.NO_BORDER));
+                    tablaEncabezado.addCell(new Cell().setBorder(NO_BORDER));
                 }
             } catch (Exception ex) {
                 System.err.println("No se pudo cargar el logo: " + ex.getMessage());
             }
 
             // Textos del encabezado
-            Cell celdaTextos = new Cell().setBorder(com.itextpdf.layout.borders.Border.NO_BORDER);
+            Cell celdaTextos = new Cell().setBorder(NO_BORDER);
             
             celdaTextos.add(new Paragraph("TLAXCALLI - REPORTE DE ACTIVIDAD")
-                    .setFont(fontBold).setFontSize(18).setTextAlignment(TextAlignment.CENTER));
+                    .setFont(fontBold).setFontSize(18).setTextAlignment(CENTER));
             
             celdaTextos.add(new Paragraph("Periodo: " + fInicio + " al " + fFin)
-                    .setFont(fontNormal).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
+                    .setFont(fontNormal).setFontSize(10).setTextAlignment(CENTER));
             
             celdaTextos.add(new Paragraph("Filtro Empleado: " + empleado)
-                    .setFont(fontNormal).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
+                    .setFont(fontNormal).setFontSize(10).setTextAlignment(CENTER));
 
             tablaEncabezado.addCell(celdaTextos);
             documento.add(tablaEncabezado);
             documento.add(new Paragraph("\n")); 
 
-            // ==========================================
-            // 📊 SECCIÓN 1: RESUMEN FINANCIERO
-            // ==========================================
+            // RESUMEN FINANCIERO
             documento.add(new Paragraph("1. RESUMEN FINANCIERO")
-                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(15).setFontColor(BLUE));
             
             Table tablaResumen = new Table(UnitValue.createPercentArray(2));
             tablaResumen.setWidth(UnitValue.createPercentValue(100));
@@ -157,58 +164,55 @@ public class GeneradorReportes {
             documento.add(tablaResumen);
             documento.add(new Paragraph("\n"));
 
-            // ==========================================
-            // 🏢 SECCIÓN 2: DESGLOSE ADMINISTRATIVO
-            // ==========================================
+            // DESGLOSE ADMINISTRATIVO
             documento.add(new Paragraph("2. DESGLOSE ADMINISTRATIVO")
-                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(15).setFontColor(BLUE));
             
             Table tablaAdm = crearTablaDesdeModelo(gAdm, new String[]{"ID", "Descripción", "Monto ($)", "Fecha"}, fontNormal, fontBold);
             documento.add(tablaAdm);
             
             documento.add(new Paragraph("Subtotal Administrativo: $" + String.format("%.2f", tGAdm))
-                    .setFont(fontBold).setFontSize(18));
+                    .setFont(fontBold).setFontSize(12));
             documento.add(new Paragraph("\n"));
 
             // ==========================================
             // 🛵 SECCIÓN 3: ACTIVIDAD OPERATIVA
             // ==========================================
             documento.add(new Paragraph("3. ACTIVIDAD OPERATIVA (MOSTRADOR/REPARTIDORES)")
-                    .setFont(fontBold).setFontSize(16).setFontColor(ColorConstants.BLUE));
+                    .setFont(fontBold).setFontSize(15).setFontColor(BLUE));
         
-            documento.add(new Paragraph("Ventas registradas:").setFont(fontBold).setFontSize(10));
+            documento.add(new Paragraph("Ventas registradas:").setFont(fontBold).setFontSize(14));
             documento.add(crearTablaDesdeModelo(vtas, new String[]{"Empleado", "Producto", "Monto ($)"}, fontNormal, fontBold));
         
-            documento.add(new Paragraph("Gastos operativos registrados:").setFont(fontBold).setFontSize(10));
+            documento.add(new Paragraph("Gastos operativos registrados:").setFont(fontBold).setFontSize(14));
             documento.add(crearTablaDesdeModelo(gOp, new String[]{"Empleado", "Descripción", "Monto ($)"}, fontNormal, fontBold));
         
             documento.add(new Paragraph("Subtotal Operativo: $" + String.format("%.2f", tGOp))
-                    .setFont(fontBold).setFontSize(10));
+                    .setFont(fontBold).setFontSize(12));
 
-            documento.add(new Paragraph("\n--- Fin del Reporte ---").setTextAlignment(TextAlignment.CENTER));
+            documento.add(new Paragraph("\n--- Fin del Reporte ---").setTextAlignment(CENTER));
             
             // Cierre maestro del PDF
             documento.close();
             
             // Apertura automática
-            if (java.awt.Desktop.isDesktopSupported()) {
-                java.awt.Desktop.getDesktop().open(archivoPDF);
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(archivoPDF);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(null, "✅ Reporte guardado en:\n" + rutaFinal);
+                showMessageDialog(null, "✅ Reporte guardado en:\n" + rutaFinal);
             }
             
         } catch (Exception e) {
             System.err.println("Error procesando iText 9: " + e.getMessage());
-            javax.swing.JOptionPane.showMessageDialog(null, "❌ Error generando PDF:\n" + e.getMessage());
+            showMessageDialog(null, "❌ Error generando PDF:\n" + e.getMessage());
         }
     }
 
     private void agregarCeldaResumen(Table tabla, String texto, String valor, PdfFont normal, PdfFont bold) {
         tabla.addCell(new Cell().add(new Paragraph(texto).setFont(normal)));
         
-        // La alineación en la celda se hace con TextAlignment
         Cell celdaValor = new Cell().add(new Paragraph(valor).setFont(bold));
-        celdaValor.setTextAlignment(TextAlignment.RIGHT); 
+        celdaValor.setTextAlignment(RIGHT); 
         tabla.addCell(celdaValor);
     }
     
@@ -219,9 +223,9 @@ public class GeneradorReportes {
 
         // Cabeceras (Background gris oscuro, texto blanco centrado)
         for (String titulo : titulos) {
-            Cell h = new Cell().add(new Paragraph(titulo).setFont(bold).setFontColor(ColorConstants.WHITE));
-            h.setBackgroundColor(ColorConstants.DARK_GRAY);
-            h.setTextAlignment(TextAlignment.CENTER);
+            Cell h = new Cell().add(new Paragraph(titulo).setFont(bold).setFontColor(WHITE));
+            h.setBackgroundColor(DARK_GRAY);
+            h.setTextAlignment(CENTER);
             tabla.addCell(h);
         }
     
