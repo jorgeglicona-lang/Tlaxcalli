@@ -4,5 +4,13 @@ src/test/
 *.class
 *.jar
 *.db
+*.log
+
 # Excluir configuraciones personales de NetBeans
 nbproject/private/
+build/
+dist/
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
