@@ -13,6 +13,8 @@ public class Login extends javax.swing.JFrame {
         initComponents();
         
         HerramientasVisuales.pintarImagen(Logolb, "/imagen/logazul.png");
+        HerramientasVisuales.pintarImagen(JLClaro, "/imagen/loginclaro.png");
+        HerramientasVisuales.pintarImagen(logoV, "/imagen/transparencia.png");
         HerramientasVisuales.pintarImagen(Information, "/imagen/informacion.png");
         Information.setToolTipText("<html>Primer ingreso del sistema:"
                 + "<br>Usuario: <b>Admin</b><br>Contraseña: <b>Admin123</b>"
@@ -30,11 +32,11 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        logoV = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        JLClaro = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         usertxt = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -57,9 +59,8 @@ public class Login extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagen/transparencia.png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 50, 260, -1));
+        logoV.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(logoV, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 80, 100, 100));
 
         jLabel3.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(153, 153, 153));
@@ -73,9 +74,7 @@ public class Login extends javax.swing.JFrame {
         jLabel8.setForeground(new java.awt.Color(181, 181, 181));
         jLabel8.setText("Info - Iconos creados por Roundicons - Flaticon");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 380, -1, -1));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagen/loginclaro.png"))); // NOI18N
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 0, 260, 400));
+        jPanel1.add(JLClaro, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 0, 260, 400));
 
         jLabel5.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
         jLabel5.setText("Contraseña");
@@ -135,7 +134,7 @@ public class Login extends javax.swing.JFrame {
 
         Logolb.setBackground(new java.awt.Color(0, 102, 102));
         Logolb.setForeground(new java.awt.Color(0, 102, 102));
-        jPanel1.add(Logolb, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 50, 40));
+        jPanel1.add(Logolb, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, 45, 45));
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 310, 280, 10));
         jPanel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 220, 280, 10));
 
@@ -214,11 +213,10 @@ public class Login extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Information;
+    private javax.swing.JLabel JLClaro;
     private javax.swing.JLabel Logolb;
     private javax.swing.JPanel button;
     private javax.swing.JPanel exbg;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -230,6 +228,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel logoV;
     private javax.swing.JPasswordField passtst;
     private javax.swing.JTextField usertxt;
     // End of variables declaration//GEN-END:variables
