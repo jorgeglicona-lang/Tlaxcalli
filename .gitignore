@@ -1,7 +1,8 @@
 # Excluir archivos compilados y empaquetados
 target/
+src/test/
 *.class
 *.jar
-
+*.db
 # Excluir configuraciones personales de NetBeans
 nbproject/private/
