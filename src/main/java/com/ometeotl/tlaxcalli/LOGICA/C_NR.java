@@ -1,6 +1,7 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.*;
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Servicios.CorteDiaService; // <-- Importamos el nuevo servicio
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
@@ -9,6 +10,7 @@ import java.util.List;
 import static com.ometeotl.tlaxcalli.HerramientasVisuales.LimpiarCampos;
 import static com.ometeotl.tlaxcalli.HerramientasVisuales.ActivarCampos;
 import static java.awt.Color.RED;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
@@ -22,6 +24,10 @@ public class C_NR {
     private double precioMostrador = 0.0;
     private double precioMasa = 0.0;
     private final IVentasDAO dao = DAOFactory.getVentasDAO();
+    
+    // <-- Instanciamos el servicio orquestador
+    private final CorteDiaService corteService = new CorteDiaService(); 
+    
     private Color DatoEx;
     
     public void cargarPreciosBase() {
@@ -135,6 +141,8 @@ public class C_NR {
         
         if(idEmpleado>0){
             ActivarCampos(Pro,Gas,sMasaS);
+            Pro.setSelected(false);
+            Gas.setSelected(false);
             sMasaN.setSelected(true);
         }
         
@@ -183,7 +191,7 @@ public class C_NR {
             
             showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
                             + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
-                            + "y gastos en las tablas.","Atencion", JOptionPane.INFORMATION_MESSAGE);
+                            + "y gastos en las tablas.","Atencion", INFORMATION_MESSAGE);
             return;
         }
         
@@ -210,13 +218,22 @@ public class C_NR {
             tVenta.setBackground(DatoEx);
             
             try {
+                
                 double vendidoReparto = dao.obtenerTotalRepartoHoy();
-                double sobranteMostrador = produccionTotal - vendidoReparto;
+                
+                // 2. Traemos la masa cruda vendida por los repartidores
+                double masaReparto = dao.obtenerTotalMasaHoy();
+                
+                // 3. Convertimos esa masa cruda a su equivalente de tortilla perdida (Factor 16/18)
+                double tortillaPerdidaPorMasa = masaReparto * (16.0 / 18.0);
+                
+                // 4. LA NUEVA FÓRMULA MAESTRA DE BALANCE
+                double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
                 
                 if (sobranteMostrador < 0) {
                     tVenta.setForeground(RED);
-                    showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto (" 
-                             + vendidoReparto + ") de lo que se produjo (" + produccionTotal + ").");
+                    showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto y masa (" 
+                             + (vendidoReparto + tortillaPerdidaPorMasa) + " kg equiv.) de lo que se produjo (" + produccionTotal + " kg).");
                     boxRepartidor.setSelectedIndex(0);
                     return;
                 }
@@ -293,7 +310,8 @@ public class C_NR {
         DefaultTableModel prodParaGuardar = ignoraProductos ? new DefaultTableModel() : modeloProductos;
         DefaultTableModel gastosParaGuardar = ignoraGastos ? new DefaultTableModel() : modeloGastos;
 
-        boolean exito = dao.guardarCorteCompleto(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
+        // <-- CAMBIO APLICADO AQUÍ: Llamamos al servicio orquestador en lugar del DAO directo
+        boolean exito = corteService.procesarVentaYCascada(idEmpleado, kReparto, kVenta, kMasa, prodParaGuardar, gastosParaGuardar);
         
         if (!exito) {
             showMessageDialog(parent, "❌ Error al guardar en la base de datos.");

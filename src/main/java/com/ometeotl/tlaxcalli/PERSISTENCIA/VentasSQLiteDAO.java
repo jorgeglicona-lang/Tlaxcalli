@@ -14,13 +14,10 @@ import javax.swing.table.DefaultTableModel;
 public class VentasSQLiteDAO implements IVentasDAO {
 
     @Override
-    public boolean guardarCorteCompleto(int idEmpleado, double kTortillaRep, double kTortillaPub, double kMasa, 
+    public boolean guardarCorteCompleto(Connection con, int idEmpleado, double kTortillaRep, double kTortillaPub, double kMasa, 
                                         DefaultTableModel modeloProductos, DefaultTableModel modeloGastos) {
-        CSQLiteConnection conMngr = new CSQLiteConnection();
-        Connection con = null;
         try {
-            con = conMngr.establecerConexionPortatil();
-            con.setAutoCommit(false); // MODO TRANSACCIÓN
+            // 🛡️ REPARADO: Ya no creamos conexión local, usamos la 'con' que viene del servicio
             
             // Limpiamos los registros viejos de HOY para este empleado antes de inyectar el nuevo estado limpio.
             String sqlDelVentas = "DELETE FROM Ventas_Diarias WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime')";
@@ -34,23 +31,20 @@ public class VentasSQLiteDAO implements IVentasDAO {
                 psDelG.executeUpdate();
             }
 
-            // 1. GUARDAR VENTAS FIJAS
-            // En SQLite usamos datetime('now', 'localtime') para la estampa de tiempo
+            // GUARDAR VENTAS FIJAS
             String sqlVenta = "INSERT INTO Ventas_Diarias (Id_empleado, Id_producto, Fecha, Cantidad, Total_Dinero, Observaciones) " +
                               "VALUES (?, ?, datetime('now', 'localtime'), ?, ?, ?)";
             
-            // Obtenemos los precios frescos de la base de datos justo antes de guardar
             double pReparto = obtenerPrecioProducto(1);
             double pMostrador = obtenerPrecioProducto(2);
             double pMasa = obtenerPrecioProducto(3);
 
             try (PreparedStatement psV = con.prepareStatement(sqlVenta)) {
-                // 🛠️ ¡REPARADO! Multiplicamos por la variable, no por un número fijo
                 if (kTortillaRep > 0) registrarItem(psV, idEmpleado, 1, kTortillaRep, kTortillaRep * pReparto, "Reparto");
                 if (kTortillaPub > 0) registrarItem(psV, idEmpleado, 2, kTortillaPub, kTortillaPub * pMostrador, "Mostrador");
                 if (kMasa > 0) registrarItem(psV, idEmpleado, 3, kMasa, kMasa * pMasa, "Mostrador");
 
-                // 2. GUARDAR TABLA DE PRODUCTOS ADICIONALES
+                // GUARDAR TABLA DE PRODUCTOS ADICIONALES
                 for (int i = 0; i < modeloProductos.getRowCount(); i++) {
                     int idProd = Integer.parseInt(modeloProductos.getValueAt(i, 0).toString());
                     double cant = Double.parseDouble(modeloProductos.getValueAt(i, 2).toString());
@@ -61,7 +55,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
                 }
             }
 
-            // 3. GUARDAR TABLA DE GASTOS
+            // GUARDAR TABLA DE GASTOS
             String sqlGasto = "INSERT INTO Gastos (Id_empleado, Descripcion, Monto, Fecha) VALUES (?, ?, ?, datetime('now', 'localtime'))";
             try (PreparedStatement psG = con.prepareStatement(sqlGasto)) {
                 for (int i = 0; i < modeloGastos.getRowCount(); i++) {
@@ -75,16 +69,13 @@ public class VentasSQLiteDAO implements IVentasDAO {
                 }
             }
 
-            con.commit(); 
-            return true;
+            return true; // 📦 Éxito parcial, el commit final lo decide el servicio
 
         } catch (Exception e) {
-            System.err.println("Error guardando corte en SQLite: " + e.getMessage());
-            try { if (con != null) con.rollback(); } catch (SQLException ex) { }
+            System.err.println("Error guardando corte parcial en DAO: " + e.getMessage());
             return false;
-        } finally {
-            try { if (con != null) { con.setAutoCommit(true); con.close(); } } catch (SQLException ex) { }
         }
+        // 🧼 ELIMINADO: Ya no hay bloque finally con con.close() aquí, asegurando que la transacción siga viva
     }
 
     private void registrarItem(PreparedStatement ps, int emp, int prod, double cant, double total, String obs) throws SQLException {
@@ -97,15 +88,36 @@ public class VentasSQLiteDAO implements IVentasDAO {
     }
     
     @Override
+    public double obtenerTotalRepartoHoy(Connection con) {
+        double total = 0.0;
+        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+                 "WHERE date(Fecha) = date('now', 'localtime') " +
+                 "AND Id_producto IN (1, 2) " + 
+                 "AND Id_empleado != 2";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getDouble(1);
+            }
+        } catch (Exception e) {
+            System.err.println("Error obteniendo ventas reparto en transacción: " + e.getMessage());
+        }
+        return total;
+    }
+    
+    @Override
     public double obtenerTotalRepartoHoy() {
         CSQLiteConnection conMngr = new CSQLiteConnection();
         double total = 0.0;
-        // En SQLite, usamos date(Fecha) para sacar el día de un Timestamp
-        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias WHERE date(Fecha) = date('now', 'localtime') AND Id_producto = 1";
+        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+                 "WHERE date(Fecha) = date('now', 'localtime') " +
+                 "AND Id_producto IN (1, 2) " + 
+                 "AND Id_empleado != 2";
         
-        try (Connection con = conMngr.establecerConexionPortatil();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             java.sql.PreparedStatement ps = con.prepareStatement(sql);
+             java.sql.ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 total = rs.getDouble(1);
             }
@@ -114,7 +126,47 @@ public class VentasSQLiteDAO implements IVentasDAO {
         }
         return total;
     }
-
+    
+    @Override
+    public double obtenerTotalMasaHoy(Connection con) {
+        double total = 0.0;
+        // Suma el producto 3 (Masa) vendido por los repartidores hoy
+        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+                     "WHERE date(Fecha) = date('now', 'localtime') " +
+                     "AND Id_producto = 3 " + 
+                     "AND Id_empleado != 2"; 
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) total = rs.getDouble(1);
+        } catch (Exception e) { System.err.println("Error: " + e.getMessage()); }
+        return total;
+    }
+    
+    @Override
+    public double obtenerTotalMasaHoy() {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        double total = 0.0;
+        
+        // Suma el producto 3 (Masa) vendido por los repartidores hoy
+        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+                     "WHERE date(Fecha) = date('now', 'localtime') " +
+                     "AND Id_producto = 3 " + 
+                     "AND Id_empleado != 2"; 
+                     
+        // 🛠️ CORREGIDO: Abrimos la conexión propia dentro del try
+        try (Connection con = conMngr.establecerConexionPortatil();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+             
+            if (rs.next()) {
+                total = rs.getDouble(1);
+            }
+        } catch (Exception e) { 
+            System.err.println("Error obteniendo total masa de la BD: " + e.getMessage()); 
+        }
+        return total;
+    }
+    
     @Override
     public List<ProductoItem> obtenerProductosParaVenta() {
         List<com.ometeotl.tlaxcalli.LOGICA.ProductoItem> lista = new ArrayList<>();
@@ -254,5 +306,41 @@ public class VentasSQLiteDAO implements IVentasDAO {
             }
         } catch (Exception e) { System.err.println("Error cargando tabla gastos hoy: " + e.getMessage()); }
         return lista;
+    }
+    
+    @Override
+    public boolean actualizarKilosMostrador(Connection con, int idMostrador, double cantidad) {
+        double pMostrador = obtenerPrecioProducto(2);
+        if (pMostrador == 0) pMostrador = 22.0;
+        double totalDinero = cantidad * pMostrador;
+
+        // Intentamos actualizar la tortilla del mostrador si ya existía el registro hoy
+        String sqlUpdate = "UPDATE Ventas_Diarias SET Cantidad = ?, Total_Dinero = ? " +
+                           "WHERE Id_empleado = ? AND Id_producto = 2 AND date(Fecha) = date('now', 'localtime')";
+        
+        try (PreparedStatement ps = con.prepareStatement(sqlUpdate)) {
+            ps.setDouble(1, cantidad);
+            ps.setDouble(2, totalDinero);
+            ps.setInt(3, idMostrador);
+            
+            int filasModificadas = ps.executeUpdate();
+            
+            // Si el dueño no ha abierto la ventana del mostrador hoy, no habrá filas que actualizar.
+            // En ese caso, le creamos su registro base autocalculado de una vez:
+            if (filasModificadas == 0) {
+                String sqlInsert = "INSERT INTO Ventas_Diarias (Id_empleado, Id_producto, Fecha, Cantidad, Total_Dinero, Observaciones) " +
+                                   "VALUES (?, 2, datetime('now', 'localtime'), ?, ?, 'Mostrador Autocalculado')";
+                try (PreparedStatement psIns = con.prepareStatement(sqlInsert)) {
+                    psIns.setInt(1, idMostrador);
+                    psIns.setDouble(2, cantidad);
+                    psIns.setDouble(3, totalDinero);
+                    psIns.executeUpdate();
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error en cascada Mostrador SQLite: " + e.getMessage());
+            return false;
+        }
     }
 }
