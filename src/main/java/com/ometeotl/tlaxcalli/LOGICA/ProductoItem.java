@@ -1,10 +1,10 @@
 package com.ometeotl.tlaxcalli.LOGICA;
 
 public class ProductoItem {
-    private int id;
-    private String nombre;
-    private double precio;
-    private boolean esComodin;
+    private final int id;
+    private final String nombre;
+    private final double precio;
+    private final boolean esComodin;
 
     public ProductoItem(int id, String nombre, double precio, boolean esComodin) {
         this.id = id;

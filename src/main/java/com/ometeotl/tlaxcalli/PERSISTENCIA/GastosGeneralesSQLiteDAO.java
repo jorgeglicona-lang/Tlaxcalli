@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 
 public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
-
+    private final CSQLiteConnection conMngr = new CSQLiteConnection();
+    
     @Override
     public DefaultTableModel obtenerGastosSemana() {
         DefaultTableModel modelo = new DefaultTableModel();
@@ -17,8 +18,7 @@ public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
         modelo.addColumn("Monto ($)");
         modelo.addColumn("Fecha");
         
-        CSQLiteConnection conMngr = new CSQLiteConnection();
-        // SQLite: Comparamos que el número de semana y año de la fecha sean iguales al número de semana y año de HOY.
+        //Comparamos que el número de semana y año de la fecha sean iguales al número de semana y año de HOY.
         String sql = "SELECT Id_gasto_adm, Descripcion, Monto, Fecha " +
                      "FROM Gastos_Administrativos " +
                      "WHERE strftime('%W', Fecha) = strftime('%W', 'now', 'localtime') " +
@@ -34,7 +34,7 @@ public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
                     rs.getInt("Id_gasto_adm"), 
                     rs.getString("Descripcion"), 
                     rs.getDouble("Monto"), 
-                    rs.getString("Fecha") // En SQLite la fecha es String YYYY-MM-DD
+                    rs.getString("Fecha")
                 });
             }
         } catch (SQLException e) {
@@ -51,7 +51,6 @@ public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
         modelo.addColumn("Monto ($)"); 
         modelo.addColumn("Fecha");
         
-        CSQLiteConnection conMngr = new CSQLiteConnection();
         // Usamos date() para asegurarnos de que compare correctamente los strings YYYY-MM-DD
         String sql = "SELECT Id_gasto_adm, Descripcion, Monto, Fecha " +
                      "FROM Gastos_Administrativos " +
@@ -79,7 +78,6 @@ public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
 
     @Override
     public boolean registrarGasto(String descripcion, double monto, String fecha) {
-        CSQLiteConnection conMngr = new CSQLiteConnection();
         String sql = "INSERT INTO Gastos_Administrativos (Descripcion, Monto, Fecha) VALUES (?, ?, ?)";
         
         try (Connection con = conMngr.establecerConexionPortatil();
@@ -96,7 +94,6 @@ public class GastosGeneralesSQLiteDAO implements IGastosGeneralesDAO {
 
     @Override
     public boolean eliminarGasto(int idGasto) {
-        CSQLiteConnection conMngr = new CSQLiteConnection();
         String sql = "DELETE FROM Gastos_Administrativos WHERE Id_gasto_adm = ?";
         
         try (Connection con = conMngr.establecerConexionPortatil();

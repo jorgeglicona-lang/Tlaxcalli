@@ -5,7 +5,7 @@ import javax.swing.ImageIcon;
 
 public class Molino extends javax.swing.JFrame {
 
-    private C_Molino controlador;
+    private final C_Molino controlador;
 
     public Molino() {
         initComponents();

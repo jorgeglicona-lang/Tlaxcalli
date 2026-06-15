@@ -12,12 +12,12 @@ import com.github.lgooddatepicker.components.DatePicker;
 
 public class C_Reportes {
     
-    private IReportesDAO dao = DAOFactory.getReportesDAO();
+    private final IReportesDAO dao = DAOFactory.getReportesDAO();
     
     // Lógica para estructurar el ComboBox
     public void cargarEmpleados(JComboBox<String> combo) {
         combo.removeAllItems();
-        combo.addItem("Todos"); // Añadimos la opción general primero
+        combo.addItem("Todos");
         
         List<String> empleados = dao.obtenerNombresEmpleadosFiltro();
         for (String emp : empleados) {
@@ -36,7 +36,6 @@ public class C_Reportes {
         DefaultTableModel modVentas = (DefaultTableModel) tablaVentas.getModel();
         DefaultTableModel modGastos = (DefaultTableModel) tablaGastos.getModel();
         
-        // Si las tablas no tienen columnas, se las creamos para que puedan mostrar la info.
         if (modVentas.getColumnCount() == 0) {
             modVentas.addColumn("Empleado"); 
             modVentas.addColumn("Producto"); 
@@ -48,8 +47,6 @@ public class C_Reportes {
             modGastos.addColumn("Descripción"); 
             modGastos.addColumn("Monto ($)");
         }
-        // --------------------------------------------
-        
         // Limpiamos los datos viejos
         modVentas.setRowCount(0);
         modGastos.setRowCount(0);

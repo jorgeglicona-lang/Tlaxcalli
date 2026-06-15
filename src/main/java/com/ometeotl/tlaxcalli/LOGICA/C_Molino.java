@@ -80,7 +80,7 @@ public class C_Molino {
                 if (confirmacion != YES_OPTION) {
                     return;
                 }
-                if (dao.actualizarReporteDiario(botesNew, harinaNew, despNew, 
+                if (!dao.actualizarReporteDiario(botesNew, harinaNew, despNew, 
                         masaNatural, masaTotal, 0.0, masaParaTortilla, tortillaElaborada)) {
                     showMessageDialog(ventana, "❌ Error al actualizar.");
                     return;

@@ -40,14 +40,29 @@ public class MolinoSQLiteDAO implements IMolinoDAO {
     }
 
     @Override
+    public double obtenerTotalTortillaHoy(Connection con) {
+        double total = 0.0;
+        String sql = "SELECT SUM(Tortilla_Elaborada_Kg) FROM Produccion_Diaria WHERE Fecha = date('now', 'localtime')";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getDouble(1);
+            }
+        } catch (Exception e) {
+            System.err.println("Error obteniendo total tortilla en transacción: " + e.getMessage());
+        }
+        return total;
+    }
+    @Override
     public double obtenerTotalTortillaHoy() {
         CSQLiteConnection conMngr = new CSQLiteConnection();
         double total = 0.0;
         String sql = "SELECT SUM(Tortilla_Elaborada_Kg) FROM Produccion_Diaria WHERE Fecha = date('now', 'localtime')";
         
-        try (Connection con = conMngr.establecerConexionPortatil();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (java.sql.Connection con = conMngr.establecerConexionPortatil();
+             java.sql.PreparedStatement ps = con.prepareStatement(sql);
+             java.sql.ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 total = rs.getDouble(1);
             }

@@ -1,11 +1,14 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
-import java.io.File;
+import static java.io.File.separator;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.SQLException;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class CSQLiteConnection {
     
@@ -14,23 +17,34 @@ public class CSQLiteConnection {
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
-            // 1. EL GPS: Obligamos a Java a decirnos la ruta exacta donde estamos parados
+            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME;
+            con = DriverManager.getConnection(url);
+            try (Statement pragma = con.createStatement()) {
+                pragma.execute("PRAGMA foreign_keys = ON;");
+            }
+        } catch (SQLException e) {
+            showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
+                "Error de Sistema", ERROR_MESSAGE);
+        }
+        return con;
+    }
+    
+    public Connection CrearBDPortatil() {
+        Connection con = null;
+        try {
+            // 1. Obligamos a Java a decirnos la ruta exacta donde estamos parados
             String rutaBase = System.getProperty("user.dir");
-            String rutaCompletaDb = rutaBase + java.io.File.separator + DB_NAME;
+            String rutaCompletaDb = rutaBase + separator + DB_NAME;
             
             // 2. Usamos la ruta absoluta y exacta para evitar que Windows esconda el archivo
             String url = "jdbc:sqlite:" + rutaCompletaDb;
-            File archivoDb = new File(rutaCompletaDb);
             
-            boolean esNueva = !archivoDb.exists();
-            
-            // ⏰ EL DESPERTADOR: Obligamos a Java a cargar el traductor de SQLite en memoria
+            // 3. Obligamos a Java a cargar el traductor de SQLite en memoria
             try {
                 Class.forName("org.sqlite.JDBC");
             } catch (ClassNotFoundException ex) {
-                javax.swing.JOptionPane.showMessageDialog(null, 
-                    "❌ ¡Falta la librería sqlite-jdbc en el proyecto!\nMaven no empacó el driver.", 
-                    "Error de Librería", javax.swing.JOptionPane.ERROR_MESSAGE);
+                showMessageDialog(null, "❌ ¡Falta la librería sqlite-jdbc en el proyecto!\n"
+                        + "Maven no empacó el driver.", "Error de Librería", ERROR_MESSAGE);
                 return null;
             }
             
@@ -39,28 +53,24 @@ public class CSQLiteConnection {
                 pragma.execute("PRAGMA foreign_keys = ON;");
             }
             
-            if (esNueva) {
-                System.out.println("Creando nueva estructura...");
-                inicializarEstructuraSQLite(con);
-                
-                // EL MEGÁFONO DE ÉXITO: Nos avisa exactamente dónde dejó el archivo
-                javax.swing.JOptionPane.showMessageDialog(null, 
-                    "✅ Base de datos inicializada correctamente en:\n" + rutaCompletaDb, 
-                    "Ometeotl Portátil", 
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            }
+            
+            System.out.println("Creando nueva estructura...");
+            inicializarEstructuraSQLite(con);
+
+            // Nos avisa exactamente dónde dejó el archivo
+            showMessageDialog(null, "✅ Base de datos inicializada correctamente en:\n" + rutaCompletaDb, 
+                "Ometeotl Portátil",INFORMATION_MESSAGE);
+
             
         } catch (SQLException e) {
-            // EL MEGÁFONO DE ERROR: Si algo falla, lo vemos en pantalla sí o sí
-            javax.swing.JOptionPane.showMessageDialog(null, 
-                "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
-                "Error de Sistema", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
+            // Si algo falla, lo vemos en pantalla sí o sí
+            showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
+                "Error de Sistema", ERROR_MESSAGE);
         }
         return con;
     }
 
-    private String generarSHA512(String password) {
+    public static String generarSHA512(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             byte[] hash = md.digest(password.getBytes("UTF-8"));
@@ -76,17 +86,20 @@ public class CSQLiteConnection {
         }
     }
 
-    private void inicializarEstructuraSQLite(Connection con) {
+    public void inicializarEstructuraSQLite(Connection con) {
         try (Statement stmt = con.createStatement()) {
-            
+            int[] idTabla = new int[8];
+            String[] Tabla = {"Cat_Gastos", "Empleados", "Gastos","Gastos_Administrativos","Logeo",
+                              "Produccion_Diaria","Productos","Ventas_Diarias"};
+
             // 1. Cat_Gastos
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cat_Gastos ("
+            idTabla[0]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Cat_Gastos ("
                     + "Id_tipo INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Nombre TEXT NOT NULL,"
                     + "Requiere_Descripcion INTEGER DEFAULT 0)");
             
             // 2. Empleados
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Empleados ("
+            idTabla[1]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Empleados ("
                     + "Id_empleado INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Nombre TEXT,"
                     + "ApellidoP TEXT,"
@@ -95,7 +108,7 @@ public class CSQLiteConnection {
                     + "Estatus TEXT DEFAULT 'Activo')");
 
             // 3. Gastos
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Gastos ("
+            idTabla[2]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Gastos ("
                     + "Id_gasto INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Id_empleado INTEGER NOT NULL,"
                     + "Descripcion TEXT NOT NULL,"
@@ -104,14 +117,14 @@ public class CSQLiteConnection {
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
 
             // 4. Gastos_Administrativos
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Gastos_Administrativos ("
+            idTabla[3]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Gastos_Administrativos ("
                     + "Id_gasto_adm INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Descripcion TEXT NOT NULL,"
                     + "Monto REAL NOT NULL,"
                     + "Fecha TEXT NOT NULL DEFAULT (date('now')))");
 
             // 5. Logeo (Note los UNIQUE constraints traducidos de su SQL)
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Logeo ("
+            idTabla[4]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Logeo ("
                     + "Id_login INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Id_empleado INTEGER NOT NULL UNIQUE,"
                     + "Nombre TEXT NOT NULL UNIQUE,"
@@ -119,7 +132,7 @@ public class CSQLiteConnection {
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
 
             // 6. Produccion_Diaria
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Produccion_Diaria ("
+            idTabla[5]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Produccion_Diaria ("
                     + "Id_produccion INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Fecha TEXT DEFAULT (date('now')),"
                     + "Id_empleado INTEGER NOT NULL,"
@@ -133,30 +146,15 @@ public class CSQLiteConnection {
                     + "Tortilla_Elaborada_Kg REAL NOT NULL,"
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
 
-            // 7. Productividad (Sin PK en el script original)
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productividad ("
-                    + "Fecha TEXT NOT NULL,"
-                    + "Botes REAL NOT NULL,"
-                    + "Harina REAL NOT NULL,"
-                    + "Desperdicio REAL NOT NULL,"
-                    + "TotalTortilla REAL NOT NULL)");
-
             // 8. Productos
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productos ("
+            idTabla[6]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Productos ("
                     + "Id_producto INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Nom_producto TEXT,"
                     + "Precio REAL,"
                     + "Es_Comodin INTEGER DEFAULT 0)");
 
-            // 9. Usuarios
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Usuarios ("
-                    + "Id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "Id_empleado INTEGER,"
-                    + "Contrasena TEXT NOT NULL,"
-                    + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado))");
-
             // 10. Ventas_Diarias
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Ventas_Diarias ("
+            idTabla[7]=stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Ventas_Diarias ("
                     + "Id_venta INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "Id_empleado INTEGER NOT NULL,"
                     + "Id_producto INTEGER NOT NULL,"
@@ -166,10 +164,15 @@ public class CSQLiteConnection {
                     + "Observaciones TEXT,"
                     + "FOREIGN KEY(Id_empleado) REFERENCES Empleados(Id_empleado),"
                     + "FOREIGN KEY(Id_producto) REFERENCES Productos(Id_producto))");
+            
+            for(int i=0;i<8;i++){
+                if(idTabla[i]==0) System.out.println("¡Tabla de "+Tabla[i]+" creada de forma exitosa!");
+            }
 
             // ==========================================
             // INYECCIÓN DE USUARIOS SEMILLA REQUERIDOS
             // ==========================================
+            int stmtchk;
             String contraseniaCifrada = generarSHA512("Root");
             
             // A. Insertar al Super Usuario Master en Empleados (Id_empleado = 1)
@@ -177,28 +180,38 @@ public class CSQLiteConnection {
                     + "VALUES ('Super', 'Usuario', 'Master', 'Administrador')"); // Estatus toma el DEFAULT 'Activo'
             
             // B. Crear su login amarrado al Id_empleado 1 (Admin - Admin123)
-            stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
+            stmtchk=stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
                     + "VALUES (1, 'Root', '" + contraseniaCifrada + "')");
             
-            String contraseniaCifrada1 = generarSHA512("Admin123");
+            if(stmtchk==1) System.out.println("¡Super usuario creado de forma exitosa!\n");
+            
+            contraseniaCifrada = generarSHA512("Admin123");
             
             // A. Insertar al Super Usuario Master en Empleados (Id_empleado = 1)
             stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
                     + "VALUES ('Aministrador', 'Del', 'Negocio', 'Administrador')");
             
-            stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
-                    + "VALUES (2, 'Admin', '" + contraseniaCifrada1 + "')");
+            stmtchk=stmt.executeUpdate("INSERT INTO Logeo (Id_empleado, Nombre, Contrasena) "
+                    + "VALUES (2, 'Admin', '" + contraseniaCifrada + "')");
+            
+            if(stmtchk==1) System.out.println("¡Usuario Admin creado de forma exitosa!\n");
             
             // C. Insertar al trabajador "Mostrador" vacío en apellidos con puesto Mostrador (Id_empleado = 2)
-            stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
+            stmtchk=stmt.executeUpdate("INSERT INTO Empleados (Nombre, ApellidoP, ApellidoM, Puesto) "
                     + "VALUES ('Mostrador', '', '', 'Mostrador')");
             
-            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (1, 'Tortilla de Reparto', 19.0, 0)");
-            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (2, 'Tortilla Mostrador', 22.0, 0)");
-            stmt.execute("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (3, 'Masa', 20.0, 0)");
-
+            if(stmtchk==1) System.out.println("¡Elememto Mostrador creado de forma exitosa!\n");
             
-            System.out.println("¡Base de datos portátil creada de forma idéntica a SQL Server!");
+            stmtchk=stmt.executeUpdate("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (1, 'Tortilla de Reparto', 19.0, 0)");
+            if(stmtchk==1) System.out.println("¡Producto 1 creado de forma exitosa!\n");
+            
+            stmtchk=stmt.executeUpdate("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (2, 'Tortilla Mostrador', 22.0, 0)");
+            if(stmtchk==1) System.out.println("¡Producto 2 creado de forma exitosa!\n");
+            
+            stmtchk=stmt.executeUpdate("INSERT INTO Productos (Id_producto, Nom_producto, Precio, Es_Comodin) VALUES (3, 'Masa', 20.0, 0)");
+            if(stmtchk==1) System.out.println("¡Producto 3 creado de forma exitosa!\n");
+            
+            System.out.println("¡Base de datos portátil creada de forma exitosa!");
             
         } catch (SQLException e) {
             System.err.println("Error al construir la estructura inicial en SQLite: " + e.getMessage());

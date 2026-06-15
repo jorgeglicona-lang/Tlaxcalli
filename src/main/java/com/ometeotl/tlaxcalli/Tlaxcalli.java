@@ -1,14 +1,18 @@
 package com.ometeotl.tlaxcalli;
 
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.GenV;
 import com.ometeotl.tlaxcalli.IGU.Login;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.CSQLiteConnection;
 import java.io.File;
+import static java.io.File.separator;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.showInputDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class Tlaxcalli {
     
@@ -33,11 +37,10 @@ public class Tlaxcalli {
             if (nombreNegocio.isEmpty()) {
                 
                 // Lanza la pantalla/modal de bienvenida solicitando el registro único
-                nombreNegocio = JOptionPane.showInputDialog(parent, 
-                        "¡Bienvenido a Tlaxcalli!\n\nDetectamos que es la primera vez que inicia el sistema.\n" +
-                        "Por favor, ingrese el nombre oficial de su negocio:", 
-                        "Asistente de Configuración Inicial", 
-                        JOptionPane.INFORMATION_MESSAGE);
+                nombreNegocio = showInputDialog(parent, 
+                                "¡Bienvenido a Tlaxcalli!\n\nDetectamos que es la primera vez"
+                                + "que inicia el sistema.\nPor favor, ingrese el nombre oficial "
+                                + "de su negocio:", "Asistente de Configuración Inicial", INFORMATION_MESSAGE);
 
                 // Validación de cortesía por si el usuario cancela o lo deja en blanco
                 if (nombreNegocio == null || nombreNegocio.trim().isEmpty()) {
@@ -52,7 +55,7 @@ public class Tlaxcalli {
                     propiedades.store(fos, "Configuracion de Identidad de Tlaxcalli");
                 }
                 
-                JOptionPane.showMessageDialog(parent, "✅ Nombre del negocio registrado y configurado con éxito.");
+                showMessageDialog(parent, "✅ Nombre del negocio registrado y configurado con éxito.");
             }
 
             // 4. Mandamos el nombre recuperado (o el recién creado) directamente al JLabel de su sala
@@ -65,12 +68,13 @@ public class Tlaxcalli {
     }
 
     public static void main(String[] args) {
-        // Al llamar a la clase separada, aseguramos la BD portátil sin alterar SQL Server
-        CSQLiteConnection conexionPortatil = new CSQLiteConnection();
-        conexionPortatil.establecerConexionPortatil();
+        File archivoFisico = new File(System.getProperty("user.dir") + separator + "tlaxcalli.db");
+        boolean esInstalacionNueva = !archivoFisico.exists();
+        if (esInstalacionNueva) {
+            CSQLiteConnection cP = new CSQLiteConnection();
+            cP.CrearBDPortatil();
+        }
         Login log = new Login();
-        log.setVisible(true);
-        log.setLocationRelativeTo(null);
-        
+        GenV(log);
     }
 }
