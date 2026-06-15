@@ -23,6 +23,7 @@ public class C_NR {
     private double precioReparto = 0.0;
     private double precioMostrador = 0.0;
     private double precioMasa = 0.0;
+    private double tortillaBaseMostrador = 0.0;
     private final IVentasDAO dao = DAOFactory.getVentasDAO();
     
     // <-- Instanciamos el servicio orquestador
@@ -145,18 +146,16 @@ public class C_NR {
             Gas.setSelected(false);
             sMasaN.setSelected(true);
         }
-        
+        DatoEx = new Color(190, 250, 180);
         if (corteExistente != null) {
             // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
-            DatoEx = new Color(190, 250, 180);
-            tReparto.setBackground(DatoEx);
-            tVenta.setBackground(DatoEx);
-            
             // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
             if (!seleccionado.equalsIgnoreCase("Mostrador")) {
                 ActivarCampos(tVenta,tReparto);
             } else {
                 LimpiarCampos(tVenta,tReparto);
+                tReparto.setBackground(DatoEx);
+                tVenta.setBackground(DatoEx);
             }
             
             // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
@@ -201,52 +200,47 @@ public class C_NR {
         sMasaN.setSelected(true);
         
         // ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
-        if (seleccionado.equalsIgnoreCase("Mostrador")) {
-            IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
-            double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
-            
-            if (produccionTotal <= 0) {
-                JOptionPane.showMessageDialog(parent, "⚠️ ACCIÓN BLOQUEADA:\nNo se puede calcular el Mostrador "
-                        + "porque el registro de Molino está vacío.\nPor favor, registre primero la producción "
-                        + "del día.");
-                boxRepartidor.setSelectedIndex(0); 
+        if (!seleccionado.equalsIgnoreCase("Mostrador")) {
+            ActivarCampos(tReparto,tVenta);
+            return;
+        }
+        
+        IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
+        double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
+
+        if (produccionTotal <= 0) {
+            showMessageDialog(parent, "⚠️ ACCIÓN BLOQUEADA:\nNo se puede calcular el Mostrador "
+                    + "porque el registro de Molino está vacío.\nPor favor, registre primero la producción "
+                    + "del día.");
+            boxRepartidor.setSelectedIndex(0); 
+            return;
+        }
+
+        tReparto.setBackground(DatoEx);
+        tVenta.setBackground(DatoEx);
+
+        try {
+            double vendidoReparto = dao.obtenerTotalRepartoHoy();
+            double masaReparto = dao.obtenerTotalMasaHoy();
+            double tortillaPerdidaPorMasa = masaReparto * (16.0 / 18.0);
+            double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
+            tortillaBaseMostrador = sobranteMostrador; 
+            tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
+            if (sobranteMostrador < 0) {
+                tVenta.setForeground(RED);
+                showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto y masa (" 
+                         + (vendidoReparto + tortillaPerdidaPorMasa) + " kg equiv.) de lo que se produjo (" + produccionTotal + " kg).");
+                boxRepartidor.setSelectedIndex(0);
                 return;
             }
+
+            tReparto.setText("0.0");
+            tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
             
-            DatoEx = new Color(190, 250, 180);
-            tReparto.setBackground(DatoEx);
-            tVenta.setBackground(DatoEx);
-            
-            try {
-                
-                double vendidoReparto = dao.obtenerTotalRepartoHoy();
-                
-                // 2. Traemos la masa cruda vendida por los repartidores
-                double masaReparto = dao.obtenerTotalMasaHoy();
-                
-                // 3. Convertimos esa masa cruda a su equivalente de tortilla perdida (Factor 16/18)
-                double tortillaPerdidaPorMasa = masaReparto * (16.0 / 18.0);
-                
-                // 4. LA NUEVA FÓRMULA MAESTRA DE BALANCE
-                double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
-                
-                if (sobranteMostrador < 0) {
-                    tVenta.setForeground(RED);
-                    showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto y masa (" 
-                             + (vendidoReparto + tortillaPerdidaPorMasa) + " kg equiv.) de lo que se produjo (" + produccionTotal + " kg).");
-                    boxRepartidor.setSelectedIndex(0);
-                    return;
-                }
-                
-                tReparto.setText("0.0");
-                tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
-            } catch (Exception e){
-                showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage());
-            }
-            
-        } else {
-            ActivarCampos(tReparto,tVenta);
+        } catch (Exception e){
+            showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage());
         }
+
         calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
     }
 
@@ -332,6 +326,23 @@ public class C_NR {
         if (cGastos.isSelected()) {
             cGastos.setSelected(false);
             cGastos.getActionListeners()[0].actionPerformed(null);
+        }
+    }
+    
+    public void recalcularMostradorPorMasaFiltro(JTextField tVenta, JTextField tMasa) {
+        try {
+            double masaTecleada = 0.0;
+            
+            if (!tMasa.getText().trim().isEmpty()) masaTecleada = Double.parseDouble(tMasa.getText());
+            
+            double MF=tortillaBaseMostrador - masaTecleada;
+            
+            if (MF < 0) MF = 0;
+
+            tVenta.setText(String.format("%.2f", MF).replace(",", "."));
+
+        } catch (NumberFormatException e) {
+            // Evitamos que truene si el usuario borra todo o deja el campo vacío
         }
     }
 }
