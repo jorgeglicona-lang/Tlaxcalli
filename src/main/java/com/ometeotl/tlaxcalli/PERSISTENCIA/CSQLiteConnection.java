@@ -17,7 +17,8 @@ public class CSQLiteConnection {
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
-            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME;
+            Class.forName("org.sqlite.JDBC");
+            String url = "jdbc:sqlite:"+ DB_NAME;
             con = DriverManager.getConnection(url);
             try (Statement pragma = con.createStatement()) {
                 pragma.execute("PRAGMA foreign_keys = ON;");
@@ -25,6 +26,9 @@ public class CSQLiteConnection {
         } catch (SQLException e) {
             showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
                 "Error de Sistema", ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex){
+            System.getLogger(CSQLiteConnection.class.getName()).log(System.Logger.Level.ERROR,
+                                                                    (String) null, ex);
         }
         return con;
     }
