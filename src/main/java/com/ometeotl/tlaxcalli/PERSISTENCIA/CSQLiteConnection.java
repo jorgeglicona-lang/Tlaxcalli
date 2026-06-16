@@ -18,7 +18,7 @@ public class CSQLiteConnection {
         Connection con = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            String url = "jdbc:sqlite:"+ DB_NAME;
+            String url = "jdbc:sqlite:"+ System.getProperty("user.dir") + separator + DB_NAME;
             con = DriverManager.getConnection(url);
             try (Statement pragma = con.createStatement()) {
                 pragma.execute("PRAGMA foreign_keys = ON;");
