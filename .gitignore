@@ -5,6 +5,7 @@ src/test/
 *.jar
 *.db
 *.log
+*.propeties
 
 # Excluir configuraciones personales de NetBeans
 nbproject/private/

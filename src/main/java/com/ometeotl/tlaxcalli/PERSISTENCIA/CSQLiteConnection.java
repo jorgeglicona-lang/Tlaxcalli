@@ -1,6 +1,7 @@
 package com.ometeotl.tlaxcalli.PERSISTENCIA;
 
 import static java.io.File.separator;
+import static java.lang.System.Logger.Level.ERROR;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +18,7 @@ public class CSQLiteConnection {
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
+            Class.forName("org.sqlite.JDBC");
             String url = "jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME;
             con = DriverManager.getConnection(url);
             try (Statement pragma = con.createStatement()) {
@@ -25,6 +27,8 @@ public class CSQLiteConnection {
         } catch (SQLException e) {
             showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
                 "Error de Sistema", ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            System.getLogger(CSQLiteConnection.class.getName()).log(ERROR, (String) null, ex);
         }
         return con;
     }
