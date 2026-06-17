@@ -10,10 +10,7 @@ public class Molino extends javax.swing.JFrame {
     public Molino() {
         initComponents();
         controlador = new C_Molino();
-        setIconImage(new ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
         this.setLocationRelativeTo(null);
-        
-        // El controlador llena la pantalla si ya hay datos hoy
         controlador.inicializarFormulario(t_botes, t_harina, t_desperdicio);
     }
 
@@ -35,6 +32,7 @@ public class Molino extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Molino");
         setAlwaysOnTop(true);
+        setIconImage(new ImageIcon(getClass().getResource("/imagen/transparencia.png")).getImage());
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 

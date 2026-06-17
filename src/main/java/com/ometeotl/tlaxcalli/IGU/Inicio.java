@@ -55,6 +55,8 @@ public class Inicio extends javax.swing.JFrame {
         b_reportes = new javax.swing.JLabel();
         jPBoton3 = new javax.swing.JPanel();
         b_empleados = new javax.swing.JLabel();
+        jPBoton4 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jBext = new javax.swing.JPanel();
         ext = new javax.swing.JLabel();
@@ -181,6 +183,38 @@ public class Inicio extends javax.swing.JFrame {
             .addComponent(b_empleados, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
 
+        jPBoton4.setBackground(new java.awt.Color(240, 178, 70));
+        jPBoton4.setPreferredSize(new java.awt.Dimension(250, 70));
+
+        jLabel1.setBackground(new java.awt.Color(40, 195, 20));
+        jLabel1.setFont(new java.awt.Font("Roboto Bk", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Gastos Generales");
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel1MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel1MouseExited(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPBoton4Layout = new javax.swing.GroupLayout(jPBoton4);
+        jPBoton4.setLayout(jPBoton4Layout);
+        jPBoton4Layout.setHorizontalGroup(
+            jPBoton4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPBoton4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPBoton4Layout.setVerticalGroup(
+            jPBoton4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -194,6 +228,7 @@ public class Inicio extends javax.swing.JFrame {
             .addComponent(jPBoton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPBoton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPBoton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPBoton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -211,7 +246,9 @@ public class Inicio extends javax.swing.JFrame {
                 .addComponent(jPBoton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPBoton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(234, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPBoton4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(158, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -358,15 +395,40 @@ public class Inicio extends javax.swing.JFrame {
 
     private void b_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarActionPerformed
         controlador.agregarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+        ocultarColumna(tablaProductos,0);
+        ocultarColumna(tablaProductos,3);
+        ocultarColumna(tablaCatGastos,0);
+        ocultarColumna(tablaCatGastos,2);
     }//GEN-LAST:event_b_agregarActionPerformed
 
     private void b_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_eliminarActionPerformed
         controlador.eliminarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+        ocultarColumna(tablaProductos,0);
+        ocultarColumna(tablaProductos,3);
+        ocultarColumna(tablaCatGastos,0);
+        ocultarColumna(tablaCatGastos,2);
     }//GEN-LAST:event_b_eliminarActionPerformed
 
     private void b_modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_modificarActionPerformed
         controlador.modificarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
+        ocultarColumna(tablaProductos,0);
+        ocultarColumna(tablaProductos,3);
+        ocultarColumna(tablaCatGastos,0);
+        ocultarColumna(tablaCatGastos,2);
     }//GEN-LAST:event_b_modificarActionPerformed
+
+    private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
+        jPBoton4.setBackground(new Color(35,140,35));
+    }//GEN-LAST:event_jLabel1MouseEntered
+
+    private void jLabel1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseExited
+        jPBoton4.setBackground(new Color(240,178,70));
+    }//GEN-LAST:event_jLabel1MouseExited
+
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+        Gastos_Generales GasG=new Gastos_Generales();
+        HerramientasVisuales.GenV(GasG);
+    }//GEN-LAST:event_jLabel1MouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -380,9 +442,11 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JLabel b_reportes;
     private javax.swing.JLabel ext;
     private javax.swing.JPanel jBext;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPBoton1;
     private javax.swing.JPanel jPBoton2;
     private javax.swing.JPanel jPBoton3;
+    private javax.swing.JPanel jPBoton4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
