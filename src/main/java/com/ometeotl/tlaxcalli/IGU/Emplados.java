@@ -1,7 +1,11 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBotonCerrar;
 import com.ometeotl.tlaxcalli.LOGICA.C_Empleados;
+import java.awt.Color;
+import static java.awt.Color.RED;
+import static java.awt.Color.WHITE;
 
 public class Emplados extends javax.swing.JFrame {
 
@@ -14,7 +18,7 @@ public class Emplados extends javax.swing.JFrame {
         controlador.aplicarPermisos(this, b_agregar, b_eliminar, b_modificar);
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
-        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
+        configurarBotonCerrar(this, jBext, ext, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
     }
     
     @SuppressWarnings("unchecked")

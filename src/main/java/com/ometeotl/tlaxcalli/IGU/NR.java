@@ -11,6 +11,7 @@ import com.ometeotl.tlaxcalli.LOGICA.GastoItem;
 import com.ometeotl.tlaxcalli.LOGICA.ProductoItem;
 import java.awt.Color;
 import static java.awt.Color.BLACK;
+import static java.awt.Color.RED;
 import static java.awt.Color.WHITE;
 import javax.swing.ButtonGroup;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -40,8 +41,7 @@ public class NR extends javax.swing.JFrame {
         vincularControl(s_PAdicionales, cb_producto, tabla_detalles, b_EliminarProd);
         vincularControl(c_Gastos, cb_gastos, tabla_gastos, b_EliminarGasto);
         configurarBarraArrastre(this, jPanel4);
-        configurarBotonCerrar(this, jBext, ext, false);
-        
+        configurarBotonCerrar(this, jBext, ext, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
     }
     
     private void configurarSeccionMasa() {
@@ -66,6 +66,13 @@ public class NR extends javax.swing.JFrame {
         });
     }
     
+    // Dentro de NR.java
+    /*public static void main(String[] args) {
+        // Esto lanza la ventana directamente, sin pasar por el login ni el main del sistema
+        java.awt.EventQueue.invokeLater(() -> {
+            new NR().setVisible(true);
+        });
+    }*/
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -412,6 +419,7 @@ public class NR extends javax.swing.JFrame {
     private void b_guardarVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_guardarVActionPerformed
         controlador.guardarCorte(this, BoxRepartidor, t_reparto, t_venta, t_masa, 
                                  tabla_detalles, tabla_gastos, s_masaNo, s_PAdicionales, c_Gastos);
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_b_guardarVActionPerformed
 
     private void b_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_salirActionPerformed

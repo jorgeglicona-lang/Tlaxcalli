@@ -146,18 +146,40 @@ public class C_NR {
             Gas.setSelected(false);
             sMasaN.setSelected(true);
         }
-        DatoEx = new Color(190, 250, 180);
+        
         if (corteExistente != null) {
-            // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
+            DatoEx = new Color(190, 250, 180);
+            procesarCorteExistente(seleccionado,tVenta,tReparto,corteExistente,
+                    tMasa,idEmpleado,modeloProd,modeloGastos,sMasaS,Pro,Gas,parent,
+                    cEntregar,tProd,tGastos);
+            return;
+        }
+        
+        LimpiarCampos(tReparto,tVenta,tMasa,tProd,tGastos);
+        Pro.setSelected(false);
+        Gas.setSelected(false);
+        sMasaN.setSelected(true);
+        
+        // ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
+        procesarCorte(seleccionado,tVenta,tReparto,parent,boxRepartidor);
+
+        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
+    }
+    
+    private void procesarCorteExistente(String seleccionado, JTextField tVenta, JTextField tReparto,
+                                        double[] corteExistente, JTextField tMasa, int idEmpleado,
+                                        DefaultTableModel modeloProd, DefaultTableModel modeloGastos,
+                                        JRadioButton sMasaS, JCheckBox Pro, JCheckBox Gas, JFrame parent,
+                                        JLabel cEntregar, JTable tProd, JTable tGastos){
+        // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
             // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
             if (!seleccionado.equalsIgnoreCase("Mostrador")) {
                 ActivarCampos(tVenta,tReparto);
             } else {
                 LimpiarCampos(tVenta,tReparto);
-                tReparto.setBackground(DatoEx);
-                tVenta.setBackground(DatoEx);
             }
-            
+            tReparto.setBackground(DatoEx);
+            tVenta.setBackground(DatoEx);
             // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
             // Si tiene más de 0 kilos, la habilitamos.
             double kiloM=corteExistente[2];
@@ -191,15 +213,10 @@ public class C_NR {
             showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
                             + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
                             + "y gastos en las tablas.","Atencion", INFORMATION_MESSAGE);
-            return;
-        }
-        
-        LimpiarCampos(tReparto,tVenta,tMasa,tProd,tGastos);
-        Pro.setSelected(false);
-        Gas.setSelected(false);
-        sMasaN.setSelected(true);
-        
-        // ESCENARIO B: NO HAY REGISTRO PREVIO (Su lógica normal)
+    }
+    
+    private void procesarCorte(String seleccionado, JTextField tVenta, JTextField tReparto,
+                               JFrame parent, JComboBox<Object> boxRepartidor){
         if (!seleccionado.equalsIgnoreCase("Mostrador")) {
             ActivarCampos(tReparto,tVenta);
             return;
@@ -221,8 +238,7 @@ public class C_NR {
 
         try {
             double vendidoReparto = dao.obtenerTotalRepartoHoy();
-            double masaReparto = dao.obtenerTotalMasaHoy();
-            double tortillaPerdidaPorMasa = masaReparto * (16.0 / 18.0);
+            double tortillaPerdidaPorMasa = dao.obtenerTotalMasaHoy();
             double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
             tortillaBaseMostrador = sobranteMostrador; 
             tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
@@ -240,8 +256,6 @@ public class C_NR {
         } catch (Exception e){
             showMessageDialog(parent, "Error al calcular mostrador: " + e.getMessage());
         }
-
-        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
     }
 
     // 4. GUARDADO FINAL
@@ -315,17 +329,17 @@ public class C_NR {
         showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
         // Limpieza general
         sMasa.setSelected(true);
-        LimpiarCampos(tReparto,tVenta,tMasa,boxRepartidor);
+        LimpiarCampos(tReparto,tVenta,tMasa,boxRepartidor,tProd,tGastos);
         boxRepartidor.setEnabled(true);
 
         if (sPAdicionales.isSelected()) {
-            sPAdicionales.setSelected(false);
             sPAdicionales.getActionListeners()[0].actionPerformed(null);
+            sPAdicionales.setSelected(false);
         }
         
         if (cGastos.isSelected()) {
-            cGastos.setSelected(false);
             cGastos.getActionListeners()[0].actionPerformed(null);
+            cGastos.setSelected(false);
         }
     }
     

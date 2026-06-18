@@ -2,6 +2,7 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBotonCerrar;
 import static com.ometeotl.tlaxcalli.HerramientasVisuales.ocultarColumna;
 import com.ometeotl.tlaxcalli.LOGICA.C_Inicio;
 import com.ometeotl.tlaxcalli.LOGICA.C_Sesion_login;
@@ -9,6 +10,8 @@ import com.ometeotl.tlaxcalli.Tlaxcalli;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.I_InicioDAO;
 import java.awt.Color;
+import static java.awt.Color.RED;
+import static java.awt.Color.WHITE;
 
 public class Inicio extends javax.swing.JFrame {
 
@@ -30,15 +33,21 @@ public class Inicio extends javax.swing.JFrame {
         tablaCatGastos.setModel(inicioDAO.obtenerCatGastosTabla());
         
         // Ocultamos "Es Comodín" en la tabla de Productos (Es la Columna Índice 3)
-        ocultarColumna(tablaProductos,0);
-        ocultarColumna(tablaProductos,3);
-        
-        // Ocultamos "Requiere Descripción" en la tabla de Gastos (Es la Columna Índice 2)
-        ocultarColumna(tablaCatGastos,0);
-        ocultarColumna(tablaCatGastos,2);
+        limpiaT();
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
-        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, true);
+        configurarBotonCerrar(this, jBext, ext, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
+        configurarBotonCerrar(this, jPBoton1, b_registros, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
+        configurarBotonCerrar(this, jPBoton2, b_reportes, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
+        configurarBotonCerrar(this, jPBoton3, b_empleados, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
+        configurarBotonCerrar(this, jPBoton4, jLabel1, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
+    }
+    
+    private void limpiaT(){
+        ocultarColumna(tablaProductos,0);
+        ocultarColumna(tablaProductos,3);
+        ocultarColumna(tablaCatGastos,0);
+        ocultarColumna(tablaCatGastos,2);
     }
     
     @SuppressWarnings("unchecked")
@@ -98,12 +107,6 @@ public class Inicio extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 b_registrosMouseClicked(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                b_registrosMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                b_registrosMouseExited(evt);
-            }
         });
 
         javax.swing.GroupLayout jPBoton1Layout = new javax.swing.GroupLayout(jPBoton1);
@@ -129,12 +132,6 @@ public class Inicio extends javax.swing.JFrame {
         b_reportes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 b_reportesMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                b_reportesMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                b_reportesMouseExited(evt);
             }
         });
 
@@ -162,12 +159,6 @@ public class Inicio extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 b_empleadosMouseClicked(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                b_empleadosMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                b_empleadosMouseExited(evt);
-            }
         });
 
         javax.swing.GroupLayout jPBoton3Layout = new javax.swing.GroupLayout(jPBoton3);
@@ -193,12 +184,6 @@ public class Inicio extends javax.swing.JFrame {
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel1MouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jLabel1MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jLabel1MouseExited(evt);
             }
         });
 
@@ -352,30 +337,6 @@ public class Inicio extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void b_registrosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_registrosMouseEntered
-        jPBoton1.setBackground(new Color(35,140,35));
-    }//GEN-LAST:event_b_registrosMouseEntered
-
-    private void b_registrosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_registrosMouseExited
-        jPBoton1.setBackground(new Color(240,178,70));
-    }//GEN-LAST:event_b_registrosMouseExited
-
-    private void b_reportesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_reportesMouseEntered
-        jPBoton2.setBackground(new Color(35,140,35));
-    }//GEN-LAST:event_b_reportesMouseEntered
-
-    private void b_reportesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_reportesMouseExited
-        jPBoton2.setBackground(new Color(240,178,70));
-    }//GEN-LAST:event_b_reportesMouseExited
-
-    private void b_empleadosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_empleadosMouseEntered
-        jPBoton3.setBackground(new Color(35,140,35));
-    }//GEN-LAST:event_b_empleadosMouseEntered
-
-    private void b_empleadosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_empleadosMouseExited
-        jPBoton3.setBackground(new Color(240,178,70));
-    }//GEN-LAST:event_b_empleadosMouseExited
-
     private void b_registrosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_b_registrosMouseClicked
         NR n=new NR();
         HerramientasVisuales.GenV(n);
@@ -395,35 +356,18 @@ public class Inicio extends javax.swing.JFrame {
 
     private void b_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_agregarActionPerformed
         controlador.agregarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
-        ocultarColumna(tablaProductos,0);
-        ocultarColumna(tablaProductos,3);
-        ocultarColumna(tablaCatGastos,0);
-        ocultarColumna(tablaCatGastos,2);
+        limpiaT();
     }//GEN-LAST:event_b_agregarActionPerformed
 
     private void b_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_eliminarActionPerformed
         controlador.eliminarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
-        ocultarColumna(tablaProductos,0);
-        ocultarColumna(tablaProductos,3);
-        ocultarColumna(tablaCatGastos,0);
-        ocultarColumna(tablaCatGastos,2);
+        limpiaT();
     }//GEN-LAST:event_b_eliminarActionPerformed
 
     private void b_modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_modificarActionPerformed
         controlador.modificarInteligente(this, panelPestanias, tablaProductos, tablaCatGastos);
-        ocultarColumna(tablaProductos,0);
-        ocultarColumna(tablaProductos,3);
-        ocultarColumna(tablaCatGastos,0);
-        ocultarColumna(tablaCatGastos,2);
+        limpiaT();
     }//GEN-LAST:event_b_modificarActionPerformed
-
-    private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
-        jPBoton4.setBackground(new Color(35,140,35));
-    }//GEN-LAST:event_jLabel1MouseEntered
-
-    private void jLabel1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseExited
-        jPBoton4.setBackground(new Color(240,178,70));
-    }//GEN-LAST:event_jLabel1MouseExited
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         Gastos_Generales GasG=new Gastos_Generales();

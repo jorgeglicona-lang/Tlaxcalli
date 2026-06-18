@@ -1,7 +1,11 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBotonCerrar;
 import com.ometeotl.tlaxcalli.LOGICA.C_GastosG;
+import java.awt.Color;
+import static java.awt.Color.RED;
+import static java.awt.Color.WHITE;
 import javax.swing.JOptionPane;
 
 public class Gastos_Generales extends javax.swing.JFrame {
@@ -16,7 +20,7 @@ public class Gastos_Generales extends javax.swing.JFrame {
         datePicker2.setDateToToday();
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
-        HerramientasVisuales.configurarBotonCerrar(this, jBext, ext, false);
+        configurarBotonCerrar(this, jBext, ext, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
     }
 
     @SuppressWarnings("unchecked")
