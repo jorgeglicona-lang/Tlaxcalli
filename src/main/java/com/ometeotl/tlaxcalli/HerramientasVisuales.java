@@ -55,18 +55,13 @@ public class HerramientasVisuales {
                                          Color TCin, Color TCout, Color backin, Color backout,
                                          boolean esPrin, boolean esC) {
     
-        // 1. Aseguramos que el fondo se pueda pintar
         jBext.setOpaque(true);
         jBext.setBackground(backout);
         ext.setForeground(TCout);
 
-        // 2. ¡EL TRUCO ESTÁ AQUÍ! 
-        // Le asignamos el evento ÚNICAMENTE a la etiqueta (ext), 
-        // porque al ser del mismo tamaño que el panel, es la que recibe el cursor físicamente.
         ext.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                System.out.println("¡Ratón detectado en: " + ext.getText() + "!");
                 jBext.setBackground(backin); // Pintamos el panel
                 ext.setForeground(TCin);     // Pintamos la letra
             }
@@ -92,6 +87,7 @@ public class HerramientasVisuales {
             }
         });
     }
+    
     //fabrica de ventanas
     public static void GenV(JFrame ven){
         ven.setLocationRelativeTo(null);
