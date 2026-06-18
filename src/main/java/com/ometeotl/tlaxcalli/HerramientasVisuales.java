@@ -51,29 +51,43 @@ public class HerramientasVisuales {
     }
 
     // 2. EL BOTÓN "X" INTELIGENTE
-    public static void configurarBotonCerrar(JFrame ventana, JPanel jBext, JLabel ext, boolean esPrincipal) {
-        jBext.setBackground(Color.WHITE);
-        ext.setForeground(new Color(204, 204, 204));
-        
-        jBext.addMouseListener(new MouseAdapter() {
+    public static void configurarBotonCerrar(JFrame ventana, JPanel jBext, JLabel ext,
+                                         Color TCin, Color TCout, Color backin, Color backout,
+                                         boolean esPrin, boolean esC) {
+    
+        // 1. Aseguramos que el fondo se pueda pintar
+        jBext.setOpaque(true);
+        jBext.setBackground(backout);
+        ext.setForeground(TCout);
+
+        // 2. ¡EL TRUCO ESTÁ AQUÍ! 
+        // Le asignamos el evento ÚNICAMENTE a la etiqueta (ext), 
+        // porque al ser del mismo tamaño que el panel, es la que recibe el cursor físicamente.
+        ext.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent evt) {
-                jBext.setBackground(Color.RED);
-                ext.setForeground(Color.WHITE);
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                System.out.println("¡Ratón detectado en: " + ext.getText() + "!");
+                jBext.setBackground(backin); // Pintamos el panel
+                ext.setForeground(TCin);     // Pintamos la letra
             }
 
             @Override
-            public void mouseExited(MouseEvent evt) {
-                jBext.setBackground(Color.WHITE);
-                ext.setForeground(new Color(204, 204, 204));
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jBext.setBackground(backout); // Regresamos al panel normal
+                ext.setForeground(TCout);     // Regresamos a la letra normal
             }
 
             @Override
-            public void mouseClicked(MouseEvent evt) {
-                if (esPrincipal) {
-                    System.exit(0); // Si es el Menú Principal o el Login, apagamos todo.
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Si no está configurado para cerrar, simplemente ignoramos el clic
+                // y dejamos que tu código de NetBeans abra tus ventanas (NR, Molino, etc.)
+                if(!esC){
+                    return;
+                }
+                if (esPrin) {
+                    System.exit(0);
                 } else {
-                    ventana.dispose(); // Si es una sub-ventana, solo cerramos esa ventana.
+                    ventana.dispose();
                 }
             }
         });

@@ -1,8 +1,11 @@
 package com.ometeotl.tlaxcalli.IGU;
 
 import com.ometeotl.tlaxcalli.HerramientasVisuales;
+import static com.ometeotl.tlaxcalli.HerramientasVisuales.configurarBotonCerrar;
 import com.ometeotl.tlaxcalli.LOGICA.C_Login;
 import java.awt.Color;
+import static java.awt.Color.RED;
+import static java.awt.Color.WHITE;
 import java.awt.event.KeyEvent;
 
 public class Login extends javax.swing.JFrame {
@@ -21,7 +24,7 @@ public class Login extends javax.swing.JFrame {
                 + "<br><br> Recuerde cambiar la contraseña</html>");
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel4);
-        HerramientasVisuales.configurarBotonCerrar(this, exbg, jLabel9, true);
+        configurarBotonCerrar(this, exbg, jLabel9, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
         HerramientasVisuales.configurarPlaceholderTexto(usertxt, "Ingrese su usuario");
         HerramientasVisuales.configurarPlaceholderClave(passtst, "**********");
         HerramientasVisuales.configurarSaltoEnter(usertxt, passtst);
