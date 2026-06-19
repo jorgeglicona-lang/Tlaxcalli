@@ -50,7 +50,7 @@ public class CorteDiaService {
                 double totalMasaVendidaRepartidores = ventasDAO.obtenerTotalMasaHoy(con);
                 
                 // Convertimos esos kilos de masa a su equivalente en tortilla usando su factor (16/18)
-                double tortillaQueNoSeHizoPorVenderMasa = totalMasaVendidaRepartidores * (16.0 / 18.0);
+                double tortillaQueNoSeHizoPorVenderMasa = totalMasaVendidaRepartidores;
                 
                 // 4. LA FÓRMULA MAESTRA:
                 // Lo que le queda al Mostrador es: Lo que hizo el molino - Las tortillas que se llevaron - La masa que vendieron

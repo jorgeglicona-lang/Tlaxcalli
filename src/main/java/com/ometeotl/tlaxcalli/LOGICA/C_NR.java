@@ -25,10 +25,8 @@ public class C_NR {
     private double precioMasa = 0.0;
     private double tortillaBaseMostrador = 0.0;
     private final IVentasDAO dao = DAOFactory.getVentasDAO();
-    
-    // <-- Instanciamos el servicio orquestador
+    // Instanciamos el servicio
     private final CorteDiaService corteService = new CorteDiaService(); 
-    
     private Color DatoEx;
     
     public void cargarPreciosBase() {
@@ -172,47 +170,47 @@ public class C_NR {
                                         JRadioButton sMasaS, JCheckBox Pro, JCheckBox Gas, JFrame parent,
                                         JLabel cEntregar, JTable tProd, JTable tGastos){
         // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
-            // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
-            if (!seleccionado.equalsIgnoreCase("Mostrador")) {
-                ActivarCampos(tVenta,tReparto);
-            } else {
-                LimpiarCampos(tVenta,tReparto);
-            }
-            tReparto.setBackground(DatoEx);
-            tVenta.setBackground(DatoEx);
-            // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
-            // Si tiene más de 0 kilos, la habilitamos.
-            double kiloM=corteExistente[2];
-            if (kiloM>0) {
-                ActivarCampos(tMasa,sMasaS);
-                tMasa.setBackground(DatoEx);
-            } else {
-                LimpiarCampos(tMasa);
-            }
-            tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
-            tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
-            tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
-            
-            //️ Llenamos las tablas visuales de productos adicionales y gastos
-            List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
-            List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
-            
-            for (Object[] fila : productosHoy) {
-                modeloProd.addRow(fila);
-            }
-            
-            for (Object[] fila : gastosHoy) {
-                modeloGastos.addRow(fila);
-            }
-            
-            if(modeloGastos.getRowCount()>0) Gas.setSelected(true);
-            if(modeloProd.getRowCount()>0) Pro.setSelected(true);
-            
-            calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
-            
-            showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
-                            + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
-                            + "y gastos en las tablas.","Atencion", INFORMATION_MESSAGE);
+        // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
+        if (!seleccionado.equalsIgnoreCase("Mostrador")) {
+            ActivarCampos(tVenta,tReparto);
+        } else {
+            LimpiarCampos(tVenta,tReparto);
+        }
+        tReparto.setBackground(DatoEx);
+        tVenta.setBackground(DatoEx);
+        // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
+        // Si tiene más de 0 kilos, la habilitamos.
+        double kiloM=corteExistente[2];
+        if (kiloM>0) {
+            ActivarCampos(tMasa,sMasaS);
+            tMasa.setBackground(DatoEx);
+        } else {
+            LimpiarCampos(tMasa);
+        }
+        tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
+        tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
+        tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
+
+        //️ Llenamos las tablas visuales de productos adicionales y gastos
+        List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
+        List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
+
+        for (Object[] fila : productosHoy) {
+            modeloProd.addRow(fila);
+        }
+
+        for (Object[] fila : gastosHoy) {
+            modeloGastos.addRow(fila);
+        }
+
+        if(modeloGastos.getRowCount()>0) Gas.setSelected(true);
+        if(modeloProd.getRowCount()>0) Pro.setSelected(true);
+
+        calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
+
+        showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
+                        + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
+                        + "y gastos en las tablas.","Atencion", INFORMATION_MESSAGE);
     }
     
     private void procesarCorte(String seleccionado, JTextField tVenta, JTextField tReparto,

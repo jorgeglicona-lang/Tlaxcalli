@@ -77,7 +77,7 @@ public class VentasSQLiteDAO implements IVentasDAO {
         }
         // 🧼 ELIMINADO: Ya no hay bloque finally con con.close() aquí, asegurando que la transacción siga viva
     }
-
+    
     private void registrarItem(PreparedStatement ps, int emp, int prod, double cant, double total, String obs) throws SQLException {
         ps.setInt(1, emp);
         ps.setInt(2, prod);
@@ -316,27 +316,16 @@ public class VentasSQLiteDAO implements IVentasDAO {
 
         // Intentamos actualizar la tortilla del mostrador si ya existía el registro hoy
         String sqlUpdate = "UPDATE Ventas_Diarias SET Cantidad = ?, Total_Dinero = ? " +
-                           "WHERE Id_empleado = ? AND Id_producto = 2 AND date(Fecha) = date('now', 'localtime')";
+                           "WHERE Id_empleado = ? AND Id_producto = 2 "
+                            + "AND date(Fecha) = date('now', 'localtime')";
         
         try (PreparedStatement ps = con.prepareStatement(sqlUpdate)) {
             ps.setDouble(1, cantidad);
             ps.setDouble(2, totalDinero);
             ps.setInt(3, idMostrador);
             
-            int filasModificadas = ps.executeUpdate();
+            ps.executeUpdate(); 
             
-            // Si el dueño no ha abierto la ventana del mostrador hoy, no habrá filas que actualizar.
-            // En ese caso, le creamos su registro base autocalculado de una vez:
-            if (filasModificadas == 0) {
-                String sqlInsert = "INSERT INTO Ventas_Diarias (Id_empleado, Id_producto, Fecha, Cantidad, Total_Dinero, Observaciones) " +
-                                   "VALUES (?, 2, datetime('now', 'localtime'), ?, ?, 'Mostrador Autocalculado')";
-                try (PreparedStatement psIns = con.prepareStatement(sqlInsert)) {
-                    psIns.setInt(1, idMostrador);
-                    psIns.setDouble(2, cantidad);
-                    psIns.setDouble(3, totalDinero);
-                    psIns.executeUpdate();
-                }
-            }
             return true;
         } catch (SQLException e) {
             System.err.println("Error en cascada Mostrador SQLite: " + e.getMessage());
