@@ -66,13 +66,14 @@ public class NR extends javax.swing.JFrame {
         });
     }
     
-    // Dentro de NR.java
-    /*public static void main(String[] args) {
-        // Esto lanza la ventana directamente, sin pasar por el login ni el main del sistema
-        java.awt.EventQueue.invokeLater(() -> {
-            new NR().setVisible(true);
-        });
-    }*/
+    public void refreshMostrador() {
+        if (BoxRepartidor.getSelectedItem() != null && 
+            BoxRepartidor.getSelectedItem().toString().equalsIgnoreCase("Mostrador")) {
+            controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,s_masaNo,
+                                                s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
+                                                cb_gastos, cb_producto);
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
