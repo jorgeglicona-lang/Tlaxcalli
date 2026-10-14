@@ -554,10 +554,10 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_t_ventaKeyReleased
 
     private void t_masaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_masaKeyReleased
-        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
         if (BoxRepartidor.getSelectedItem() != null && BoxRepartidor.getSelectedItem().toString().equalsIgnoreCase("Mostrador")) {
             controlador.recalcularMostradorPorMasaFiltro(t_venta, t_masa);
         }
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_t_masaKeyReleased
 
     private void eliminarProd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarProd

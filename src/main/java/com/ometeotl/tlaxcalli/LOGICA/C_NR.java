@@ -83,9 +83,9 @@ public class C_NR {
         double totalGastos = 0.0;
         
         try {
-            if (!tReparto.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tReparto.getText()) * precioReparto;
-            if (!tVenta.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tVenta.getText()) * precioMostrador;
-            if (!tMasa.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tMasa.getText()) * precioMasa;
+            if (!tReparto.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tReparto.getText().trim().replace(",", ".")) * precioReparto;
+            if (!tVenta.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tVenta.getText().trim().replace(",", ".")) * precioMostrador;
+            if (!tMasa.getText().trim().isEmpty()) totalIngresos += Double.parseDouble(tMasa.getText().trim().replace(",", ".")) * precioMasa;
             
             DefaultTableModel modeloProd = (DefaultTableModel) tProd.getModel();
             
@@ -169,29 +169,39 @@ public class C_NR {
                                         DefaultTableModel modeloProd, DefaultTableModel modeloGastos,
                                         JRadioButton sMasaS, JCheckBox Pro, JCheckBox Gas, JFrame parent,
                                         JLabel cEntregar, JTable tProd, JTable tGastos){
-        // ¡SÍ YA EXISTE REGISTRO! Cargamos textos principales
-        // 1. REGLA DE REPARTO/VENTA: Solo el Repartidor puede editar. El Mostrador se queda bloqueado.
-        if (!seleccionado.equalsIgnoreCase("Mostrador")) {
-            ActivarCampos(tVenta,tReparto);
+        IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
+        double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
+        int idMostrador = dao.obtenerIdMostrador();
+        boolean esMostrador = (idEmpleado == idMostrador || seleccionado.equalsIgnoreCase("Mostrador"));
+
+        if (!esMostrador) {
+            ActivarCampos(tVenta, tReparto);
+            tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
+            tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
         } else {
-            LimpiarCampos(tVenta,tReparto);
+            LimpiarCampos(tVenta, tReparto);
+            // Para mostrador: recalculamos el sobrante actual en cascada con la producción y repartos vivos
+            double vendidoReparto = dao.obtenerTotalRepartoHoy();
+            double tortillaPerdidaPorMasa = dao.obtenerTotalMasaHoy();
+            double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
+            if (sobranteMostrador < 0) sobranteMostrador = 0;
+            tortillaBaseMostrador = sobranteMostrador;
+            tReparto.setText("0.0");
+            tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
         }
         tReparto.setBackground(DatoEx);
         tVenta.setBackground(DatoEx);
-        // 2. REGLA DE LA MASA: Leemos el texto de la caja (no el objeto). 
-        // Si tiene más de 0 kilos, la habilitamos.
-        double kiloM=corteExistente[2];
-        if (kiloM>0) {
-            ActivarCampos(tMasa,sMasaS);
+
+        double kiloM = corteExistente[2];
+        if (kiloM > 0) {
+            ActivarCampos(tMasa, sMasaS);
             tMasa.setBackground(DatoEx);
         } else {
             LimpiarCampos(tMasa);
         }
-        tReparto.setText(String.format("%.2f", corteExistente[0]).replace(",", "."));
-        tVenta.setText(String.format("%.2f", corteExistente[1]).replace(",", "."));
-        tMasa.setText(String.format("%.2f", corteExistente[2]).replace(",", "."));
+        tMasa.setText(String.format("%.2f", kiloM).replace(",", "."));
 
-        //️ Llenamos las tablas visuales de productos adicionales y gastos
+        // Llenamos las tablas visuales de productos adicionales y gastos
         List<Object[]> productosHoy = dao.obtenerProductosCorteHoy(idEmpleado);
         List<Object[]> gastosHoy = dao.obtenerGastosCorteHoy(idEmpleado);
 
@@ -210,7 +220,7 @@ public class C_NR {
 
         showMessageDialog(parent, "ℹ️ REGISTRO LOCALIZADO:\nEl empleado " + seleccionado
                         + " ya cuenta con un corte hoy.\nSe han restaurado todos sus datos, productos "
-                        + "y gastos en las tablas.","Atencion", INFORMATION_MESSAGE);
+                        + "y gastos en las tablas.","Atención", INFORMATION_MESSAGE);
     }
     
     private void procesarCorte(String seleccionado, JTextField tVenta, JTextField tReparto,
@@ -231,15 +241,11 @@ public class C_NR {
             return;
         }
 
-        tReparto.setBackground(DatoEx);
-        tVenta.setBackground(DatoEx);
-
         try {
             double vendidoReparto = dao.obtenerTotalRepartoHoy();
             double tortillaPerdidaPorMasa = dao.obtenerTotalMasaHoy();
             double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
             tortillaBaseMostrador = sobranteMostrador; 
-            tVenta.setText(String.format("%.2f", sobranteMostrador).replace(",", "."));
             if (sobranteMostrador < 0) {
                 tVenta.setForeground(RED);
                 showMessageDialog(parent, "❌ ERROR DE BALANCE:\nSe ha vendido más en reparto y masa (" 
@@ -281,9 +287,9 @@ public class C_NR {
         double kReparto = 0, kVenta = 0, kMasa = 0;
         
         try {
-            if (!tReparto.getText().trim().isEmpty()) kReparto = Double.parseDouble(tReparto.getText());
-            if (!tVenta.getText().trim().isEmpty()) kVenta = Double.parseDouble(tVenta.getText());
-            if (!tMasa.getText().trim().isEmpty()) kMasa = Double.parseDouble(tMasa.getText());
+            if (!tReparto.getText().trim().isEmpty()) kReparto = Double.parseDouble(tReparto.getText().trim().replace(",", "."));
+            if (!tVenta.getText().trim().isEmpty()) kVenta = Double.parseDouble(tVenta.getText().trim().replace(",", "."));
+            if (!tMasa.getText().trim().isEmpty()) kMasa = Double.parseDouble(tMasa.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
             showMessageDialog(parent, "❌ Verifica que los kilos sean números válidos.");
             return;
@@ -295,19 +301,44 @@ public class C_NR {
         boolean ignoraProductos = !sPAdicionales.isSelected() && modeloProductos.getRowCount() > 0;
         boolean ignoraGastos = !cGastos.isSelected() && modeloGastos.getRowCount() > 0;
 
-        String mensajeConfirmacion = "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?";
+        int idMostrador = dao.obtenerIdMostrador();
+        boolean esRepartidor = (idEmpleado != idMostrador && !itemSeleccionado.toString().equalsIgnoreCase("Mostrador"));
+        boolean mostradorYaCerro = dao.existeCorteMostradorHoy();
+
+        // Si es un repartidor y Mostrador ya cerró su corte final, advertimos antes de guardar/modificar
+        if (esRepartidor && mostradorYaCerro) {
+            int resp = showConfirmDialog(parent, 
+                "⚠️ AVISO: El Mostrador ya realizó su corte final del día de hoy.\n" +
+                "Al guardar o modificar este registro, los kilos del Mostrador se recalcularán automáticamente en cascada.\n\n" +
+                "¿Desea continuar con el guardado?",
+                "Corte Final de Mostrador Detectado", YES_NO_OPTION, WARNING_MESSAGE);
+            if (resp != YES_OPTION) return;
+        }
+
+        String mensajeConfirmacion;
+        if (!esRepartidor) {
+            if (!mostradorYaCerro) {
+                mensajeConfirmacion = "⚠️ ESTE ES EL GUARDADO FINAL DEL DÍA PARA EL MOSTRADOR.\n\n" +
+                                      "Se consolidará el corte oficial con " + String.format("%.2f", kVenta) + " kg de tortilla sobrante.\n" +
+                                      "¿Estás seguro de realizar el guardado final?";
+            } else {
+                mensajeConfirmacion = "¿Estás seguro de actualizar el corte de Mostrador?";
+            }
+        } else {
+            mensajeConfirmacion = "¿Estás seguro de guardar el corte para: " + itemSeleccionado.toString() + "?";
+        }
 
         if (ignoraProductos) {
-            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay productos en la tabla, pero la casilla 'Productos Adicionales'"
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay productos en la tabla, pero la casilla 'Productos Adicionales' "
                     + "está desactivada. NO SE GUARDARÁN.";
         }
         if (ignoraGastos) {
-            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay gastos en la tabla, pero la casilla 'Gastos' está desactivada."
+            mensajeConfirmacion += "\n\n⚠️ AVISO: Hay gastos en la tabla, pero la casilla 'Gastos' está desactivada. "
                     + "NO SE GUARDARÁN.";
         }
 
-        // Mostramos el cuadro de diálogo (usamos WARNING_MESSAGE si hay avisos, QUESTION_MESSAGE si todo está normal)
-        int tipoMensaje = (ignoraProductos || ignoraGastos) ? WARNING_MESSAGE : QUESTION_MESSAGE;
+        // Mostramos el cuadro de diálogo (usamos WARNING_MESSAGE si hay avisos o es corte final, QUESTION_MESSAGE si todo está normal)
+        int tipoMensaje = (ignoraProductos || ignoraGastos || (!esRepartidor && !mostradorYaCerro)) ? WARNING_MESSAGE : QUESTION_MESSAGE;
         int confirm = showConfirmDialog(parent, mensajeConfirmacion, "Confirmar Guardado", YES_NO_OPTION,
                 tipoMensaje);
         
@@ -325,6 +356,14 @@ public class C_NR {
         }
         
         showMessageDialog(parent, "✅ ¡Corte guardado exitosamente!");
+
+        // Refrescamos en vivo cualquier ventana NR que tenga Mostrador abierto
+        for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
+            if (frame instanceof com.ometeotl.tlaxcalli.IGU.NR nrFrame && nrFrame != parent) {
+                nrFrame.refreshMostrador();
+            }
+        }
+
         // Limpieza general
         sMasa.setSelected(true);
         LimpiarCampos(tReparto,tVenta,tMasa,boxRepartidor,tProd,tGastos);
@@ -345,7 +384,7 @@ public class C_NR {
         try {
             double masaTecleada = 0.0;
             
-            if (!tMasa.getText().trim().isEmpty()) masaTecleada = Double.parseDouble(tMasa.getText());
+            if (!tMasa.getText().trim().isEmpty()) masaTecleada = Double.parseDouble(tMasa.getText().trim().replace(",", "."));
             
             double MF=tortillaBaseMostrador - masaTecleada;
             

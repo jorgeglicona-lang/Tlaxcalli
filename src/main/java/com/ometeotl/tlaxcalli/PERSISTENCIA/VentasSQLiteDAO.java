@@ -35,9 +35,12 @@ public class VentasSQLiteDAO implements IVentasDAO {
             String sqlVenta = "INSERT INTO Ventas_Diarias (Id_empleado, Id_producto, Fecha, Cantidad, Total_Dinero, Observaciones) " +
                               "VALUES (?, ?, datetime('now', 'localtime'), ?, ?, ?)";
             
-            double pReparto = obtenerPrecioProducto(1);
-            double pMostrador = obtenerPrecioProducto(2);
-            double pMasa = obtenerPrecioProducto(3);
+            double pReparto = obtenerPrecioProducto(con, 1);
+            double pMostrador = obtenerPrecioProducto(con, 2);
+            double pMasa = obtenerPrecioProducto(con, 3);
+            if (pReparto == 0) pReparto = 19.0;
+            if (pMostrador == 0) pMostrador = 22.0;
+            if (pMasa == 0) pMasa = 20.0;
 
             try (PreparedStatement psV = con.prepareStatement(sqlVenta)) {
                 if (kTortillaRep > 0) registrarItem(psV, idEmpleado, 1, kTortillaRep, kTortillaRep * pReparto, "Reparto");
@@ -90,10 +93,10 @@ public class VentasSQLiteDAO implements IVentasDAO {
     @Override
     public double obtenerTotalRepartoHoy(Connection con) {
         double total = 0.0;
-        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
-                 "WHERE date(Fecha) = date('now', 'localtime') " +
-                 "AND Id_producto IN (1, 2) " + 
-                 "AND Id_empleado != 2";
+        String sql = "SELECT COALESCE(SUM(Cantidad), 0) FROM Ventas_Diarias " +
+                     "WHERE date(Fecha) = date('now', 'localtime') " +
+                     "AND Id_producto IN (1, 2) " + 
+                     "AND Id_empleado IN (SELECT Id_empleado FROM Empleados WHERE Puesto = 'Repartidor')";
         
         try (PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -110,10 +113,10 @@ public class VentasSQLiteDAO implements IVentasDAO {
     public double obtenerTotalRepartoHoy() {
         CSQLiteConnection conMngr = new CSQLiteConnection();
         double total = 0.0;
-        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
-                 "WHERE date(Fecha) = date('now', 'localtime') " +
-                 "AND Id_producto IN (1, 2) " + 
-                 "AND Id_empleado != 2";
+        String sql = "SELECT COALESCE(SUM(Cantidad), 0) FROM Ventas_Diarias " +
+                     "WHERE date(Fecha) = date('now', 'localtime') " +
+                     "AND Id_producto IN (1, 2) " + 
+                     "AND Id_empleado IN (SELECT Id_empleado FROM Empleados WHERE Puesto = 'Repartidor')";
         
         try (java.sql.Connection con = conMngr.establecerConexionPortatil();
              java.sql.PreparedStatement ps = con.prepareStatement(sql);
@@ -131,10 +134,10 @@ public class VentasSQLiteDAO implements IVentasDAO {
     public double obtenerTotalMasaHoy(Connection con) {
         double total = 0.0;
         // Suma el producto 3 (Masa) vendido por los repartidores hoy
-        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+        String sql = "SELECT COALESCE(SUM(Cantidad), 0) FROM Ventas_Diarias " +
                      "WHERE date(Fecha) = date('now', 'localtime') " +
                      "AND Id_producto = 3 " + 
-                     "AND Id_empleado != 2"; 
+                     "AND Id_empleado IN (SELECT Id_empleado FROM Empleados WHERE Puesto = 'Repartidor')"; 
         try (PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) total = rs.getDouble(1);
@@ -148,12 +151,11 @@ public class VentasSQLiteDAO implements IVentasDAO {
         double total = 0.0;
         
         // Suma el producto 3 (Masa) vendido por los repartidores hoy
-        String sql = "SELECT SUM(Cantidad) FROM Ventas_Diarias " +
+        String sql = "SELECT COALESCE(SUM(Cantidad), 0) FROM Ventas_Diarias " +
                      "WHERE date(Fecha) = date('now', 'localtime') " +
                      "AND Id_producto = 3 " + 
-                     "AND Id_empleado != 2"; 
+                     "AND Id_empleado IN (SELECT Id_empleado FROM Empleados WHERE Puesto = 'Repartidor')"; 
                      
-        // 🛠️ CORREGIDO: Abrimos la conexión propia dentro del try
         try (Connection con = conMngr.establecerConexionPortatil();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -264,7 +266,11 @@ public class VentasSQLiteDAO implements IVentasDAO {
     public List<Object[]> obtenerProductosCorteHoy(int idEmpleado) {
         List<Object[]> lista = new ArrayList<>();
         CSQLiteConnection conMngr = new CSQLiteConnection();
-        String sql = "SELECT v.Id_producto, p.Nom_producto, v.Cantidad, p.Precio, v.Total_Dinero " +
+        String sql = "SELECT v.Id_producto, " +
+                     "CASE WHEN p.Es_Comodin = 1 AND v.Observaciones IS NOT NULL AND v.Observaciones != '' THEN v.Observaciones ELSE p.Nom_producto END AS Nom_mostrar, " +
+                     "v.Cantidad, " +
+                     "CASE WHEN p.Es_Comodin = 1 AND v.Cantidad > 0 THEN (v.Total_Dinero / v.Cantidad) ELSE p.Precio END AS Precio_unitario, " +
+                     "v.Total_Dinero " +
                      "FROM Ventas_Diarias v " +
                      "JOIN Productos p ON v.Id_producto = p.Id_producto " +
                      "WHERE v.Id_empleado = ? AND date(v.Fecha) = date('now', 'localtime') AND v.Id_producto > 3";
@@ -276,9 +282,9 @@ public class VentasSQLiteDAO implements IVentasDAO {
                 while (rs.next()) {
                     Object[] fila = new Object[5];
                     fila[0] = rs.getInt("Id_producto");
-                    fila[1] = rs.getString("Nom_producto");
+                    fila[1] = rs.getString("Nom_mostrar");
                     fila[2] = rs.getDouble("Cantidad");
-                    fila[3] = rs.getDouble("Precio");
+                    fila[3] = rs.getDouble("Precio_unitario");
                     fila[4] = rs.getDouble("Total_Dinero");
                     lista.add(fila);
                 }
@@ -310,11 +316,10 @@ public class VentasSQLiteDAO implements IVentasDAO {
     
     @Override
     public boolean actualizarKilosMostrador(Connection con, int idMostrador, double cantidad) {
-        double pMostrador = obtenerPrecioProducto(2);
+        double pMostrador = obtenerPrecioProducto(con, 2);
         if (pMostrador == 0) pMostrador = 22.0;
         double totalDinero = cantidad * pMostrador;
 
-        // Intentamos actualizar la tortilla del mostrador si ya existía el registro hoy
         String sqlUpdate = "UPDATE Ventas_Diarias SET Cantidad = ?, Total_Dinero = ? " +
                            "WHERE Id_empleado = ? AND Id_producto = 2 "
                             + "AND date(Fecha) = date('now', 'localtime')";
@@ -325,10 +330,72 @@ public class VentasSQLiteDAO implements IVentasDAO {
             ps.setInt(3, idMostrador);
             
             ps.executeUpdate(); 
-            
             return true;
         } catch (SQLException e) {
             System.err.println("Error en cascada Mostrador SQLite: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public double obtenerPrecioProducto(Connection con, int idProducto) {
+        String sql = "SELECT Precio FROM Productos WHERE Id_producto = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getDouble("Precio");
+            }
+        } catch (Exception e) {
+            System.err.println("Error obteniendo precio con Connection: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
+    @Override
+    public int obtenerIdMostrador(Connection con) {
+        String sql = "SELECT Id_empleado FROM Empleados WHERE Puesto = 'Mostrador' LIMIT 1";
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.err.println("Error obteniendo ID Mostrador: " + e.getMessage());
+        }
+        return 3; // Respaldo por defecto
+    }
+
+    @Override
+    public int obtenerIdMostrador() {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        try (Connection con = conMngr.establecerConexionPortatil()) {
+            return obtenerIdMostrador(con);
+        } catch (Exception e) {
+            return 3;
+        }
+    }
+
+    @Override
+    public boolean existeCorteMostradorHoy(Connection con) {
+        int idMostrador = obtenerIdMostrador(con);
+        String sql = "SELECT 1 FROM Ventas_Diarias WHERE Id_empleado = ? AND date(Fecha) = date('now', 'localtime') LIMIT 1";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idMostrador);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.err.println("Error verificando si Mostrador tiene corte hoy: " + e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existeCorteMostradorHoy() {
+        CSQLiteConnection conMngr = new CSQLiteConnection();
+        try (Connection con = conMngr.establecerConexionPortatil()) {
+            return existeCorteMostradorHoy(con);
+        } catch (Exception e) {
             return false;
         }
     }

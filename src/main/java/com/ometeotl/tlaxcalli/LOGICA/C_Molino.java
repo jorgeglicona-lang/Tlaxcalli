@@ -3,6 +3,7 @@ package com.ometeotl.tlaxcalli.LOGICA;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.DAOFactory;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IMolinoDAO;
 import com.ometeotl.tlaxcalli.PERSISTENCIA.Servicios.CorteDiaService; // Importamos el servicio
+import com.ometeotl.tlaxcalli.PERSISTENCIA.Interfaces.IVentasDAO;
 import java.awt.Color;
 import javax.swing.JFrame;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
@@ -14,6 +15,7 @@ import javax.swing.JTextField;
 
 public class C_Molino {
     private final IMolinoDAO dao = DAOFactory.getMolinoDAO();
+    private final IVentasDAO ventasDao = DAOFactory.getVentasDAO();
     // Instanciamos el servicio orquestador
     private final CorteDiaService corteService = new CorteDiaService(); 
     
@@ -37,9 +39,21 @@ public class C_Molino {
 
     public void procesarGuardado(JFrame ventana, String botesStr, String harinaStr, String despStr) {
         try {
-            double botesNew = Double.parseDouble(botesStr);
-            double harinaNew = Double.parseDouble(harinaStr);
-            double despNew = Double.parseDouble(despStr);
+            double botesNew = Double.parseDouble(botesStr.trim().replace(",", "."));
+            double harinaNew = Double.parseDouble(harinaStr.trim().replace(",", "."));
+            double despNew = Double.parseDouble(despStr.trim().replace(",", "."));
+            
+            // Si el Mostrador ya hizo su corte final hoy, advertimos al usuario antes de modificar
+            if (ventasDao.existeCorteMostradorHoy()) {
+                int resp = showConfirmDialog(ventana, 
+                    "⚠️ AVISO: El Mostrador ya realizó su corte final del día de hoy.\n" +
+                    "Si actualiza la producción del Molino, los kilos del Mostrador se recalcularán automáticamente en cascada.\n\n" +
+                    "¿Desea continuar con la modificación?",
+                    "Corte Final de Mostrador Detectado", YES_NO_OPTION, WARNING_MESSAGE);
+                if (resp != YES_OPTION) {
+                    return;
+                }
+            }
             
             // --- REGLAS DE NEGOCIO MATEMÁTICAS ---
             double KILOS_MASA_POR_BOTE = 19.0; 

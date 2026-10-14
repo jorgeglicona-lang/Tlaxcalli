@@ -18,6 +18,12 @@ public interface IVentasDAO {
     List<GastoItem> obtenerGastosParaVenta();
     double[] obtenerCorteEmpleadoHoy(int idEmpleado);
     double obtenerPrecioProducto(int idProducto);
+    double obtenerPrecioProducto(Connection con, int idProducto);
+    
+    int obtenerIdMostrador();
+    int obtenerIdMostrador(Connection con);
+    boolean existeCorteMostradorHoy();
+    boolean existeCorteMostradorHoy(Connection con);
     
     List<Object[]> obtenerProductosCorteHoy(int idEmpleado);
     List<Object[]> obtenerGastosCorteHoy(int idEmpleado);

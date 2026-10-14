@@ -27,22 +27,25 @@ public class CorteDiaService {
                 throw new SQLException("Fallo interno al guardar los datos del corte.");
             }
 
-            int ID_MOSTRADOR = 2; 
+            int idMostrador = ventasDAO.obtenerIdMostrador(con);
 
-            if (idEmpleado != ID_MOSTRADOR) {
+            if (idEmpleado != idMostrador) {
+                // Solo si Mostrador ya cerró su corte se actualiza en la BD; 
+                // mientras tanto, los kilos de Mostrador se mantienen dinámicos en cascada
+                boolean mostradorYaGuardo = ventasDAO.existeCorteMostradorHoy(con);
                 
-                double produccionBrutaTortilla = molinoDAO.obtenerTotalTortillaHoy(con);
-                double totalTortillaVendidaRepartidores = ventasDAO.obtenerTotalRepartoHoy(con);
-                double totalMasaVendidaRepartidores = ventasDAO.obtenerTotalMasaHoy(con);
-                double tortillaQueNoSeHizoPorVenderMasa = totalMasaVendidaRepartidores * (16.0 / 18.0);
-                double sobranteMostrador = produccionBrutaTortilla - totalTortillaVendidaRepartidores - tortillaQueNoSeHizoPorVenderMasa;
-                
-                if (sobranteMostrador < 0) sobranteMostrador = 0; 
-                
-                boolean exitoCascada = ventasDAO.actualizarKilosMostrador(con, ID_MOSTRADOR, sobranteMostrador);
-                
-                if (!exitoCascada) {
-                    throw new SQLException("Fallo al aplicar el efecto cascada en el Mostrador.");
+                if (mostradorYaGuardo) {
+                    double produccionBrutaTortilla = molinoDAO.obtenerTotalTortillaHoy(con);
+                    double totalTortillaVendidaRepartidores = ventasDAO.obtenerTotalRepartoHoy(con);
+                    double tortillaQueNoSeHizoPorVenderMasa = ventasDAO.obtenerTotalMasaHoy(con);
+                    
+                    double sobranteMostrador = produccionBrutaTortilla - totalTortillaVendidaRepartidores - tortillaQueNoSeHizoPorVenderMasa;
+                    if (sobranteMostrador < 0) sobranteMostrador = 0; 
+                    
+                    boolean exitoCascada = ventasDAO.actualizarKilosMostrador(con, idMostrador, sobranteMostrador);
+                    if (!exitoCascada) {
+                        throw new SQLException("Fallo al aplicar el efecto cascada en el Mostrador.");
+                    }
                 }
             }
 
@@ -71,16 +74,19 @@ public class CorteDiaService {
             con = conMngr.establecerConexionPortatil();
             con.setAutoCommit(false); 
 
-            int ID_MOSTRADOR = 2;
-            double produccionBrutaTortilla = molinoDAO.obtenerTotalTortillaHoy(con);
-            double totalTortillaVendidaRepartidores = ventasDAO.obtenerTotalRepartoHoy(con);
-            double totalMasaVendidaRepartidores = ventasDAO.obtenerTotalMasaHoy(con);
-            double tortillaQueNoSeHizoPorVenderMasa = totalMasaVendidaRepartidores * (16.0 / 18.0);
-            double sobranteMostrador = produccionBrutaTortilla - totalTortillaVendidaRepartidores - tortillaQueNoSeHizoPorVenderMasa;
-            
-            if (sobranteMostrador < 0) sobranteMostrador = 0;
+            int idMostrador = ventasDAO.obtenerIdMostrador(con);
+            boolean mostradorYaGuardo = ventasDAO.existeCorteMostradorHoy(con);
 
-            ventasDAO.actualizarKilosMostrador(con, ID_MOSTRADOR, sobranteMostrador);
+            if (mostradorYaGuardo) {
+                double produccionBrutaTortilla = molinoDAO.obtenerTotalTortillaHoy(con);
+                double totalTortillaVendidaRepartidores = ventasDAO.obtenerTotalRepartoHoy(con);
+                double tortillaQueNoSeHizoPorVenderMasa = ventasDAO.obtenerTotalMasaHoy(con);
+                
+                double sobranteMostrador = produccionBrutaTortilla - totalTortillaVendidaRepartidores - tortillaQueNoSeHizoPorVenderMasa;
+                if (sobranteMostrador < 0) sobranteMostrador = 0;
+
+                ventasDAO.actualizarKilosMostrador(con, idMostrador, sobranteMostrador);
+            }
 
             con.commit();
             return true;
