@@ -66,13 +66,14 @@ public class NR extends javax.swing.JFrame {
         });
     }
     
-    // Dentro de NR.java
-    /*public static void main(String[] args) {
-        // Esto lanza la ventana directamente, sin pasar por el login ni el main del sistema
-        java.awt.EventQueue.invokeLater(() -> {
-            new NR().setVisible(true);
-        });
-    }*/
+    public void refreshMostrador() {
+        if (BoxRepartidor.getSelectedItem() != null && 
+            BoxRepartidor.getSelectedItem().toString().equalsIgnoreCase("Mostrador")) {
+            controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,s_masaNo,
+                                                s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
+                                                cb_gastos, cb_producto);
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -553,10 +554,10 @@ public class NR extends javax.swing.JFrame {
     }//GEN-LAST:event_t_ventaKeyReleased
 
     private void t_masaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_masaKeyReleased
-        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
         if (BoxRepartidor.getSelectedItem() != null && BoxRepartidor.getSelectedItem().toString().equalsIgnoreCase("Mostrador")) {
             controlador.recalcularMostradorPorMasaFiltro(t_venta, t_masa);
         }
+        controlador.calcularTotalAPagar(t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
     }//GEN-LAST:event_t_masaKeyReleased
 
     private void eliminarProd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarProd

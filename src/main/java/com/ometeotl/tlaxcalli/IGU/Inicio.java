@@ -37,10 +37,10 @@ public class Inicio extends javax.swing.JFrame {
         
         HerramientasVisuales.configurarBarraArrastre(this, jPanel3);
         configurarBotonCerrar(this, jBext, ext, WHITE,new Color(204, 204, 204), RED, WHITE,false,true);
-        configurarBotonCerrar(this, jPBoton1, b_registros, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
-        configurarBotonCerrar(this, jPBoton2, b_reportes, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
-        configurarBotonCerrar(this, jPBoton3, b_empleados, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
-        configurarBotonCerrar(this, jPBoton4, jLabel1, WHITE, WHITE,new Color(35,140,35), new Color(240,178,70),false,false);
+        configurarBotonCerrar(this, jPBoton1, b_registros, WHITE, WHITE,new Color(35,140,35), new Color(255,215,41),false,false);
+        configurarBotonCerrar(this, jPBoton2, b_reportes, WHITE, WHITE,new Color(35,140,35), new Color(255,215,41),false,false);
+        configurarBotonCerrar(this, jPBoton3, b_empleados, WHITE, WHITE,new Color(35,140,35), new Color(255,215,41),false,false);
+        configurarBotonCerrar(this, jPBoton4, jLabel1, WHITE, WHITE,new Color(35,140,35), new Color(255,215,41),false,false);
     }
     
     private void limpiaT(){
@@ -87,16 +87,15 @@ public class Inicio extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(240, 178, 70));
+        jPanel2.setBackground(new java.awt.Color(255, 215, 41));
         jPanel2.setPreferredSize(new java.awt.Dimension(250, 550));
 
         Name.setFont(new java.awt.Font("Roboto Black", 0, 26)); // NOI18N
         Name.setForeground(new java.awt.Color(255, 255, 255));
         Name.setText("Tlaxcalli");
 
-        jPBoton1.setBackground(new java.awt.Color(240, 178, 70));
+        jPBoton1.setBackground(new java.awt.Color(255, 215, 41));
         jPBoton1.setPreferredSize(new java.awt.Dimension(250, 70));
 
         b_registros.setBackground(new java.awt.Color(40, 195, 20));
@@ -122,7 +121,7 @@ public class Inicio extends javax.swing.JFrame {
             .addComponent(b_registros, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
 
-        jPBoton2.setBackground(new java.awt.Color(240, 178, 70));
+        jPBoton2.setBackground(new java.awt.Color(255, 215, 41));
         jPBoton2.setPreferredSize(new java.awt.Dimension(250, 70));
 
         b_reportes.setBackground(new java.awt.Color(40, 195, 20));
@@ -148,7 +147,7 @@ public class Inicio extends javax.swing.JFrame {
             .addComponent(b_reportes, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
 
-        jPBoton3.setBackground(new java.awt.Color(240, 178, 70));
+        jPBoton3.setBackground(new java.awt.Color(255, 215, 41));
         jPBoton3.setPreferredSize(new java.awt.Dimension(250, 70));
 
         b_empleados.setBackground(new java.awt.Color(40, 195, 20));
@@ -174,7 +173,7 @@ public class Inicio extends javax.swing.JFrame {
             .addComponent(b_empleados, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
 
-        jPBoton4.setBackground(new java.awt.Color(240, 178, 70));
+        jPBoton4.setBackground(new java.awt.Color(255, 215, 41));
         jPBoton4.setPreferredSize(new java.awt.Dimension(250, 70));
 
         jLabel1.setBackground(new java.awt.Color(40, 195, 20));
@@ -236,8 +235,6 @@ public class Inicio extends javax.swing.JFrame {
                 .addContainerGap(158, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
-
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         jBext.setBackground(new java.awt.Color(255, 255, 255));
@@ -274,13 +271,13 @@ public class Inicio extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 40));
-
+        nomU.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         nomU.setText("Nombre");
-        jPanel1.add(nomU, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 90, -1, -1));
+        nomU.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
+        negocio.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         negocio.setText("negocio");
-        jPanel1.add(negocio, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 140, -1, -1));
+        negocio.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         tablaProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -306,15 +303,12 @@ public class Inicio extends javax.swing.JFrame {
 
         panelPestanias.addTab("Catalogo Gastos", jScrollPane2);
 
-        jPanel1.add(panelPestanias, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 240, 580, 280));
-
         b_agregar.setText("Agregar");
         b_agregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 b_agregarActionPerformed(evt);
             }
         });
-        jPanel1.add(b_agregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 200, 80, 30));
 
         b_modificar.setText("Modificar");
         b_modificar.addActionListener(new java.awt.event.ActionListener() {
@@ -322,7 +316,6 @@ public class Inicio extends javax.swing.JFrame {
                 b_modificarActionPerformed(evt);
             }
         });
-        jPanel1.add(b_modificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 200, -1, 30));
 
         b_eliminar.setText("Eliminar");
         b_eliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -330,7 +323,52 @@ public class Inicio extends javax.swing.JFrame {
                 b_eliminarActionPerformed(evt);
             }
         });
-        jPanel1.add(b_eliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 200, -1, 30));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(panelPestanias, javax.swing.GroupLayout.PREFERRED_SIZE, 580, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(nomU, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                        .addGap(310, 310, 310)
+                                        .addComponent(b_agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(10, 10, 10)
+                                .addComponent(b_modificar)
+                                .addGap(19, 19, 19)
+                                .addComponent(b_eliminar)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(negocio)
+                        .addGap(295, 295, 295))))
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(55, 55, 55)
+                .addComponent(nomU)
+                .addGap(18, 18, 18)
+                .addComponent(negocio)
+                .addGap(55, 55, 55)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(b_agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(b_modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(b_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addComponent(panelPestanias, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 550));
 

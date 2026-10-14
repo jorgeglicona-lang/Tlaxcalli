@@ -42,7 +42,8 @@ public class MolinoSQLiteDAO implements IMolinoDAO {
     @Override
     public double obtenerTotalTortillaHoy(Connection con) {
         double total = 0.0;
-        String sql = "SELECT SUM(Tortilla_Elaborada_Kg) FROM Produccion_Diaria WHERE Fecha = date('now', 'localtime')";
+        String sql = "SELECT SUM(Tortilla_Elaborada_Kg) FROM Produccion_Diaria "
+                + "WHERE Fecha = date('now', 'localtime')";
         
         try (PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
