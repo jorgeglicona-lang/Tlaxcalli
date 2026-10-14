@@ -14,19 +14,32 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class CSQLiteConnection {
     
     private final String DB_NAME = "tlaxcalli.db";
+    private static String urlOverride = null;
+
+    public static void setUrlOverride(String url) {
+        urlOverride = url;
+    }
+
+    public static String getUrlOverride() {
+        return urlOverride;
+    }
     
     public Connection establecerConexionPortatil() {
         Connection con = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            String url = "jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME;
+            String url = (urlOverride != null) ? urlOverride : ("jdbc:sqlite:" + System.getProperty("user.dir") + separator + DB_NAME);
             con = DriverManager.getConnection(url);
             try (Statement pragma = con.createStatement()) {
                 pragma.execute("PRAGMA foreign_keys = ON;");
             }
         } catch (SQLException e) {
-            showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
-                "Error de Sistema", ERROR_MESSAGE);
+            if (urlOverride == null) {
+                showMessageDialog(null, "❌ Error crítico al conectar la BD:\n" + e.getMessage(), 
+                    "Error de Sistema", ERROR_MESSAGE);
+            } else {
+                System.err.println("Error en test de conexión SQLite: " + e.getMessage());
+            }
         } catch (ClassNotFoundException ex) {
             System.getLogger(CSQLiteConnection.class.getName()).log(ERROR, (String) null, ex);
         }

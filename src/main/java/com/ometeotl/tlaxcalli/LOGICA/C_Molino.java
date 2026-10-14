@@ -76,9 +76,8 @@ public class C_Molino {
                 // ⚡ Intentamos sincronizar el mostrador por si acaso
                 corteService.sincronizarMostradorPasivo();
                 for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
-                    if (frame instanceof com.ometeotl.tlaxcalli.IGU.NR) {
-                        ((com.ometeotl.tlaxcalli.IGU.NR) frame).refreshMostrador();
-                        break;
+                    if (frame instanceof com.ometeotl.tlaxcalli.IGU.NR nrFrame) {
+                        nrFrame.refreshMostrador();
                     }
                 }
                 showMessageDialog(ventana, "✅ Producción del día registrada con éxito.");
@@ -112,9 +111,8 @@ public class C_Molino {
             } 
             corteService.sincronizarMostradorPasivo();
             for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
-                if (frame instanceof com.ometeotl.tlaxcalli.IGU.NR) {
-                    ((com.ometeotl.tlaxcalli.IGU.NR) frame).refreshMostrador();
-                    break;
+                if (frame instanceof com.ometeotl.tlaxcalli.IGU.NR nrFrame) {
+                    nrFrame.refreshMostrador();
                 }
             }
             showMessageDialog(ventana, "✅ Datos actualizados correctamente.");

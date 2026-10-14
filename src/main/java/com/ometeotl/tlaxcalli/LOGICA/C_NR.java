@@ -396,4 +396,54 @@ public class C_NR {
             // Evitamos que truene si el usuario borra todo o deja el campo vacío
         }
     }
+
+    public int obtenerIdMostrador() {
+        return dao.obtenerIdMostrador();
+    }
+
+    public void refrescarKilosMostradorEnVivo(JFrame parent, JTextField tReparto, JTextField tVenta, 
+                                             JTextField tMasa, JTable tProd, JTable tGastos, JLabel cEntregar) {
+        IMolinoDAO molinoDao = DAOFactory.getMolinoDAO();
+        double produccionTotal = molinoDao.obtenerTotalTortillaHoy();
+
+        if (produccionTotal <= 0) {
+            tReparto.setText("0.0");
+            tVenta.setText("0.0");
+            cEntregar.setText("Total a Entregar: $0.00");
+            return;
+        }
+
+        try {
+            double vendidoReparto = dao.obtenerTotalRepartoHoy();
+            double tortillaPerdidaPorMasa = dao.obtenerTotalMasaHoy();
+            double sobranteMostrador = produccionTotal - vendidoReparto - tortillaPerdidaPorMasa;
+            if (sobranteMostrador < 0) sobranteMostrador = 0;
+            tortillaBaseMostrador = sobranteMostrador;
+
+            double masaActual = 0.0;
+            if (!tMasa.getText().trim().isEmpty()) {
+                try {
+                    masaActual = Double.parseDouble(tMasa.getText().trim().replace(",", "."));
+                } catch (NumberFormatException e) { }
+            }
+
+            double ventaFinal = sobranteMostrador - masaActual;
+            if (ventaFinal < 0) ventaFinal = 0;
+
+            tReparto.setText("0.0");
+            tVenta.setText(String.format("%.2f", ventaFinal).replace(",", "."));
+
+            if (dao.existeCorteMostradorHoy()) {
+                if (DatoEx == null) DatoEx = new Color(190, 250, 180);
+                tReparto.setBackground(DatoEx);
+                tVenta.setBackground(DatoEx);
+            }
+
+            // Recalcular inmediatamente el Total a Entregar
+            calcularTotalAPagar(tReparto, tVenta, tMasa, tProd, tGastos, cEntregar);
+
+        } catch (Exception e) {
+            System.err.println("Error refrescando Mostrador en vivo: " + e.getMessage());
+        }
+    }
 }
