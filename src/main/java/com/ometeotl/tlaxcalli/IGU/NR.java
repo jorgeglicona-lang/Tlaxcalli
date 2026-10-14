@@ -67,11 +67,15 @@ public class NR extends javax.swing.JFrame {
     }
     
     public void refreshMostrador() {
-        if (BoxRepartidor.getSelectedItem() != null && 
-            BoxRepartidor.getSelectedItem().toString().equalsIgnoreCase("Mostrador")) {
-            controlador.procesarSeleccionRepartidor(this, BoxRepartidor, t_reparto, t_venta, t_masa, s_masaSi,s_masaNo,
-                                                s_PAdicionales, c_Gastos,tabla_detalles, tabla_gastos, c_entregar,
-                                                cb_gastos, cb_producto);
+        Object item = BoxRepartidor.getSelectedItem();
+        if (item != null) {
+            String str = item.toString().trim();
+            int idMostrador = controlador.obtenerIdMostrador();
+            boolean esMostrador = str.equalsIgnoreCase("Mostrador") 
+                    || (item instanceof com.ometeotl.tlaxcalli.LOGICA.EmpleadoItem emp && emp.getId() == idMostrador);
+            if (esMostrador) {
+                controlador.refrescarKilosMostradorEnVivo(this, t_reparto, t_venta, t_masa, tabla_detalles, tabla_gastos, c_entregar);
+            }
         }
     }
     @SuppressWarnings("unchecked")
